@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-Use Str;
-Use Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class SessionsController extends Controller
             'password' => 'required'
         ]);
 
-        if (! auth()->attempt($attributes)) {
+        if (! Auth::attempt($attributes)) {
             throw ValidationException::withMessages([
                 'email' => 'Your provided credentials could not be verified.'
             ]);
@@ -33,7 +33,6 @@ class SessionsController extends Controller
         session()->regenerate();
 
         return redirect('/dashboard');
-
     }
 
     public function show(){
@@ -79,7 +78,7 @@ class SessionsController extends Controller
 
     public function destroy()
     {
-        auth()->logout();
+        Auth::logout();
 
         return redirect('/sign-in');
     }

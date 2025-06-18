@@ -10,6 +10,26 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\InventoryController;
+
+Route::middleware(['auth'])->prefix('inventory')->group(function () {
+    Route::get('/', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/add', [InventoryController::class, 'create'])->name('inventory.create');
+    Route::post('/store', [InventoryController::class, 'store'])->name('inventory.store');
+});
+
+use App\Http\Controllers\SalesController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+    Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+    Route::get('/sales/history', [SalesController::class, 'history'])->name('sales.history');
+    Route::get('/sales/status', [SalesController::class, 'status'])->name('sales.status');
+});
+
+Route::middleware(['auth', 'admin'])->get('/admin/sales-report', [SalesController::class, 'report'])->name('admin.sales.report');
+
+
             
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 Route::get('sign-up', [RegisterController::class, 'create'])->middleware('guest')->name('register');

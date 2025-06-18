@@ -17,7 +17,9 @@
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Laravel examples</h6>
             </li>
-            <li class="nav-item">
+            
+            {{-- <li class="nav-item">
+                <a clas<li class="nav-item">
                 <a class="nav-link text-white {{ $activePage == 'user-profile' ? 'active bg-gradient-primary' : '' }} "
                     href="{{ route('user-profile') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -110,14 +112,31 @@
                         <i class="material-icons opacity-10">login</i>
                     </div>
                     <span class="nav-link-text ms-1">Sign In</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white " href="{{ route('static-sign-up') }}">
+                </a> --}}
+            {{-- </li> --}}
+            {{-- <a  class="nav-link text-white " href="{{ route('static-sign-up') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">assignment</i>
                     </div>
-                    <span class="nav-link-text ms-1">Sign Up</span>
+                    <span class="nav-link-text ms-1">Inventory</span>
+                </a> --}}
+            {{-- </li> --}}
+            <li class="nav-item">
+    <a class="nav-link text-white {{ $activePage == 'inventory' ? ' active bg-gradient-primary' : '' }}"
+        href="{{ route('inventory.index') }}">
+        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">inventory_2</i>
+        </div>
+        <span class="nav-link-text ms-1">Inventory</span>
+    </a>
+</li>
+<li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'sales' ? ' active bg-gradient-primary' : '' }}"
+                    href="{{ route('sales.index') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">point_of_sale</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Sales</span>
                 </a>
             </li>
         </ul>
