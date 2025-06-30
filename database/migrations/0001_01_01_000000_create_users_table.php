@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->text('about')->nullable();
             $table->string('password');
+            $table->tinyInteger('role_as')->default('0');
             $table->rememberToken();
             $table->timestamps();
         });
