@@ -1,5 +1,9 @@
 @props(['activePage'])
 
+@php
+    $user = auth()->user();
+@endphp
+
 <aside
     class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark"
     id="sidenav-main">
@@ -47,6 +51,17 @@
                     <span class="nav-link-text ms-1">Dashboard</span>
                 </a>
             </li>
+            @if($user && $user->role_as == 1)
+            <li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'admin-users' ? ' active bg-gradient-primary' : '' }} "
+                    href="{{ route('admin.users') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user-shield fa-lg ps-2 pe-2 text-center"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Manage User Roles</span>
+                </a>
+            </li>
+            @endif
             <li class="nav-item">
                 <a class="nav-link text-white {{ $activePage == 'tables' ? ' active bg-gradient-primary' : '' }} "
                     href="{{ route('tables') }}">
@@ -90,6 +105,23 @@
                         <i class="material-icons opacity-10">notifications</i>
                     </div>
                     <span class="nav-link-text ms-1">Notifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{{ route('vendor.apply') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-store fa-lg ps-2 pe-2 text-center"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Apply as Vendor</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'vendor-status' ? 'active bg-gradient-primary' : '' }} "
+                    href="{{ route('vendor.status') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-info-circle fa-lg ps-2 pe-2 text-center"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Vendor Application Status</span>
                 </a>
             </li>
             <li class="nav-item mt-3">
