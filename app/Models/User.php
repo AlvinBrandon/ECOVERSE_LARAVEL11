@@ -25,7 +25,8 @@ class User extends Authenticatable
         'location',
         'phone',
         'about',
-        'password_confirmation'
+        'password_confirmation',
+        'role'
     ];
 
     /**
@@ -57,4 +58,8 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function isAdmin() { return $this->role === 'admin'; }
+    public function isSupplier() { return $this->role === 'supplier'; }
+    public function isStaff() { return $this->role === 'staff'; }
+    public function isWholesaler() { return $this->role === 'wholesaler'; }
 }

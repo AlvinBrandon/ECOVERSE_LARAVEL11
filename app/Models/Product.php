@@ -20,6 +20,7 @@ class Product extends Model
 } 
         'type',
         'price',
+        'image',
     ];
 
     public function sales()
@@ -30,5 +31,10 @@ class Product extends Model
     public function inventory()
     {
         return $this->hasOne(Inventory::class);
+    }
+
+    public function inventories()
+    {
+        return $this->hasMany(\App\Models\Inventory::class);
     }
 }

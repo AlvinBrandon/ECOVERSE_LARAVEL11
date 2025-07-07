@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@material.com',
-            'password' => Hash::make('secret')
-        ]);
+        // User::factory()->create([
+        //    'name' => 'Admin',
+        //    'email' => 'admin@material.com',
+        //    'password' => Hash::make('secret')
+        //]);
         // Remove old products and inventory
         // Disable foreign key checks for MySQL
         if (app()->environment('local') && \DB::getDriverName() === 'mysql') {
@@ -42,5 +42,7 @@ class DatabaseSeeder extends Seeder
                 'quantity' => rand(10, 100),
             ]);
         });
+        $this->call(RawMaterialInventorySeeder::class);
+        $this->call(UserSeeder::class);
     }
 }

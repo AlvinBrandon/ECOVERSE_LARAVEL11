@@ -23,28 +23,58 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\StockTransferController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RawMaterialController;
+use Illuminate\Support\Facades\Auth;
 
-Route::middleware(['auth'])->prefix('inventory')->group(function () {
+Route::middleware(['auth', 'role:supplier,admin,staff'])->prefix('supplier')->group(function () {
+    Route::resource('raw-materials', RawMaterialController::class);
+});
+
+Route::middleware(['auth', 'role:admin,staff'])->prefix('inventory')->group(function () {
     Route::get('/', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/add', [InventoryController::class, 'create'])->name('inventory.create');
     Route::post('/store', [InventoryController::class, 'store'])->name('inventory.store');
+    Route::get('/deduct', [InventoryController::class, 'deductForm'])->name('inventory.deductForm');
+    Route::post('/deduct', [InventoryController::class, 'deduct'])->name('inventory.deduct');
+    Route::get('/history', [InventoryController::class, 'history'])->name('inventory.history');
+    Route::get('/export/csv', [InventoryController::class, 'export'])->name('inventory.export.csv');
+    Route::get('/analytics', [InventoryController::class, 'analytics'])->name('inventory.analytics');
 });
 
-use App\Http\Controllers\SalesController;
-
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:admin,staff,retailer,wholesaler,customer'])->group(function () {
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
     Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
     Route::get('/sales/history', [SalesController::class, 'history'])->name('sales.history');
     Route::get('/sales/status', [SalesController::class, 'status'])->name('sales.status');
+    Route::get('/sales/analytics', [SalesController::class, 'analytics'])->name('sales.analytics');
+    Route::get('/sales/{id}/invoice', [SalesController::class, 'invoice'])->name('sales.invoice');
 });
 
-Route::middleware(['auth', 'admin'])->get('/admin/sales-report', [SalesController::class, 'report'])->name('admin.sales.report');
+Route::middleware(['auth', 'role:admin'])->get('/admin/sales-report', [SalesController::class, 'report'])->name('admin.sales.report');
 
 
+Route::middleware(['auth', 'role:admin,staff'])->group(function () {
+    Route::get('/stock-transfer', [StockTransferController::class, 'create'])->name('stock_transfer.create');
+    Route::post('/stock-transfer', [StockTransferController::class, 'store'])->name('stock_transfer.store');
+    Route::resource('customers', CustomerController::class);
+});
 
-            
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
+Route::get('/dashboard', function () {
+    $role = Auth::check() ? Auth::user()->role : 'customer';
+	// dd($role);
+    $view = match($role) {
+        'admin' => 'dashboards.admin',
+        'staff' => 'dashboards.staff',
+        'supplier' => 'dashboards.supplier',
+        'retailer' => 'dashboards.retailer',
+        'wholesaler' => 'dashboards.wholesaler',
+        default => 'dashboards.customer',
+    };
+    return view($view);
+})->middleware('auth')->name('dashboard');
 Route::get('sign-up', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 
 Route::post('sign-up', [RegisterController::class, 'store'])->middleware('guest');
