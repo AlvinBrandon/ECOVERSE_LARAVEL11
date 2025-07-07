@@ -42,29 +42,94 @@ class SalesController extends Controller
         return back()->with('success', 'Order placed successfully for ' . $product->name);
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        $orders = Order::with('product')
-            ->where('user_id', Auth::id())
-            ->latest()->get();
-
+        $query = Order::with('product');
+        if ($request->filled('product')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->product . '%');
+            });
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        $orders = $query->orderByDesc('created_at')->get();
         return view('sales.history', compact('orders'));
     }
 
-    public function status()
+    public function status(Request $request)
     {
-        $orders = Order::with('product')
-            ->where('user_id', Auth::id())
-            ->get();
-
+        $query = Order::with('product');
+        if ($request->filled('product')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->product . '%');
+            });
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        $orders = $query->orderByDesc('created_at')->get();
         return view('sales.status', compact('orders'));
     }
 
-    public function report()
+    public function report(Request $request)
     {
-        $sales = Order::with('product', 'user')->get();
+        $query = Order::with('product', 'user');
+        if ($request->filled('product')) {
+            $query->whereHas('product', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->product . '%');
+            });
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        $sales = $query->orderByDesc('created_at')->get();
         $totalRevenue = $sales->sum(fn($o) => $o->product->price * $o->quantity);
 
         return view('admin.report', compact('sales', 'totalRevenue'));
+    }
+
+    public function analytics()
+    {
+        $totalSales = Order::with('product')->get()->sum(function($o) {
+            return $o->product ? $o->product->price * $o->quantity : 0;
+        });
+        $totalOrders = Order::count();
+        $topProduct = Order::selectRaw('product_id, SUM(quantity) as total_qty')
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->with('product')
+            ->first();
+        $topProductName = $topProduct && $topProduct->product ? $topProduct->product->name : 'N/A';
+        $dates = collect(range(0,29))->map(function($i) {
+            return now()->subDays(29-$i)->format('Y-m-d');
+        });
+        $salesData = $dates->map(function($date) {
+            return Order::with('product')->whereDate('created_at', $date)->get()->sum(function($o) {
+                return $o->product ? $o->product->price * $o->quantity : 0;
+            });
+        });
+        return view('sales.analytics', [
+            'totalSales' => $totalSales,
+            'totalOrders' => $totalOrders,
+            'topProduct' => $topProductName,
+            'dates' => $dates,
+            'salesData' => $salesData,
+        ]);
+    }
+
+    public function invoice($id)
+    {
+        $sale = \App\Models\Sale::with(['product', 'user'])->findOrFail($id);
+        return view('sales.invoice', compact('sale'));
     }
 }

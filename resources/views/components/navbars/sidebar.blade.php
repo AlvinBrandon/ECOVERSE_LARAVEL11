@@ -1,6 +1,7 @@
 @props(['activePage'])
 
 <aside
+
     class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark"
     id="sidenav-main">
     <div class="sidenav-header">
@@ -121,16 +122,35 @@
                     <span class="nav-link-text ms-1">Inventory</span>
                 </a> --}}
             {{-- </li> --}}
+            {{-- Inventory (Admin, Staff) --}}
+            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'staff'))
             <li class="nav-item">
-    <a class="nav-link text-white {{ $activePage == 'inventory' ? ' active bg-gradient-primary' : '' }}"
-        href="{{ route('inventory.index') }}">
-        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-            <i class="material-icons opacity-10">inventory_2</i>
-        </div>
-        <span class="nav-link-text ms-1">Inventory</span>
-    </a>
-</li>
-<li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'inventory' ? ' active bg-gradient-primary' : '' }}"
+                    href="{{ route('inventory.index') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">inventory_2</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Inventory</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Raw Materials (Admin, Staff, Supplier) --}}
+            @if(auth()->check() && (in_array(auth()->user()->role, ['admin','staff','supplier'])))
+            <li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'raw-materials' ? ' active bg-gradient-primary' : '' }}"
+                    href="{{ route('raw-materials.index') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">category</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Raw Materials</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- Sales (All except Supplier) --}}
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin','staff','retailer','wholesaler','customer']))
+            <li class="nav-item">
                 <a class="nav-link text-white {{ $activePage == 'sales' ? ' active bg-gradient-primary' : '' }}"
                     href="{{ route('sales.index') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -139,6 +159,20 @@
                     <span class="nav-link-text ms-1">Sales</span>
                 </a>
             </li>
+            @endif
+
+            {{-- Admin Reports --}}
+            @if(auth()->check() && auth()->user()->role === 'admin')
+            <li class="nav-item">
+                <a class="nav-link text-white {{ $activePage == 'admin-sales-report' ? ' active bg-gradient-primary' : '' }}"
+                    href="{{ route('admin.sales.report') }}">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">bar_chart</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Sales Report</span>
+                </a>
+            </li>
+            @endif
         </ul>
     </div>
     <div class="sidenav-footer position-absolute w-100 bottom-0 ">
