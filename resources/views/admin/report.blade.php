@@ -13,7 +13,7 @@
     margin-bottom: 2rem;
   }
   .dashboard-header {
-    background: linear-gradient(90deg, #6366f1 0%, #10b981 100%) !important;
+    background: linear-gradient(90deg, #10b981 0%, #6366f1 100%) !important;
     color: #fff !important;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
@@ -24,15 +24,6 @@
     font-size: 2.5rem;
     margin-right: 1rem;
     vertical-align: middle;
-  }
-  .ecoverse-logo {
-    width: 48px;
-    height: 48px;
-    margin-right: 1rem;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #10b981;
-    background: #fff;
   }
   table {
     width: 100%;
@@ -46,11 +37,36 @@
     text-align: left;
   }
   thead {
-    background: #10b981;
+    background: #6366f1;
     color: white;
   }
   tr:nth-child(even) {
     background: #f9fafb;
+  }
+  .btn-verify {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .btn-verify:hover {
+    background-color: #0f9f75;
+  }
+  .btn-reject {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+  .btn-reject:hover {
+    background-color: #dc2626;
   }
 </style>
 
@@ -58,37 +74,50 @@
 
 <div class="dashboard-card">
   <div class="dashboard-header d-flex align-items-center">
-    <i class="bi bi-bar-chart-line dashboard-icon"></i>
-    <h2 class="mb-0">Sales Report</h2>
+    <i class="bi bi-check-circle dashboard-icon"></i>
+    <h2 class="mb-0">Pending Orders for Verification</h2>
   </div>
 
-  <p class="mb-4">
-    <strong>Total Revenue:</strong> UGX {{ number_format($totalRevenue, 0) }}
-  </p>
+  @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
 
   <div class="table-responsive">
     <table>
       <thead>
         <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
           <th>Product</th>
-          <th>User</th>
           <th>Quantity</th>
-          <th>Subtotal</th>
+          <th>Status</th>
           <th>Date</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         @forelse($sales as $sale)
           <tr>
-            <td>{{ $sale->product->name ?? 'N/A' }}</td>
+            <td>{{ $sale->id }}</td>
             <td>{{ $sale->user->name ?? 'Guest' }}</td>
+            <td>{{ $sale->product->name ?? 'N/A' }}</td>
             <td>{{ $sale->quantity }}</td>
-            <td>UGX {{ number_format($sale->product->price * $sale->quantity, 0) }}</td>
+            <td><span class="badge bg-warning">{{ ucfirst($sale->status) }}</span></td>
             <td>{{ $sale->created_at->format('Y-m-d') }}</td>
+            <td class="d-flex">
+              <form method="POST" action="{{ route('admin.sales.verify', $sale->id) }}">
+                @csrf
+                <button type="submit" class="btn-verify">Verify</button>
+              </form>
+              <form method="POST" action="{{ route('admin.sales.reject', $sale->id) }}">
+                @csrf
+                <button type="submit" class="btn-reject">Reject</button>
+              </form>
+            </td>
           </tr>
         @empty
           <tr>
-            <td colspan="5" class="text-center">No sales found for this period.</td>
+            <td colspan="7" class="text-center">No pending orders found.</td>
           </tr>
         @endforelse
       </tbody>

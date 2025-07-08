@@ -137,3 +137,11 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');
+
+use App\Http\Controllers\SalesApprovalController;
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
+    Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
+    Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
+});
