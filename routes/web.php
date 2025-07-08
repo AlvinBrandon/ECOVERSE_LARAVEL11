@@ -115,7 +115,7 @@ Route::group(['middleware' => 'auth'], function () {
 		return view('pages.static-sign-up');
 	})->name('static-sign-up');
 	Route::get('user-management', function () {
-		return view('pages.laravel-examples.user-management');
+		return redirect()->route('admin.users');
 	})->name('user-management');
 	Route::get('user-profile', function () {
 		return view('pages.laravel-examples.user-profile');
@@ -137,11 +137,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');
-
-use App\Http\Controllers\SalesApprovalController;
-
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
-    Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
-    Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
-});
