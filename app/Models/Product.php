@@ -12,14 +12,9 @@ class Product extends Model
     protected $fillable = [
         'name',
         'description',
-
-        'price',
-        'stock',
-        'image',
-    ];
-} 
         'type',
         'price',
+        'stock',
         'image',
     ];
 
@@ -35,6 +30,6 @@ class Product extends Model
 
     public function inventories()
     {
-        return $this->hasMany(\App\Models\Inventory::class);
+        return $this->hasMany(Inventory::class);
     }
 }

@@ -42,7 +42,5 @@ class DatabaseSeeder extends Seeder
                 'quantity' => rand(10, 100),
             ]);
         });
-        $this->call(RawMaterialInventorySeeder::class);
-        $this->call(UserSeeder::class);
     }
 }
