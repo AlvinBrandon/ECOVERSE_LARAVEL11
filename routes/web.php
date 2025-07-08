@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SalesApprovalController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -134,6 +135,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendor/status', [App\Http\Controllers\VendorController::class, 'showStatus'])->name('vendor.status');
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
+    Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
+    Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');

@@ -23,7 +23,8 @@ class SalesApprovalController extends Controller
         $sale->status = 'verified';
         $sale->save();
 
-        return back()->with('success', 'Order verified.');
+        // return back()->with('success', 'Order verified.');
+        return redirect()->route('admin.sales.report')->with('success', 'Order verified.');
     }
 
     public function reject($id)

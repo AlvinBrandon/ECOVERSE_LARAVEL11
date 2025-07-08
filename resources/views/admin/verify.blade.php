@@ -3,6 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Pending Sales Approvals</h1>
+    
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif

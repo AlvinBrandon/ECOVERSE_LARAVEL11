@@ -21,6 +21,10 @@ class SalesController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1'
         ]);
+        $user = Auth::user();
+        if (!$user) {
+            return back()->with('error', 'You must be logged in to place an order.');
+        }
 
         $product = Product::findOrFail($request->product_id);
         $inventory = $product->inventory;
@@ -30,7 +34,7 @@ class SalesController extends Controller
         }
 
         Order::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => $request->quantity,
             'status' => 'pending',
@@ -44,7 +48,7 @@ class SalesController extends Controller
 
     public function history(Request $request)
     {
-        $query = Order::with('product');
+        $query = Order::with('product')->where('user_id', Auth::id());
         if ($request->filled('product')) {
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->product . '%');
@@ -62,7 +66,7 @@ class SalesController extends Controller
 
     public function status(Request $request)
     {
-        $query = Order::with('product');
+        $query = Order::with('product')->where('user_id', Auth::id());
         if ($request->filled('product')) {
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->product . '%');
@@ -80,7 +84,7 @@ class SalesController extends Controller
 
     public function report(Request $request)
     {
-        $query = Order::with('product', 'user');
+        $query = Order::with('product', 'user'); // Removed user_id filter
         if ($request->filled('product')) {
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->product . '%');
@@ -100,21 +104,22 @@ class SalesController extends Controller
 
     public function analytics()
     {
-        $totalSales = Order::with('product')->get()->sum(function($o) {
+        $totalSales = Order::with('product')->where('user_id', Auth::id())->get()->sum(function($o) {
             return $o->product ? $o->product->price * $o->quantity : 0;
         });
-        $totalOrders = Order::count();
+        $totalOrders = Order::where('user_id', Auth::id())->count();
         $topProduct = Order::selectRaw('product_id, SUM(quantity) as total_qty')
             ->groupBy('product_id')
             ->orderByDesc('total_qty')
             ->with('product')
+            ->where('user_id', Auth::id())
             ->first();
         $topProductName = $topProduct && $topProduct->product ? $topProduct->product->name : 'N/A';
         $dates = collect(range(0,29))->map(function($i) {
             return now()->subDays(29-$i)->format('Y-m-d');
         });
         $salesData = $dates->map(function($date) {
-            return Order::with('product')->whereDate('created_at', $date)->get()->sum(function($o) {
+            return Order::with('product')->where('user_id', Auth::id())->whereDate('created_at', $date)->get()->sum(function($o) {
                 return $o->product ? $o->product->price * $o->quantity : 0;
             });
         });
