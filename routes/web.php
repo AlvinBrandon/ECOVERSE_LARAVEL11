@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StaffOrderController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -137,3 +138,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');
+
+Route::middleware(['auth', 'role:staff'])->group(function(){
+    Route::get('/staff/orders',[StaffOrderController::class, 'index'])->name('staff.orders');
+    Route::post('/staff/orders/update-status/{id}', [StaffOrderController::class, 'updateStatus'])->name('staff.orders.updateStatus');
+});
+
+Route::middleware(['auth', 'role:customer'])->group(function () {
+    Route::get('/my-orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
+});
