@@ -40,10 +40,9 @@ class SalesController extends Controller
             'status' => 'pending',
         ]);
 
-        $inventory->quantity -= $request->quantity;
-        $inventory->save();
+        // Do NOT deduct inventory here. Deduct only after admin verification.
 
-        return back()->with('success', 'Order placed successfully for ' . $product->name);
+        return back()->with('success', 'Order placed successfully for ' . $product->name . '. Awaiting admin verification.');
     }
 
     public function history(Request $request)

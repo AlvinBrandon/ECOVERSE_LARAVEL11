@@ -6,6 +6,14 @@
 
     <title>@yield('title', 'Ecoverse')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+      .unit-label {
+        font-size: 0.95em;
+        color: #6366f1;
+        font-weight: 500;
+        margin-left: 2px;
+      }
+    </style>
     @yield('head')
 </head>
 <body>

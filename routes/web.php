@@ -17,7 +17,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesApprovalController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
@@ -43,6 +43,7 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('inventory')->group(func
     Route::get('/history', [InventoryController::class, 'history'])->name('inventory.history');
     Route::get('/export/csv', [InventoryController::class, 'export'])->name('inventory.export.csv');
     Route::get('/analytics', [InventoryController::class, 'analytics'])->name('inventory.analytics');
+    Route::get('/inventory/product/{product}/batches', [InventoryController::class, 'productSales'])->name('inventory.product.batches');
 });
 
 Route::middleware(['auth', 'role:admin,staff,retailer,wholesaler,customer'])->group(function () {
@@ -64,14 +65,15 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 });
 
 Route::get('/dashboard', function () {
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return app(\App\Http\Controllers\AdminController::class)->dashboard();
+    }
     $role = Auth::check() ? Auth::user()->role : 'customer';
-	// dd($role);
     $view = match($role) {
-        'admin' => 'dashboards.admin',
         'staff' => 'dashboards.staff',
         'supplier' => 'dashboards.supplier',
         'retailer' => 'dashboards.retailer',
-        'wholesaler' => 'dashboards.wholesaler',
+        'wholesaler' => 'dashboards.wholesaler', 
         default => 'dashboards.customer',
     };
     return view($view);
