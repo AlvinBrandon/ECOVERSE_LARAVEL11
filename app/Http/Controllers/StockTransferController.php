@@ -42,9 +42,27 @@ class StockTransferController extends Controller
 
         $inventory->quantity -= $request->quantity;
         $inventory->save();
+        // StockHistory for source (deduct)
+        \App\Models\StockHistory::create([
+            'inventory_id' => $inventory->id,
+            'user_id' => Auth::id(),
+            'action' => 'deduct',
+            'quantity_before' => $inventory->quantity + $request->quantity,
+            'quantity_after' => $inventory->quantity,
+            'note' => 'Stock transferred out',
+        ]);
 
         $toInventory->quantity += $request->quantity;
         $toInventory->save();
+        // StockHistory for destination (add)
+        \App\Models\StockHistory::create([
+            'inventory_id' => $toInventory->id,
+            'user_id' => Auth::id(),
+            'action' => 'add',
+            'quantity_before' => $toInventory->quantity - $request->quantity,
+            'quantity_after' => $toInventory->quantity,
+            'note' => 'Stock transferred in',
+        ]);
 
         StockTransfer::create([
             'product_id' => $inventory->product_id,

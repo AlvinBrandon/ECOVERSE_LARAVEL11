@@ -64,23 +64,26 @@
               <thead class="bg-light">
                 <tr>
                   <th>Product</th>
-                  <th>Batch ID</th>
                   <th>Available Quantity</th>
                   <th>Last Updated</th>
                 </tr>
               </thead>
               <tbody>
                 @foreach ($productInventory as $item)
-                <tr @if($item->quantity <= 10) style="background-color: #fff3cd;" @endif>
-                  <td class="fw-semibold"><i class="bi bi-cube me-1"></i> {{ $item->product->name }}</td>
-                  <td>{{ $item->batch_id }}</td>
+                <tr @if($item['quantity'] <= 10) style="background-color: #fff3cd;" @endif>
+                  <td class="fw-semibold">
+                    <i class="bi bi-cube me-1"></i>
+                    <a href="{{ route('inventory.product.batches', $item['product_id']) }}">
+                      {{ $item['product']->name }}
+                    </a>
+                  </td>
                   <td>
-                    <span class="badge bg-{{ $item->quantity <= 10 ? 'danger' : 'success' }}">{{ $item->quantity }}</span>
-                    @if ($item->quantity <= 10)
+                    <span class="badge bg-{{ $item['quantity'] <= 10 ? 'danger' : 'success' }}">{{ $item['quantity'] }} <span class="unit-label">pcs</span></span>
+                    @if ($item['quantity'] <= 10)
                       <span class="text-danger fw-bold ms-2">(Low)</span>
                     @endif
                   </td>
-                  <td>{{ $item->updated_at->format('Y-m-d H:i') }}</td>
+                  <td>{{ $item['updated_at'] ? \Carbon\Carbon::parse($item['updated_at'])->format('Y-m-d H:i') : '-' }}</td>
                 </tr>
                 @endforeach
               </tbody>
@@ -103,7 +106,6 @@
               <thead class="bg-light">
                 <tr>
                   <th>Raw Material</th>
-                  <th>Batch ID</th>
                   <th>Available Quantity</th>
                   <th>Last Updated</th>
                 </tr>
@@ -114,7 +116,6 @@
                   <td class="fw-semibold">
                     <i class="bi bi-droplet-half me-1"></i> {{ $item->rawMaterial->name }} <span class="text-muted">({{ $item->rawMaterial->type }})</span>
                   </td>
-                  <td>{{ $item->batch_id }}</td>
                   <td>
                     <span class="badge bg-{{ $item->quantity <= 10 ? 'danger' : 'success' }}">{{ $item->quantity }}</span>
                     @if ($item->quantity <= 10)
@@ -149,14 +150,14 @@
     data: {
       labels: [
         @foreach ($productInventory as $item)
-          '{{ $item->product->name }}',
+          '{{ $item['product']->name }}',
         @endforeach
       ],
       datasets: [{
         label: 'Stock Quantity',
         data: [
           @foreach ($productInventory as $item)
-            {{ $item->quantity }},
+            {{ $item['quantity'] }},
           @endforeach
         ],
         backgroundColor: productGradient,

@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\StockHistory;
 use App\Models\RawMaterial;
+use App\Models\Batch;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LowStockAlert;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,19 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        $productInventory = Inventory::with(['product'])->whereNotNull('product_id')->get();
+        // Group products and sum their batch quantities
+        $products = Product::with('batches')->get();
+        $productInventory = $products->map(function($product) {
+            return [
+                'product' => $product,
+                'quantity' => $product->batches->sum('quantity'),
+                'updated_at' => $product->batches->max('updated_at'),
+                'product_id' => $product->id,
+            ];
+        });
         $rawMaterialInventory = Inventory::with(['rawMaterial'])->whereNotNull('raw_material_id')->get();
-        $totalValue = $productInventory->reduce(function ($carry, $item) {
-            return $carry + (($item->product->price ?? 0) * $item->quantity);
+        $totalValue = $products->reduce(function ($carry, $product) {
+            return $carry + (($product->price ?? 0) * $product->batches->sum('quantity'));
         }, 0);
         return view('inventory.index', compact('productInventory', 'rawMaterialInventory', 'totalValue'));
     }
@@ -36,28 +46,73 @@ class InventoryController extends Controller
             'product_id' => 'nullable|exists:products,id',
             'raw_material_id' => 'nullable|exists:raw_materials,id',
             'quantity' => 'required|integer|min:1',
-            'batch_id' => 'nullable|string|max:255',
+            'batch_id' => [
+                'required',
+                'string',
+                'max:255',
+                // Ensure unique batch_id for each product/raw_material
+                function($attribute, $value, $fail) use ($request) {
+                    if ($request->product_id) {
+                        $exists = Batch::where('batch_id', $value)
+                            ->where('product_id', $request->product_id)
+                            ->exists();
+                        if ($exists) {
+                            $fail('The batch ID must be unique for each restock of this product.');
+                        }
+                    } else if ($request->raw_material_id) {
+                        $exists = Inventory::where('batch_id', $value)
+                            ->where('raw_material_id', $request->raw_material_id)
+                            ->exists();
+                        if ($exists) {
+                            $fail('The batch ID must be unique for each restock of this raw material.');
+                        }
+                    }
+                }
+            ],
+            'expiry_date' => 'nullable|date',
         ]);
 
-        $inventory = Inventory::firstOrNew([
-            'product_id' => $request->product_id,
-            'raw_material_id' => $request->raw_material_id,
-            'batch_id' => $request->batch_id,
-        ]);
-
-        $before = $inventory->exists ? $inventory->quantity : 0;
-        $inventory->quantity += $request->quantity;
-        $inventory->save();
-
-        StockHistory::create([
-            'inventory_id' => $inventory->id,
-            'user_id' => Auth::id(),
-            'action' => 'add',
-            'quantity_before' => $before,
-            'quantity_after' => $inventory->quantity,
-            'note' => 'Stock added via create form',
-        ]);
-
+        if ($request->product_id) {
+            $batch = Batch::create([
+                'product_id' => $request->product_id,
+                'batch_id' => $request->batch_id,
+                'quantity' => $request->quantity,
+                'expiry_date' => $request->expiry_date,
+            ]);
+            // Ensure Inventory record exists for this product and batch
+            $inventory = Inventory::firstOrNew([
+                'product_id' => $request->product_id,
+                'batch_id' => $request->batch_id,
+            ]);
+            $before = $inventory->exists ? $inventory->quantity : 0;
+            $inventory->quantity += $request->quantity;
+            $inventory->save();
+            // Create StockHistory record for product batch addition
+            StockHistory::create([
+                'inventory_id' => $inventory->id,
+                'user_id' => Auth::id(),
+                'action' => 'add',
+                'quantity_before' => $before,
+                'quantity_after' => $inventory->quantity,
+                'note' => 'Stock added via create form (batch)',
+            ]);
+        } else if ($request->raw_material_id) {
+            $inventory = Inventory::firstOrNew([
+                'raw_material_id' => $request->raw_material_id,
+                'batch_id' => $request->batch_id,
+            ]);
+            $before = $inventory->exists ? $inventory->quantity : 0;
+            $inventory->quantity += $request->quantity;
+            $inventory->save();
+            StockHistory::create([
+                'inventory_id' => $inventory->id,
+                'user_id' => Auth::id(),
+                'action' => 'add',
+                'quantity_before' => $before,
+                'quantity_after' => $inventory->quantity,
+                'note' => 'Stock added via create form',
+            ]);
+        }
         return redirect()->route('inventory.index')->with('success', 'Inventory updated successfully.');
     }
 
@@ -190,5 +245,25 @@ class InventoryController extends Controller
             'productNames', 'productQuantities',
             'historyDates', 'stockAdded', 'stockDeducted'
         ));
+    }
+
+    public function productBatches($productId)
+    {
+        $product = Product::with('batches')->findOrFail($productId);
+        return view('inventory.product_batches', [
+            'product' => $product,
+        ]);
+    }
+
+    public function productSales($productId)
+    {
+        $product = Product::with('orders.user')->findOrFail($productId);
+        $batches = \App\Models\Inventory::where('product_id', $productId)->get();
+        $movements = \App\Models\StockHistory::whereIn('inventory_id', $batches->pluck('id'))
+            ->orderByDesc('created_at')->get();
+        $sales = \App\Models\Order::with(['user'])
+            ->where('product_id', $productId)
+            ->orderByDesc('created_at')->get();
+        return view('inventory.product_batches', compact('product', 'batches', 'movements', 'sales'));
     }
 }

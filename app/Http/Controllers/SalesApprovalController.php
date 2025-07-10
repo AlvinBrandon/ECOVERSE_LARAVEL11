@@ -20,10 +20,17 @@ class SalesApprovalController extends Controller
     public function verify($id)
     {
         $sale = Order::findOrFail($id);
-        $sale->status = 'verified';
-        $sale->save();
-
-        return back()->with('success', 'Order verified.');
+        $product = $sale->product;
+        $inventory = $product->inventory;
+        if ($inventory && $inventory->quantity >= $sale->quantity) {
+            $inventory->quantity -= $sale->quantity;
+            $inventory->save();
+            $sale->status = 'verified';
+            $sale->save();
+            return redirect()->route('admin.sales.report')->with('success', 'Order verified and inventory updated.');
+        } else {
+            return back()->with('error', 'Insufficient stock to verify this order.');
+        }
     }
 
     public function reject($id)

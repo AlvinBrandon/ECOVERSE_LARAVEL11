@@ -61,8 +61,13 @@
             </div>
 
             <div class="mb-3">
-              <label for="batch_id" class="form-label">Batch ID (Optional):</label>
-              <input type="text" name="batch_id" class="form-control">
+              <label for="batch_id" class="form-label">Batch ID <span class="text-danger">*</span> (must be unique for each restock):</label>
+              <input type="text" name="batch_id" class="form-control" required>
+              <small class="text-muted">Each restock must have a unique batch ID.</small>
+            </div>
+            <div class="mb-3">
+              <label for="expiry_date" class="form-label">Expiry Date (optional):</label>
+              <input type="date" name="expiry_date" class="form-control">
             </div>
 
             <div class="mb-3">

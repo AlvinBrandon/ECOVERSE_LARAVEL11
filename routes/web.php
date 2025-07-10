@@ -14,10 +14,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SalesApprovalController;
 use App\Http\Controllers\StaffOrderController;
+use App\Http\Controllers\CustomerOrderController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
@@ -43,6 +45,7 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('inventory')->group(func
     Route::get('/history', [InventoryController::class, 'history'])->name('inventory.history');
     Route::get('/export/csv', [InventoryController::class, 'export'])->name('inventory.export.csv');
     Route::get('/analytics', [InventoryController::class, 'analytics'])->name('inventory.analytics');
+    Route::get('/inventory/product/{product}/batches', [InventoryController::class, 'productSales'])->name('inventory.product.batches');
 });
 
 Route::middleware(['auth', 'role:admin,staff,retailer,wholesaler,customer'])->group(function () {
@@ -64,14 +67,15 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 });
 
 Route::get('/dashboard', function () {
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return app(\App\Http\Controllers\AdminController::class)->dashboard();
+    }
     $role = Auth::check() ? Auth::user()->role : 'customer';
-	// dd($role);
     $view = match($role) {
-        'admin' => 'dashboards.admin',
         'staff' => 'dashboards.staff',
         'supplier' => 'dashboards.supplier',
         'retailer' => 'dashboards.retailer',
-        'wholesaler' => 'dashboards.wholesaler',
+        'wholesaler' => 'dashboards.wholesaler', 
         default => 'dashboards.customer',
     };
     return view($view);
@@ -135,6 +139,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendor/status', [App\Http\Controllers\VendorController::class, 'showStatus'])->name('vendor.status');
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
+    Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
+    Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');

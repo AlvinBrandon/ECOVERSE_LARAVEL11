@@ -73,6 +73,16 @@
     </div>
   </div>
 
+  @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+  @endif
+  @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
+  <div class="alert alert-warning">
+    <strong>Note:</strong> Orders placed here will only be deducted from stock after admin verification. Your order will remain pending until approved by an admin.
+  </div>
+
   <div class="row g-4">
     @foreach ($products as $product)
     <div class="col-md-4">
