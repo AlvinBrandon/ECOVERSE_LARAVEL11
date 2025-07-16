@@ -12,6 +12,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatPollingController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProductController;
 
@@ -20,6 +21,31 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
+});
+
+// Chat routes
+Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/history/{roomId?}', [ChatController::class, 'history'])->name('history');
+    Route::get('/start', [ChatController::class, 'start'])->name('start');
+    Route::post('/start', [ChatController::class, 'startChat'])->name('startChat');
+    Route::post('/room', [ChatController::class, 'createRoom'])->name('createRoom');
+    Route::post('/message', [ChatController::class, 'sendMessage'])->name('sendMessage');
+    Route::post('/message/reply', [ChatController::class, 'sendMessage'])->name('replyToMessage');
+    Route::post('/message/feedback', [ChatController::class, 'sendAdminFeedback'])->name('sendAdminFeedback')->middleware('role:admin');
+    Route::get('/messages/{roomId}', [ChatController::class, 'getMessages'])->name('getMessages');
+    Route::post('/messages/{roomId}/read', [ChatController::class, 'markAsRead'])->name('markAsRead');
+    Route::post('/status', [ChatController::class, 'updateStatus'])->name('updateStatus');
+    Route::get('/demo', [ChatController::class, 'demo'])->name('demo');
+    
+    // Polling routes
+    Route::get('/poll/messages', [ChatPollingController::class, 'getMessages'])->name('poll.messages');
+    Route::post('/poll/send', [ChatPollingController::class, 'sendMessage'])->name('poll.sendMessage');
+    Route::get('/poll/online-users', [ChatPollingController::class, 'getOnlineUsers'])->name('poll.onlineUsers');
+    Route::post('/poll/typing', [ChatPollingController::class, 'setTypingStatus'])->name('poll.setTyping');
+    Route::get('/poll/typing-users', [ChatPollingController::class, 'getTypingUsers'])->name('poll.typingUsers');
+    Route::get('/poll/unread-count', [ChatPollingController::class, 'getUnreadCount'])->name('poll.unreadCount');
+    Route::post('/poll/mark-read', [ChatNotificationController::class, 'markAsRead'])->name('poll.markRead');
 });
 
 use App\Http\Controllers\InventoryController;

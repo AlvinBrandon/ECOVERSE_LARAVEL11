@@ -22,4 +22,12 @@
         <a href="#" class="btn btn-success mt-2"><i class="bi bi-truck me-1"></i> Track Orders</a>
       </div>
     </div>
+     <div class="col-md-6">
+      <div class="dashboard-card text-center">
+        <i class="bi bi-chat text-success" style="font-size:2rem;"></i>
+        <h5 class="mt-2">Chat Support</h5>
+        <p>Need help? Chat with our support team.</p>
+        <a href="{{ route('chat.index') }}" class="btn btn-success mt-2"><i class="bi bi-chat me-1"></i> Start Chat</a>
+      </div>
+    </div>
 </div>
