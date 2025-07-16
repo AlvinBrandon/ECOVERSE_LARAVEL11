@@ -14,7 +14,7 @@ class EcoVerseChat {
     constructor(options = {}) {
         // Default configuration
         this.config = {
-            messagesPollInterval: 3000,
+            messagesPollInterval: 1000, // Reduced to 1 second for faster updates
             usersPollInterval: 10000,
             typingPollInterval: 2000,
             unreadPollInterval: 15000,
@@ -48,6 +48,8 @@ class EcoVerseChat {
         this.unreadPollInterval = null;
         this.unreadMessages = [];
         this.audio = new Audio(this.config.notificationSound);
+        this.messageQueue = [];
+        this.processingQueue = false;
         
         // Initialize the chat if we have a room ID
         const roomIdElement = document.querySelector('[data-room-id]');
@@ -239,21 +241,34 @@ class EcoVerseChat {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Clear input field
-                input.value = '';
-                
-                // Reset typing status
-                this.updateTypingStatus(false);
-                
-                // Optionally, you can add the message immediately without waiting for polling
-                if (data.message) {
-                    this.appendMessages([data.message]);
-                    this.lastMessageId = data.message.id;
+
+            if (!response.ok) {
+                const data = await response.json();
+                if (response.status === 429) {
+                    console.log('Duplicate message prevented');
+                    return;
                 }
+                throw new Error(data.error || 'Failed to send message');
+            }
+            
+            // Clear input field
+            input.value = '';
+            
+            // Reset typing status
+            this.updateTypingStatus(false);
+            
+            // Process the response data
+            const data = await response.json();
+                
+            // Add the message immediately for instant feedback
+            if (data.message) {
+                // Create and append the message immediately
+                this.appendMessages([{
+                    ...data.message,
+                    is_mine: true // Mark as own message for proper styling
+                }]);
+                this.lastMessageId = data.message.id;
+                this.scrollToBottom(); // Ensure the new message is visible
             }
         } catch (error) {
             console.error('Error sending message:', error);
@@ -314,6 +329,9 @@ class EcoVerseChat {
     appendMessages(messages) {
         const container = document.querySelector(this.config.messageContainer);
         if (!container) return;
+        
+        // Create a document fragment for better performance
+        const fragment = document.createDocumentFragment();
         
         messages.forEach(message => {
             // Check if message is already in the container

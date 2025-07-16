@@ -96,6 +96,17 @@ class ChatPollingController extends Controller
             'is_feedback' => 'nullable|boolean'
         ]);
 
+        // Check for duplicate message within 5 seconds
+        $recentDuplicate = ChatMessage::where('user_id', Auth::id())
+            ->where('room_id', $request->input('room_id'))
+            ->where('message', $request->input('message'))
+            ->where('created_at', '>=', now()->subSeconds(5))
+            ->exists();
+
+        if ($recentDuplicate) {
+            return response()->json(['error' => 'Duplicate message detected'], 429);
+        }
+
         $roomId = $request->input('room_id');
         
         // Check if user is a member of this room or is admin
