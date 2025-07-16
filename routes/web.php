@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesApprovalController;
 use App\Http\Controllers\StaffOrderController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\OrderController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -139,6 +140,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendor/status', [App\Http\Controllers\VendorController::class, 'showStatus'])->name('vendor.status');
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
@@ -157,3 +159,27 @@ Route::middleware(['auth', 'role:staff'])->group(function(){
 Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/my-orders', [CustomerOrderController::class, 'index'])->name('customer.orders');
 });
+Route::get('/order/{product}', [SalesController::class, 'showOrderForm'])->name('order.form');
+Route::post('/order/place', [SalesController::class, 'placeOrder'])->name('order.place');
+//Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+// web.php
+
+// Step 1: Form submission from product or cart
+//Route::post('/order/preview', [OrderController::class, 'preview'])->name('order.preview');
+
+// Step 2: Confirm final order placement
+//Route::post('/order/confirm', [OrderController::class, 'confirm'])->name('order.confirm');
+
+// Cart routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/remove', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'view'])->name('cart.view');
+    Route::post('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
+});
+
+Route::get('/order/confirmation', [App\Http\Controllers\CartController::class, 'confirmation'])->name('order.confirmation');
+Route::post('/help/request', [App\Http\Controllers\HelpController::class, 'request'])->name('help.request');
+
+// TEMP: Route to clear cart session for development
+Route::get('/cart/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');

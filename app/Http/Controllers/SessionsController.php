@@ -31,8 +31,12 @@ class SessionsController extends Controller
         }
 
         session()->regenerate();
-
-        return redirect('/dashboard');
+        $user = Auth::user();
+        if ($user && $user->role === 'supplier') {
+            return redirect()->route('supplier.dashboard');
+        }
+        // Redirect customers to shop page
+        return redirect()->route('sales.index');
     }
 
     public function show(){

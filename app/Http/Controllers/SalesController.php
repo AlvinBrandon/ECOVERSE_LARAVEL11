@@ -19,7 +19,8 @@ class SalesController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'address' => 'required|string|max:255' // ✅ Step 1: Validate address
         ]);
         $user = Auth::user();
         if (!$user) {
@@ -32,11 +33,14 @@ class SalesController extends Controller
         if (!$inventory || $inventory->quantity < $request->quantity) {
             return back()->with('error', 'Insufficient stock for ' . $product->name);
         }
+         $total_price = $product->price * $request->quantity;
 
         Order::create([
             'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => $request->quantity,
+             'total_price' => $total_price,
+             'address' => $request->address, // ✅ Step 2: Save the address
             'status' => 'pending',
         ]);
 
@@ -136,4 +140,25 @@ class SalesController extends Controller
         $sale = \App\Models\Sale::with(['product', 'user'])->findOrFail($id);
         return view('sales.invoice', compact('sale'));
     }
-}
+    public function showOrderForm($productId)
+    {
+        $product = Product::findOrFail($productId);
+        return view('orderform', compact('product'));
+            }
+    public function placeOrder(Request $request)
+    {
+        $request->validate([
+            'product_id'=>'required| exists:products,id',
+            'quantity'=>'required|integer|min:1',
+            'address'=>'required|string|max:255',
+        ]);
+        Order::create([
+            'user_id'=>Auth::id(),
+            'product_id'=>$request->product_id,
+            'quantity'=>$request->quantity,
+            'address'=>$request->address,
+            'status'=>'pending',
+        ]);
+        return redirect()->route('dashboard')->with('success','Order placed successfully!');
+    }
+        }
