@@ -14,7 +14,9 @@ class AddReadAtToChatMessagesTable extends Migration
     public function up()
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->timestamp('read_at')->nullable()->after('is_feedback');
+            if (!Schema::hasColumn('chat_messages', 'read_at')) {
+                $table->timestamp('read_at')->nullable()->after('is_feedback');
+            }
         });
     }
 
@@ -26,7 +28,9 @@ class AddReadAtToChatMessagesTable extends Migration
     public function down()
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->dropColumn('read_at');
+            if (Schema::hasColumn('chat_messages', 'read_at')) {
+                $table->dropColumn('read_at');
+            }
         });
     }
 }
