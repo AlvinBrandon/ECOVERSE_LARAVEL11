@@ -160,5 +160,6 @@ class SalesController extends Controller
             'status'=>'pending',
         ]);
         return redirect()->route('dashboard')->with('success','Order placed successfully!');
+        
     }
         }
