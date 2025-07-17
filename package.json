@@ -11,6 +11,8 @@
         "vite": "^5.0"
     },
     "dependencies": {
-        "lodash": "^4.17.21"
+        "laravel-echo": "^2.1.6",
+        "lodash": "^4.17.21",
+        "pusher-js": "^8.4.0"
     }
 }

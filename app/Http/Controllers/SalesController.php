@@ -9,28 +9,99 @@ use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
+    // Helper: Get min/max order quantity for a role
+    protected function getOrderQuantityLimits($role)
+    {
+        switch ($role) {
+            case 'wholesaler':
+                return ['min' => 10, 'max' => 1000];
+            case 'retailer':
+                return ['min' => 2, 'max' => 100];
+            case 'customer':
+                return ['min' => 1, 'max' => 10];
+            default:
+                return ['min' => 1, 'max' => 10];
+        }
+    }
+
     public function index()
     {
-        $products = Product::with('inventory')->get();
+        $user = Auth::user();
+        if ($user && $user->role === 'wholesaler') {
+            // Wholesalers see all products
+            $products = Product::with('inventory')->get();
+        } else {
+            $query = Product::with('inventory');
+            if ($user) {
+                if ($user->role === 'retailer') {
+                    $query->where('seller_role', 'wholesaler');
+                } elseif ($user->role === 'customer') {
+                    $query->where('seller_role', 'retailer');
+                }
+            }
+            if (request()->filled('type')) {
+                $query->where('seller_role', request('type'));
+            }
+            $products = $query->get();
+        }
         return view('sales.index', compact('products'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
-        ]);
         $user = Auth::user();
         if (!$user) {
             return back()->with('error', 'You must be logged in to place an order.');
         }
 
         $product = Product::findOrFail($request->product_id);
-        $inventory = $product->inventory;
 
-        if (!$inventory || $inventory->quantity < $request->quantity) {
-            return back()->with('error', 'Insufficient stock for ' . $product->name);
+        // Enforce sales hierarchy
+        $buyerRole = $user->role;
+        $sellerRole = $product->seller_role ?? null; // You may need to set this field in your products table
+
+        if ($sellerRole === 'factory' && $buyerRole !== 'wholesaler') {
+            return back()->with('error', 'Factory can only sell to wholesalers.');
+        }
+        if ($sellerRole === 'wholesaler' && $buyerRole !== 'retailer') {
+            return back()->with('error', 'Wholesalers can only sell to retailers.');
+        }
+        if ($sellerRole === 'retailer' && $buyerRole !== 'customer') {
+            return back()->with('error', 'Retailers can only sell to end-customers.');
+        }
+
+        $limits = $this->getOrderQuantityLimits($user->role);
+        $rules = [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:' . $limits['min'] . '|max:' . $limits['max'],
+        ];
+        $deliveryRequired = false;
+        $deliveryOptional = false;
+        if ($user) {
+            if ($user->role === 'wholesaler' && $product->seller_role === 'factory') {
+                $deliveryRequired = true;
+            } elseif ($user->role === 'retailer' && $product->seller_role === 'wholesaler') {
+                $deliveryOptional = true;
+            } elseif ($user->role === 'customer' && $product->seller_role === 'retailer') {
+                $deliveryRequired = true;
+            }
+        }
+        if ($deliveryRequired) {
+            $rules['delivery_method'] = 'required|in:delivery';
+        } elseif ($deliveryOptional) {
+            $rules['delivery_method'] = 'required|in:delivery,pickup';
+        }
+        $request->validate($rules, [
+            'quantity.min' => 'Minimum order quantity for your role is ' . $limits['min'] . '.',
+            'quantity.max' => 'Maximum order quantity for your role is ' . $limits['max'] . '.',
+            'delivery_method.required' => 'Please select a delivery method.',
+            'delivery_method.in' => 'Invalid delivery method selected.',
+        ]);
+
+        // Sum all inventory quantities for this product
+        $totalAvailable = $product->inventories()->sum('quantity');
+        if ($totalAvailable < $request->quantity) {
+            return back()->with('error', 'Insufficient stock for ' . $product->name . '. Available: ' . $totalAvailable);
         }
 
         Order::create([
@@ -38,11 +109,23 @@ class SalesController extends Controller
             'product_id' => $product->id,
             'quantity' => $request->quantity,
             'status' => 'pending',
+            'delivery_method' => $request->delivery_method ?? null,
         ]);
 
-        // Do NOT deduct inventory here. Deduct only after admin verification.
+        // Do NOT deduct inventory here. Deduct only after verification by the next role in the sales chain.
 
-        return back()->with('success', 'Order placed successfully for ' . $product->name . '. Awaiting admin verification.');
+        $role = $user->role ?? ($user->role_as == 5 ? 'wholesaler' : ($user->role_as == 2 ? 'retailer' : ($user->role_as == 0 ? 'customer' : 'other')));
+        $message = 'Order placed successfully for ' . $product->name . '. ';
+        if ($role === 'wholesaler') {
+            $message .= 'Awaiting admin verification. Your order will remain pending until approved by an admin.';
+        } elseif ($role === 'retailer') {
+            $message .= 'Awaiting wholesaler verification. Your order will remain pending until approved by a wholesaler.';
+        } elseif ($role === 'customer') {
+            $message .= 'Awaiting retailer verification. Your order will remain pending until approved by a retailer.';
+        } else {
+            $message .= 'Awaiting verification.';
+        }
+        return back()->with('success', $message);
     }
 
     public function history(Request $request)
@@ -83,7 +166,10 @@ class SalesController extends Controller
 
     public function report(Request $request)
     {
-        $query = Order::with('product', 'user'); // Removed user_id filter
+        $query = Order::with('product', 'user')
+            ->whereHas('user', function($q) {
+                $q->where('role', 'wholesaler');
+            });
         if ($request->filled('product')) {
             $query->whereHas('product', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->product . '%');

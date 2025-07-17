@@ -7,30 +7,55 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\StockHistory;
 use App\Models\RawMaterial;
+
 use App\Models\Batch;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LowStockAlert;
 use Illuminate\Support\Facades\Auth;
+use App\Events\InventoryUpdated;
 
 class InventoryController extends Controller
 {
+    // All raw material purchase order prices must be entered and displayed in Ugandan Shillings (UGX).
+    // ...existing code...
+
+    /**
+     * Show the raw material inventory in a dedicated view.
+     */
+    public function rawMaterials()
+    {
+        // Group inventory by raw_material_id and sum quantities, show only one row per raw material
+        $rawMaterialInventory = \App\Models\Inventory::with(['rawMaterial'])
+            ->whereNotNull('raw_material_id')
+            ->get()
+            ->groupBy('raw_material_id')
+            ->map(function($group) {
+                $first = $group->first();
+                return (object) [
+                    'rawMaterial' => $first->rawMaterial,
+                    'quantity' => $group->sum('quantity'),
+                    'updated_at' => $group->max('updated_at'),
+                ];
+            });
+        return view('inventory.raw-materials', ['rawMaterialInventory' => $rawMaterialInventory]);
+    }
+
     public function index()
     {
-        // Group products and sum their batch quantities
-        $products = Product::with('batches')->get();
+        // Group products and sum their inventory quantities (all batches)
+        $products = Product::with('inventories')->get();
         $productInventory = $products->map(function($product) {
             return [
                 'product' => $product,
-                'quantity' => $product->batches->sum('quantity'),
-                'updated_at' => $product->batches->max('updated_at'),
+                'quantity' => $product->inventories->sum('quantity'),
+                'updated_at' => $product->inventories->max('updated_at'),
                 'product_id' => $product->id,
             ];
         });
-        $rawMaterialInventory = Inventory::with(['rawMaterial'])->whereNotNull('raw_material_id')->get();
         $totalValue = $products->reduce(function ($carry, $product) {
-            return $carry + (($product->price ?? 0) * $product->batches->sum('quantity'));
+            return $carry + (($product->price ?? 0) * $product->inventories->sum('quantity'));
         }, 0);
-        return view('inventory.index', compact('productInventory', 'rawMaterialInventory', 'totalValue'));
+        return view('inventory.index', compact('productInventory', 'totalValue'));
     }
 
     public function create()
@@ -42,6 +67,7 @@ class InventoryController extends Controller
 
     public function store(Request $request)
     {
+        // NOTE: All raw material purchase order prices must be in Ugandan Shillings (UGX)
         $request->validate([
             'product_id' => 'nullable|exists:products,id',
             'raw_material_id' => 'nullable|exists:raw_materials,id',
@@ -70,6 +96,8 @@ class InventoryController extends Controller
                 }
             ],
             'expiry_date' => 'nullable|date',
+            // If price is present, ensure it is numeric and >= 0 (UGX)
+            'price' => 'nullable|numeric|min:0',
         ]);
 
         if ($request->product_id) {
@@ -96,6 +124,8 @@ class InventoryController extends Controller
                 'quantity_after' => $inventory->quantity,
                 'note' => 'Stock added via create form (batch)',
             ]);
+            // Broadcast inventory update event
+            event(new InventoryUpdated('add', $request->product_id, $request->batch_id, $request->quantity, Auth::id()));
         } else if ($request->raw_material_id) {
             $inventory = Inventory::firstOrNew([
                 'raw_material_id' => $request->raw_material_id,
@@ -156,6 +186,8 @@ class InventoryController extends Controller
             'quantity_after' => $inventory->quantity,
             'note' => 'Stock deducted via deduct form',
         ]);
+        // Broadcast inventory update event
+        event(new InventoryUpdated('deduct', $inventory->product_id, $inventory->batch_id, $request->quantity, Auth::id()));
 
         if ($inventory->quantity <= 10) {
             $itemName = $inventory->product->name ?? 'Unknown';
@@ -204,15 +236,20 @@ class InventoryController extends Controller
 
     public function analytics()
     {
-        $totalValue = Inventory::with('product')->get()
-            ->sum(function($item) {
-                return $item->quantity * ($item->product->unit_price ?? 0);
-            });
+        // Sum all inventory quantities * product price
+        $totalValue = 0;
+        $products = Product::with('inventories')->get();
+        foreach ($products as $product) {
+            $totalQty = $product->inventories->sum('quantity');
+            $totalValue += $totalQty * ($product->price ?? 0);
+        }
 
-        $totalProducts = Product::count();
-        $lowStockCount = Inventory::where('quantity', '<=', 10)->count();
+        $totalProducts = $products->count();
+        // Low stock: count products where total quantity across all batches <= 10
+        $lowStockCount = $products->filter(function($product) {
+            return $product->inventories->sum('quantity') <= 10;
+        })->count();
 
-        $products = Product::all();
         $productNames = $products->pluck('name');
         $productQuantities = $products->map(function($product) {
             return $product->inventories->sum('quantity');

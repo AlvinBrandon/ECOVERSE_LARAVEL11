@@ -21,7 +21,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
+    Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
 });
+
+use App\Http\Controllers\WholesalerReportController;
+use App\Http\Controllers\RetailerReportController;
+// Wholesaler analytics and retailer order verification
+Route::middleware(['auth', 'role:wholesaler,5'])->get('/wholesaler/reports', [WholesalerReportController::class, 'index'])->name('wholesaler.reports');
+
+// Retailer analytics and customer order verification
+Route::middleware(['auth', 'role:retailer,2'])->get('/retailer/reports', [RetailerReportController::class, 'index'])->name('retailer.reports');
 
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SalesController;
@@ -36,6 +45,7 @@ Route::middleware(['auth', 'role:supplier,admin,staff'])->prefix('supplier')->gr
 
 Route::middleware(['auth', 'role:admin,staff'])->prefix('inventory')->group(function () {
     Route::get('/', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/raw-materials', [InventoryController::class, 'rawMaterials'])->name('inventory.raw-materials');
     Route::get('/add', [InventoryController::class, 'create'])->name('inventory.create');
     Route::post('/store', [InventoryController::class, 'store'])->name('inventory.store');
     Route::get('/deduct', [InventoryController::class, 'deductForm'])->name('inventory.deductForm');
@@ -69,9 +79,12 @@ Route::get('/dashboard', function () {
         return app(\App\Http\Controllers\AdminController::class)->dashboard();
     }
     $role = Auth::check() ? Auth::user()->role : 'customer';
+    if ($role === 'supplier') {
+        $data = \App\Http\Controllers\PurchaseOrderController::supplierDashboardData(Auth::id());
+        return view('dashboards.supplier', $data);
+    }
     $view = match($role) {
         'staff' => 'dashboards.staff',
-        'supplier' => 'dashboards.supplier',
         'retailer' => 'dashboards.retailer',
         'wholesaler' => 'dashboards.wholesaler', 
         default => 'dashboards.customer',
@@ -86,46 +99,48 @@ Route::post('sign-in', [SessionsController::class, 'store'])->middleware('guest'
 Route::post('verify', [SessionsController::class, 'show'])->middleware('guest');
 Route::post('reset-password', [SessionsController::class, 'update'])->middleware('guest')->name('password.update');
 Route::get('verify', function () {
-	return view('sessions.password.verify');
+    return view('sessions.password.verify');
 })->middleware('guest')->name('verify'); 
 Route::get('/reset-password/{token}', function ($token) {
-	return view('sessions.password.reset', ['token' => $token]);
+    return view('sessions.password.reset', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
 Route::post('sign-out', [SessionsController::class, 'destroy'])->middleware('auth')->name('logout');
 Route::get('profile', [ProfileController::class, 'create'])->middleware('auth')->name('profile');
 Route::post('user-profile', [ProfileController::class, 'update'])->middleware('auth');
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('billing', function () {
-		return view('pages.billing');
-	})->name('billing');
-	Route::get('tables', function () {
-		return view('pages.tables');
-	})->name('tables');
-	Route::get('rtl', function () {
-		return view('pages.rtl');
-	})->name('rtl');
-	Route::get('virtual-reality', function () {
-		return view('pages.virtual-reality');
-	})->name('virtual-reality');
-	Route::get('notifications', function () {
-		return view('pages.notifications');
-	})->name('notifications');
-	Route::get('static-sign-in', function () {
-		return view('pages.static-sign-in');
-	})->name('static-sign-in');
-	Route::get('static-sign-up', function () {
-		return view('pages.static-sign-up');
-	})->name('static-sign-up');
-	Route::get('user-management', function () {
-		return redirect()->route('admin.users');
-	})->name('user-management');
-	Route::get('user-profile', function () {
-		return view('pages.laravel-examples.user-profile');
-	})->name('user-profile');
+    Route::get('billing', function () {
+        return view('pages.billing');
+    Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    })->name('billing');
+    Route::get('tables', function () {
+        return view('pages.tables');
+    })->name('tables');
+    Route::get('rtl', function () {
+        return view('pages.rtl');
+    })->name('rtl');
+    Route::get('virtual-reality', function () {
+        return view('pages.virtual-reality');
+    })->name('virtual-reality');
+    Route::get('notifications', function () {
+        return view('pages.notifications');
+    })->name('notifications');
+    Route::get('static-sign-in', function () {
+        return view('pages.static-sign-in');
+    })->name('static-sign-in');
+    Route::get('static-sign-up', function () {
+        return view('pages.static-sign-up');
+    })->name('static-sign-up');
+    Route::get('user-management', function () {
+        return redirect()->route('admin.users');
+    })->name('user-management');
+    Route::get('user-profile', function () {
+        return view('pages.laravel-examples.user-profile');
+    })->name('user-profile');
 });
 
 // Vendor Validation Feature
+require_once __DIR__.'/orders_verify.php';
 Route::get('/vendor/apply', [VendorController::class, 'showApplicationForm'])->name('vendor.apply');
 Route::post('/vendor/apply', [VendorController::class, 'submitApplication'])->name('vendor.submit');
 Route::get('/admin/vendors', [VendorController::class, 'listApplications'])->middleware('auth')->name('vendor.admin');
@@ -143,6 +158,26 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
     Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
     Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
+});
+
+// Purchase Order Workflow Routes
+
+// Admin routes for purchase orders
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'adminIndex'])->name('admin.purchase_orders.index');
+    Route::get('/purchase-orders/create', [App\Http\Controllers\PurchaseOrderController::class, 'create'])->name('admin.purchase_orders.create');
+    Route::post('/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'store'])->name('admin.purchase_orders.store');
+    Route::post('/purchase-orders/{purchaseOrder}/verify', [App\Http\Controllers\PurchaseOrderController::class, 'verify'])->name('admin.purchase_orders.verify');
+    Route::post('/purchase-orders/{purchaseOrder}/mark-paid', [App\Http\Controllers\PurchaseOrderController::class, 'markPaid'])->name('admin.purchase_orders.markPaid');
+    Route::get('/purchase-orders/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'show'])->name('admin.purchase_orders.show');
+});
+
+// Supplier routes for purchase orders
+Route::middleware(['auth', 'role:supplier'])->prefix('supplier')->group(function () {
+    Route::get('/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'supplierIndex'])->name('supplier.purchase_orders.index');
+    Route::get('/purchase-orders/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'show'])->name('supplier.purchase_orders.show');
+    Route::post('/purchase-orders/{purchaseOrder}/deliver', [App\Http\Controllers\PurchaseOrderController::class, 'deliver'])->name('supplier.purchase_orders.deliver');
+    Route::post('/purchase-orders/{purchaseOrder}/mark-delivered', [App\Http\Controllers\PurchaseOrderController::class, 'markDelivered'])->name('supplier.purchase_orders.markDelivered');
 });
 
 Route::get('/admin/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');

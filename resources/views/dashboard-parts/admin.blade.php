@@ -1,9 +1,16 @@
+<div class="d-flex align-items-center mb-2">
+    <h5 class="mb-0" style="color:#fff; font-size:1.5rem; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,0.18);">Welcome, {{ Auth::user()->name }}</h5>
+</div>
 <div class="dashboard-header d-flex align-items-center">
     <img src="/assets/img/ecoverse-logo.svg" alt="Ecoverse Logo" class="ecoverse-logo">
     <div>
       <h2 class="mb-0">Admin Dashboard</h2>
       <p class="mb-0" style="font-size:1.1rem;">Full control: Reports, user management, inventory, system config.</p>
     </div>
+</div>
+<!-- Sales Verification Widget Row -->
+<div class="row mb-4">
+  @include('dashboard-parts.admin-sales-verify-widget')
 </div>
 <div class="row">
     <div class="col-md-4">
@@ -30,10 +37,18 @@
         <a href="{{ route('admin.sales.report') }}" class="btn btn-info mt-2"><i class="bi bi-graph-up-arrow me-1"></i> Sales Report</a>
       </div>
     </div>
+    <div class="col-md-4">
+      <div class="dashboard-card text-center">
+        <i class="bi bi-clipboard-check text-warning" style="font-size:2rem;"></i>
+        <h5 class="mt-2">Purchase Orders (Admin)</h5>
+        <p>Review, verify, and mark purchase orders as paid.</p>
+        <a href="{{ route('admin.purchase_orders.index') }}" class="btn btn-warning mt-2"><i class="bi bi-clipboard-check me-1"></i> Manage Purchase Orders</a>
+      </div>
+    </div>
 </div>
 
 <!-- System Health Widget -->
-<div class="row">
+{{-- <div class="row">
   <div class="col-md-4">
     <div class="dashboard-card">
       <h6><i class="bi bi-heart-pulse text-danger dashboard-icon"></i>System Health</h6>
@@ -44,9 +59,9 @@
         <li><strong>Last Backup:</strong> <span class="text-info">{{ $systemHealth['last_backup'] }}</span></li>
       </ul>
     </div>
-  </div>
+  </div> --}}
   <!-- Notifications Panel -->
-  <div class="col-md-4">
+  {{-- <div class="col-md-4">
     <div class="dashboard-card">
       <h6><i class="bi bi-bell text-warning dashboard-icon"></i>Notifications</h6>
       <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
@@ -55,7 +70,7 @@
         @endforeach
       </ul>
     </div>
-  </div>
+  </div> --}}
   <!-- Quick Actions -->
   <div class="col-md-4">
     <div class="dashboard-card text-center">
@@ -68,13 +83,13 @@
 </div>
 
 <!-- Advanced Analytics & Trends -->
-<div class="row">
+{{-- <div class="row">
   <div class="col-md-6">
     <div class="dashboard-card">
       <h6><i class="bi bi-graph-up-arrow text-info dashboard-icon"></i>Sales Trends</h6>
       <canvas id="salesTrendsChart" height="120"></canvas>
     </div>
-  </div>
+  </div> --}}
   <div class="col-md-6 text-sm">
     <div class="dashboard-card">
       <h6><i class="bi bi-pie-chart text-success dashboard-icon"></i>Batch-Level Inventory Analytics</h6>
@@ -86,7 +101,7 @@
 </div>
 
 <!-- Activity Log -->
-<div class="row">
+{{-- <div class="row">
   <div class="col-md-12">
     <div class="dashboard-card">
       <h6><i class="bi bi-clock-history text-secondary dashboard-icon"></i>Recent Activity</h6>
@@ -97,27 +112,119 @@
       </ul>
     </div>
   </div>
-</div>
+</div> --}}
 
+<!-- Purchase Orders Management -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-clipboard-data dashboard-icon text-primary"></i>Purchase Orders</h6>
+      <a href="{{ route('admin.purchase_orders.create') }}" class="btn btn-outline-primary btn-sm mb-2"><i class="bi bi-plus-circle"></i> Create PO</a>
+      <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
+        @foreach($adminPOs as $po)
+          <li>
+            <span class="badge bg-secondary">#{{ $po->id }}</span>
+            {{ $po->rawMaterial->name ?? 'N/A' }} to {{ $po->supplier->name ?? 'N/A' }}
+            <span class="badge bg-info">{{ ucfirst($po->status) }}</span>
+            <a href="{{ route('admin.purchase_orders.show', $po->id) }}" class="btn btn-link btn-sm">View</a>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  </div>
+  {{-- <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-truck dashboard-icon text-success"></i>Delivery Verification</h6>
+      <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
+        @foreach($pendingDeliveries as $po)
+          <li>
+            <span class="badge bg-secondary">#{{ $po->id }}</span>
+            {{ $po->rawMaterial->name ?? 'N/A' }} from {{ $po->supplier->name ?? 'N/A' }}
+            <span class="badge bg-warning">Awaiting Verification</span>
+            <a href="{{ route('admin.purchase_orders.show', $po->id) }}" class="btn btn-link btn-sm">Verify</a>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  </div> --}}
+</div>
+<!-- Raw Material Inventory & Supplier Payments -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-boxes dashboard-icon text-info"></i>Raw Material Inventory</h6>
+      <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
+        @foreach($rawMaterials as $mat)
+          <li>
+            {{ $mat->name }}: <strong>{{ $mat->quantity }} {{ $mat->unit }}</strong>
+            <span class="text-muted">(Reorder: {{ $mat->reorder_level }})</span>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-cash-stack dashboard-icon text-success"></i>Supplier Payments</h6>
+      <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
+        @foreach($supplierPayments as $pay)
+          <li>
+            {{ $pay['supplier'] }}: <span class="badge bg-{{ $pay['status'] == 'paid' ? 'success' : 'warning' }}">{{ ucfirst($pay['status']) }}</span>
+            <span class="ms-2">₱{{ number_format($pay['amount'],2) }}</span>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- Invoice Management & Analytics -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-receipt dashboard-icon text-secondary"></i>Invoice Management</h6>
+      <ul class="list-unstyled mb-0" style="max-height:120px;overflow:auto;">
+        @foreach($invoices as $inv)
+          <li>
+            <span class="badge bg-secondary">#{{ $inv->po_id }}</span>
+            <a href="{{ asset('storage/'.$inv->invoice_path) }}" target="_blank">Invoice</a>
+            <span class="badge bg-{{ $inv->status == 'approved' ? 'success' : ($inv->status == 'rejected' ? 'danger' : 'warning') }}">{{ ucfirst($inv->status) }}</span>
+            <a href="{{ route('admin.purchase_orders.show', $inv->po_id) }}" class="btn btn-link btn-sm">Review</a>
+          </li>
+        @endforeach
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="dashboard-card">
+      <h6><i class="bi bi-bar-chart-steps dashboard-icon text-info"></i>Raw Material Analytics</h6>
+      <ul class="list-unstyled mb-0">
+        <li>Received this month: <strong>{{ $analytics['received_this_month'] ?? 0 }}</strong></li>
+        <li>Pending POs: <strong>{{ $analytics['pending_pos'] ?? 0 }}</strong></li>
+        <li>Pending Deliveries: <strong>{{ $analytics['pending_deliveries'] ?? 0 }}</strong></li>
+        <li>Unpaid: <strong>{{ $analytics['unpaid'] ?? 0 }}</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
 <!-- Chart.js for analytics -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Sales Trends Chart (real data)
-  const ctx1 = document.getElementById('salesTrendsChart').getContext('2d');
-  new Chart(ctx1, {
-    type: 'line',
-    data: {
-      labels: @json($revenueTrendLabels),
-      datasets: [{
-        label: 'Sales',
-        data: @json($revenueTrendData),
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99,102,241,0.1)',
-        tension: 0.4
-      }]
-    },
-    options: { plugins: { legend: { display: false } } }
-  });
+  // // Sales Trends Chart (real data)
+  // const ctx1 = document.getElementById('salesTrendsChart').getContext('2d');
+  // new Chart(ctx1, {
+  //   type: 'line',
+  //   data: {
+  //     labels: @json($revenueTrendLabels),
+  //     datasets: [{
+  //       label: 'Sales',
+  //       data: @json($revenueTrendData),
+  //       borderColor: '#6366f1',
+  //       backgroundColor: 'rgba(99,102,241,0.1)',
+  //       tension: 0.4
+  //     }]
+  //   },
+  //   options: { plugins: { legend: { display: false } } }
+  // });
   // Batch Analytics Chart (real data)
   const ctx2 = document.getElementById('batchAnalyticsChart').getContext('2d');
   new Chart(ctx2, {
