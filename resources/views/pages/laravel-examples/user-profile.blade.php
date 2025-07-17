@@ -17,7 +17,7 @@
                         <div class="avatar avatar-xl position-relative">
                             <img src="{{ asset('assets') }}/img/bruce-mars.jpg" alt="profile_image"
                                 class="w-100 border-radius-lg shadow-sm">
-                        </div>
+                   https://github.com/AlvinBrandon/ECOVERSE_LARAVEL11/pull/6/conflict?name=resources%252Fviews%252Fpages%252Flaravel-examples%252Fuser-management.blade.php&base_oid=21aca7071da2f53d9a260b154c50dee29209717e&head_oid=6bfb24bb1934e7c12ddd8b24ada4406f8fd7dc4d     </div>
                     </div>
                     <div class="col-auto my-auto">
                         <div class="h-100">
@@ -147,3 +147,4 @@
     <x-plugins></x-plugins>
 
 </x-layout>
+
