@@ -85,7 +85,7 @@ class PurchaseOrderController extends Controller
         // Log in StockHistory (raw material context)
         \App\Models\StockHistory::create([
             'inventory_id' => $inventory->id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'action' => 'add_from_po',
             'quantity_before' => $inventoryBefore,
             'quantity_after' => $inventory->quantity,
