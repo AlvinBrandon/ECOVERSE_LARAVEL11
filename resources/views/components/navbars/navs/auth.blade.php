@@ -22,6 +22,16 @@
             </form>
             <ul class="navbar-nav  justify-content-end">
                 <li class="nav-item d-flex align-items-center">
+                    <!-- Chat notification icon -->
+                    <a href="{{ route('chat.history') }}" class="nav-link position-relative px-2" id="chat-navbar-link"
+                        title="Open Chat" style="display:inline-block;">
+                        <span style="position:relative;display:inline-block;">
+                            <img id="chat-navbar-notification-icon" src="{{ asset('images/chat-notification.svg') }}" width="28"
+                                height="28" alt="Chat Notification">
+                            <sup id="chat-navbar-notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                                style="font-size:0.8rem;z-index:2;min-width:1.5em;line-height:1.2;">0</sup>
+                        </span>
+                    </a>
                     <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
                         <i class="fa fa-user me-sm-1"></i>
                         <span class="d-sm-inline d-none"
@@ -43,6 +53,100 @@
                         <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
                     </a>
                 </li>
+                
+                <!-- Chat Notification Icon -->
+                <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-body p-0 position-relative" id="chatMenuButton"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-comments cursor-pointer"></i>
+                        @if(auth()->check() && auth()->user()->hasUnreadMessages())
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ auth()->user()->unreadMessagesCount() }}
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4" aria-labelledby="chatMenuButton">
+                        <li class="mb-2">
+                            <a class="dropdown-item border-radius-md" href="{{ route('chat.index') }}">
+                                <div class="d-flex py-1">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="text-sm font-weight-normal mb-1">
+                                            <span class="font-weight-bold">Chat Dashboard</span>
+                                        </h6>
+                                        <p class="text-xs text-secondary mb-0">
+                                            View all your chat conversations
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a class="dropdown-item border-radius-md" href="{{ route('chat.start') }}">
+                                <div class="d-flex py-1">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="text-sm font-weight-normal mb-1">
+                                            <span class="font-weight-bold">Start New Chat</span>
+                                        </h6>
+                                        <p class="text-xs text-secondary mb-0">
+                                            Create a new conversation
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        @if(auth()->check())
+                            @php
+                                $recentChats = App\Models\ChatRoom::whereHas('users', function($query) {
+                                    $query->where('users.id', auth()->id());
+                                })
+                                ->with(['messages' => function($query) {
+                                    $query->latest()->take(1);
+                                }])
+                                ->take(3)
+                                ->get();
+                            @endphp
+                            
+                            @if($recentChats->isNotEmpty())
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-header">Recent Chats</li>
+                                
+                                @foreach($recentChats as $room)
+                                    <li>
+                                        <a class="dropdown-item border-radius-md" href="{{ route('chat.history', $room->id) }}">
+                                            <div class="d-flex py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="text-sm font-weight-normal mb-1">
+                                                        {{ $room->name }}
+                                                        @php
+                                                            $unreadCount = $room->messages()
+                                                                ->where('user_id', '!=', auth()->id())
+                                                                ->whereNull('read_at')
+                                                                ->count();
+                                                        @endphp
+                                                        @if($unreadCount > 0)
+                                                            <span class="badge bg-danger ms-2">{{ $unreadCount }}</span>
+                                                        @endif
+                                                    </h6>
+                                                    @if($room->messages->isNotEmpty())
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            {{ Str::limit($room->messages->first()->message, 30) }}
+                                                        </p>
+                                                    @else
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            No messages yet
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
+                        @endif
+                    </ul>
+                </li>
+                
                 <li class="nav-item dropdown pe-2 d-flex align-items-center">
                     <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -130,3 +234,24 @@
         </div>
     </div>
 </nav>
+
+@push('scripts')
+<script>
+// Update chat notification badge in navbar
+function updateChatNavbarNotification(count) {
+    const badge = document.getElementById('chat-navbar-notification-badge');
+    const icon = document.getElementById('chat-navbar-notification-icon');
+    if (badge && icon) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('d-none');
+            icon.style.filter = 'drop-shadow(0 0 8px #dc3545)';
+        } else {
+            badge.classList.add('d-none');
+            icon.style.filter = '';
+        }
+    }
+}
+// Example: Call updateChatNavbarNotification(unreadCount) from your polling JS when new messages arrive
+</script>
+@endpush

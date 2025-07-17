@@ -26,7 +26,7 @@
                     <h5 class="card-title">Total Products</h5>
                     <p class="card-text display-5 fw-bold">{{ $totalProducts ?? '--' }}</p>
                 </div>
-            </div>
+            </div> 
         </div>
         <div class="col-md-3">
             <div class="card shadow border-0 bg-gradient-warning text-dark h-100">

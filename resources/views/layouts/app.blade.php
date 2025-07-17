@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>@yield('title', 'Ecoverse')</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Vite Assets -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     <style>
       .unit-label {
         font-size: 0.95em;
@@ -60,29 +66,16 @@
         margin-right: 0;
       }
     </style>
+    @stack('styles')
     @yield('head')
+    @stack('head')
 </head>
-<body>
+<body @auth data-user-id="{{ auth()->id() }}" data-user-role="{{ auth()->user()->role }}" @endauth>
     @auth
-    <div style="position:fixed;top:10px;right:20px;z-index:2000;">
-        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-            @csrf
-            <button type="submit" class="btn btn-link">Logout</button>
-        </form>
-    </div>
+        @include('components.navbars.navs.auth', ['titlePage' => $titlePage ?? 'Dashboard'])
+    @else
+        @include('components.navbars.navs.guest')
     @endauth
-    <!-- Main Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-ecoverse py-2">
-      <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="/dashboard">
-          <span style="font-size:2rem;line-height:1;color:#10b981;">&#9733;</span> <span style="color:#10b981;">ECOVERSE</span>
-        </a>
-        <div class="d-flex align-items-center w-100" style="max-width: 700px; margin: 0 auto;">
-          @if(auth()->user() && auth()->user()->role === 'customer')
-          <form class="d-flex search-bar flex-grow-1 position-relative" role="search">
-            <input class="form-control me-2" id="productSearchInput" type="search" placeholder="Search products, brands and categories" aria-label="Search" autocomplete="off">
-            <button class="btn btn-warning text-white px-4" type="submit">Search</button>
-            <div id="searchSuggestions" class="list-group position-absolute w-100" style="top:100%;z-index:2000;display:none;"></div>
           </form>
           <a href="/dashboard" class="btn btn-outline-success ms-2" title="Home"><i class="bi bi-house-door"></i></a>
           <button class="navbar-icon-btn ms-2" title="Help" id="openHelpModalBtn"><i class="bi bi-question-circle"></i></button>
@@ -103,6 +96,14 @@
         </div>
       </div>
     </nav>
+=======
+<body @auth data-user-id="{{ auth()->id() }}" data-user-role="{{ auth()->user()->role }}" @endauth>
+    @auth
+        @include('components.navbars.navs.auth', ['titlePage' => $titlePage ?? 'Dashboard'])
+    @else
+        @include('components.navbars.navs.guest')
+    @endauth
+>>>>>>> chat
     <main class="py-4">
         @yield('content')
     </main>
@@ -111,6 +112,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @yield('scripts')
+<<<<<<< HEAD
     <script>
 // Autocomplete for product search
 (function() {
@@ -263,5 +265,9 @@
     });
   });
 </script>
+=======
+    @stack('scripts')
+
+>>>>>>> chat
 </body>
 </html>

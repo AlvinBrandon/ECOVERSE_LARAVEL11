@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoVerse Chat Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="" id="csrf-token">
+    <style>
+        .test-card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .test-header {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .test-passed {
+            background-color: #d1e7dd;
+        }
+        .test-failed {
+            background-color: #f8d7da;
+        }
+        .test-pending {
+            background-color: #fff3cd;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>EcoVerse Chat Function Test</h1>
+        <p class="lead mb-4">This page will test the chat functionality to ensure it's working correctly.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Test Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="room-id" class="form-label">Room ID</label>
+                            <input type="number" class="form-control" id="room-id" value="5">
+                            <div class="form-text">Enter a valid room ID from your database.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="form-label">Test Message</label>
+                            <input type="text" class="form-control" id="message-text" value="This is a test message from the chat-test.html page">
+                        </div>
+                        <button id="get-csrf" class="btn btn-warning mb-3">1. Get CSRF Token</button>
+                        <button id="run-tests" class="btn btn-primary mb-3" disabled>2. Run Tests</button>
+                        <div class="form-text">First get the CSRF token, then run the tests.</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Chat Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>CSRF Token:</strong> <span id="csrf-status">Not retrieved</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Connected:</strong> <span id="connection-status">Not tested</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Tests Complete:</strong> <span id="tests-status">Not started</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div id="test-results">
+                    <!-- Test results will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roomIdInput = document.getElementById('room-id');
+            const messageTextInput = document.getElementById('message-text');
+            const getCsrfBtn = document.getElementById('get-csrf');
+            const runTestsBtn = document.getElementById('run-tests');
+            const csrfStatus = document.getElementById('csrf-status');
+            const connectionStatus = document.getElementById('connection-status');
+            const testsStatus = document.getElementById('tests-status');
+            const testResultsContainer = document.getElementById('test-results');
+            const csrfTokenMeta = document.getElementById('csrf-token');
+
+            // Initialize test cases
+            const tests = [
+                {
+                    id: 'test-csrf',
+                    name: 'CSRF Token Retrieval',
+                    description: 'Checks if a valid CSRF token is available',
+                    status: 'pending',
+                    results: {}
+                },
+                {
+                    id: 'test-messages-endpoint',
+                    name: 'Messages Endpoint',
+                    description: 'Tests if the messages endpoint returns valid data',
+                    status: 'pending',
+                    results: {}
+                },
+                {
+                    id: 'test-send-message',
+                    name: 'Send Message',
+                    description: 'Tests if a message can be sent successfully',
+                    status: 'pending',
+                    results: {}
+                },
+                {
+                    id: 'test-online-users',
+                    name: 'Online Users',
+                    description: 'Tests if the online users endpoint returns data',
+                    status: 'pending',
+                    results: {}
+                }
+            ];
+
+            // Get CSRF token from the Laravel page
+            getCsrfBtn.addEventListener('click', async function() {
+                try {
+                    csrfStatus.textContent = 'Retrieving...';
+                    const response = await fetch('/');
+                    const text = await response.text();
+                    
+                    // Extract CSRF token from the HTML
+                    const match = text.match(/<meta name="csrf-token" content="([^"]+)"/);
+                    
+                    if (match && match[1]) {
+                        const csrfToken = match[1];
+                        csrfTokenMeta.content = csrfToken;
+                        csrfStatus.textContent = csrfToken.substring(0, 10) + '...';
+                        
+                        // Enable run tests button
+                        runTestsBtn.disabled = false;
+                        
+                        updateTestStatus('test-csrf', 'passed', { token: csrfToken });
+                    } else {
+                        csrfStatus.textContent = 'Failed to retrieve';
+                        updateTestStatus('test-csrf', 'failed', { error: 'Could not find CSRF token in the response' });
+                    }
+                } catch (error) {
+                    csrfStatus.textContent = 'Error: ' + error.message;
+                    updateTestStatus('test-csrf', 'failed', { error: error.message });
+                }
+                
+                renderTestResults();
+            });
+
+            // Run all tests
+            runTestsBtn.addEventListener('click', async function() {
+                const roomId = roomIdInput.value;
+                const messageText = messageTextInput.value;
+                const csrfToken = csrfTokenMeta.content;
+                
+                if (!roomId || !csrfToken) {
+                    alert('Please enter a Room ID and get a CSRF token first');
+                    return;
+                }
+                
+                testsStatus.textContent = 'Running tests...';
+                connectionStatus.textContent = 'Testing...';
+                
+                // 1. Test messages endpoint
+                await testMessagesEndpoint(roomId, csrfToken);
+                
+                // 2. Test send message
+                await testSendMessage(roomId, messageText, csrfToken);
+                
+                // 3. Test online users endpoint
+                await testOnlineUsersEndpoint(csrfToken);
+                
+                testsStatus.textContent = 'Complete';
+                connectionStatus.textContent = 'Test complete';
+                
+                renderTestResults();
+            });
+            
+            // Test the messages endpoint
+            async function testMessagesEndpoint(roomId, csrfToken) {
+                try {
+                    const response = await fetch(`/chat/poll/messages?room_id=${roomId}&last_id=0`, {
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data && 'messages' in data) {
+                        updateTestStatus('test-messages-endpoint', 'passed', data);
+                    } else {
+                        updateTestStatus('test-messages-endpoint', 'failed', { 
+                            error: 'Invalid response format', 
+                            data: data
+                        });
+                    }
+                } catch (error) {
+                    updateTestStatus('test-messages-endpoint', 'failed', { error: error.message });
+                }
+            }
+            
+            // Test sending a message
+            async function testSendMessage(roomId, messageText, csrfToken) {
+                try {
+                    const formData = new FormData();
+                    formData.append('room_id', roomId);
+                    formData.append('message', messageText);
+                    
+                    const response = await fetch('/chat/poll/send', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data && data.success === true && data.message) {
+                        updateTestStatus('test-send-message', 'passed', data);
+                    } else {
+                        updateTestStatus('test-send-message', 'failed', { 
+                            error: 'Message was not sent successfully', 
+                            data: data
+                        });
+                    }
+                } catch (error) {
+                    updateTestStatus('test-send-message', 'failed', { error: error.message });
+                }
+            }
+            
+            // Test online users endpoint
+            async function testOnlineUsersEndpoint(csrfToken) {
+                try {
+                    const response = await fetch('/chat/poll/online-users', {
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data && 'users' in data) {
+                        updateTestStatus('test-online-users', 'passed', data);
+                    } else {
+                        updateTestStatus('test-online-users', 'failed', { 
+                            error: 'Invalid response format', 
+                            data: data
+                        });
+                    }
+                } catch (error) {
+                    updateTestStatus('test-online-users', 'failed', { error: error.message });
+                }
+            }
+
+            // Update test status
+            function updateTestStatus(testId, status, results) {
+                const test = tests.find(t => t.id === testId);
+                if (test) {
+                    test.status = status;
+                    test.results = results;
+                }
+            }
+            
+            // Render test results
+            function renderTestResults() {
+                testResultsContainer.innerHTML = '';
+                
+                tests.forEach(test => {
+                    const card = document.createElement('div');
+                    card.className = `card test-card`;
+                    
+                    const headerClass = test.status === 'passed' ? 'bg-success' : 
+                                       (test.status === 'failed' ? 'bg-danger' : 'bg-warning');
+                    
+                    card.innerHTML = `
+                        <div class="card-header ${headerClass} text-white test-header">
+                            <h5 class="card-title mb-0">
+                                ${test.name} 
+                                <span class="float-end badge ${test.status === 'passed' ? 'bg-light text-dark' : 
+                                                              (test.status === 'failed' ? 'bg-light text-danger' : 'bg-light text-warning')}">
+                                    ${test.status.toUpperCase()}
+                                </span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p>${test.description}</p>
+                            ${test.status !== 'pending' ? `
+                                <div class="mt-2">
+                                    <strong>Results:</strong>
+                                    <pre>${JSON.stringify(test.results, null, 2)}</pre>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    testResultsContainer.appendChild(card);
+                });
+            }
+
+            // Initial render
+            renderTestResults();
+        });
+    </script>
+</body>
+</html>

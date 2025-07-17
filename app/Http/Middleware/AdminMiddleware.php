@@ -18,18 +18,18 @@ class AdminMiddleware
     {
        if(Auth::check())
         {
-            if(Auth::user()->role_as == '1')
+            if(Auth::user()->role === 'admin')
             {
                 return $next($request);
             }
             else
             {
-                return redirect('/back')->with('status','Access Denied! as you are not as admin');
+                return redirect('/dashboard')->with('status','Access Denied! You need admin privileges.');
             }
         }
         else
         {
-            return redirect('/home')->with('status','Please Login First');
+            return redirect('sign-in')->with('status','Please login first');
         }
     }
 }
