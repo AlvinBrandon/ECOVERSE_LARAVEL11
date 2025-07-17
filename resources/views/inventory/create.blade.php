@@ -51,8 +51,23 @@
             </div>
 
             <div class="mb-3">
-              <label for="batch_id" class="form-label">Batch ID (Optional):</label>
-              <input type="text" name="batch_id" class="form-control">
+              <label for="raw_material_id" class="form-label">Select Raw Material:</label>
+              <select name="raw_material_id" class="form-control">
+                <option value="" disabled selected>Select a raw material</option>
+                @foreach ($rawMaterials as $material)
+                  <option value="{{ $material->id }}">{{ $material->name }} ({{ $material->type }})</option>
+                @endforeach
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="batch_id" class="form-label">Batch ID <span class="text-danger">*</span> (must be unique for each restock):</label>
+              <input type="text" name="batch_id" class="form-control" required>
+              <small class="text-muted">Each restock must have a unique batch ID.</small>
+            </div>
+            <div class="mb-3">
+              <label for="expiry_date" class="form-label">Expiry Date (optional):</label>
+              <input type="date" name="expiry_date" class="form-control">
             </div>
 
             <div class="mb-3">

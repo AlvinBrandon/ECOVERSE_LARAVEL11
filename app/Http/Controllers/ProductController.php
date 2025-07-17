@@ -57,4 +57,14 @@ class ProductController extends Controller
         $product->delete();
         return response()->json(null, 204);
     }
+
+    // AJAX product search for autocomplete
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        $products = Product::where('name', 'like', "%{$query}%")
+            ->limit(10)
+            ->get(['id', 'name', 'price', 'image']);
+        return response()->json($products);
+    }
 } 

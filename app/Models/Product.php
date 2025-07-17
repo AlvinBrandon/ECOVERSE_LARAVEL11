@@ -30,6 +30,16 @@ class Product extends Model
 
     public function inventories()
     {
-        return $this->hasMany(\App\Models\Inventory::class);
+        return $this->hasMany(Inventory::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'product_id');
+    }
+    
+    public function batches()
+    {
+        return $this->hasMany(Batch::class);
     }
 }

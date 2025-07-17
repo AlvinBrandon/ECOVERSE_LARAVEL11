@@ -79,7 +79,7 @@
           <thead>
             <tr>
               <th><i class="bi bi-cube me-1"></i>Product</th>
-              <th><i class="bi bi-123 me-1"></i>Quantity</th>
+              <th><i class="bi bi-cube me-1"></i>Quantity</th>
               <th><i class="bi bi-clipboard-check me-1"></i>Status</th>
               <th><i class="bi bi-calendar me-1"></i>Date</th>
               <th><i class="bi bi-receipt me-1"></i>Action</th>

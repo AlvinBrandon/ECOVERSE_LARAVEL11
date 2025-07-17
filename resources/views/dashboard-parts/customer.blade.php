@@ -19,7 +19,12 @@
         <i class="bi bi-truck text-success" style="font-size:2rem;"></i>
         <h5 class="mt-2">Order Tracking</h5>
         <p>Track your orders and delivery status.</p>
-        <a href="#" class="btn btn-success mt-2"><i class="bi bi-truck me-1"></i> Track Orders</a>
+        <a href="{{ route('sales.status') }}" class="btn btn-success mt-2"><i class="bi bi-truck me-1"></i> Track Orders</a>
+        <div class="mt-3">
+          <a href="{{ route('sales.history') }}" class="btn btn-outline-secondary btn-sm mb-1"><i class="bi bi-clock-history me-1"></i> Order History</a>
+          <a href="{{ route('sales.status') }}" class="btn btn-outline-secondary btn-sm mb-1"><i class="bi bi-info-circle me-1"></i> Order Status</a>
+          <a href="{{ route('sales.analytics') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart me-1"></i> Analytics</a>
+        </div>
       </div>
     </div>
      <div class="col-md-6">

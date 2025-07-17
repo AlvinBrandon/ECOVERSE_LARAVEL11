@@ -24,7 +24,9 @@ class AdminMiddleware
             }
             else
             {
+ 
                 return redirect('/dashboard')->with('status','Access Denied! You need admin privileges.');
+          
             }
         }
         else

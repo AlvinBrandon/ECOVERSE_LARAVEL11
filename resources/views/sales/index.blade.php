@@ -53,11 +53,12 @@
     padding: 0.75rem 0;
   }
 </style>
+
 <div class="container-fluid py-4">
   <div class="row mb-4">
     <div class="col-12 d-flex align-items-center justify-content-between">
       <h4 class="text-dark fw-bold mb-0"><i class="bi bi-cart-check me-2"></i>Sales & Product Catalog</h4>
-      <a href="{{ route('dashboard') }}" class="btn btn-outline-dark"><i class="bi bi-house-door me-1"></i>Home</a>
+      <!-- Home button removed -->
     </div>
   </div>
 
@@ -66,12 +67,39 @@
       <a href="{{ route('sales.index') }}" class="btn btn-outline-primary {{ request()->routeIs('sales.index') ? 'active' : '' }}"><i class="bi bi-box-seam me-1"></i>Product Catalog</a>
       <a href="{{ route('sales.history') }}" class="btn btn-outline-info {{ request()->routeIs('sales.history') ? 'active' : '' }}"><i class="bi bi-clock-history me-1"></i>Order History</a>
       <a href="{{ route('sales.status') }}" class="btn btn-outline-success {{ request()->routeIs('sales.status') ? 'active' : '' }}"><i class="bi bi-clipboard-check me-1"></i>Order Status</a>
-      <a href="{{ route('sales.analytics') }}" class="btn btn-outline-info"><i class="bi bi-bar-chart me-1"></i>Analytics</a>
-      @if(auth()->user() && auth()->user()->is_admin)
-        <a href="{{ route('admin.sales.report') }}" class="btn btn-outline-dark {{ request()->routeIs('admin.sales.report') ? 'active' : '' }}"><i class="bi bi-bar-chart me-1"></i>Admin Report</a>
-      @endif
+      
     </div>
   </div>
+
+  @if(session('success'))
+    <div class="alert alert-success d-none" id="orderSuccessAlert">{{ session('success') }}</div>
+    <!-- Bootstrap Toast for Success Message -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+      <div id="orderSuccessToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var toastEl = document.getElementById('orderSuccessToast');
+        if (toastEl) {
+          var toast = new bootstrap.Toast(toastEl, { delay: 10000 }); // 10 seconds
+          toast.show();
+        }
+      });
+    </script>
+  @endif
+  @if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+  @endif
+<!-- <div class="alert alert-warning">
+   <strong>Note:</strong> Orders placed here will only be deducted from stock after admin verification. Your order will remain pending until approved by an admin.
+  </div>-->
 
   <div class="row g-4">
     @foreach ($products as $product)
@@ -93,20 +121,94 @@
               <p class="card-text text-success">Price: UGX {{ number_format($product->price) }}</p>
             </div>
           </div>
-          <form action="{{ route('sales.store') }}" method="POST" class="mt-3">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $product->id }}">
-            <div class="mb-3">
-              <label for="quantity_{{ $product->id }}" class="form-label">Quantity</label>
-              <input type="number" name="quantity" id="quantity_{{ $product->id }}" class="form-control form-control-lg" min="1" required placeholder="Enter quantity...">
-            </div>
-            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-cart-plus me-1"></i>Place Order</button>
-          </form>
+          <div class="mt-3">
+            <label for="quantity_{{ $product->id }}" class="form-label">Enter Quantity</label>
+            <input type="number" id="quantity_{{ $product->id }}" class="form-control form-control-lg order-qty-input" min="1" max="100" required placeholder="Enter quantity..." data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-type="{{ $product->type }}" data-product-description="{{ $product->description }}" data-product-price="{{ $product->price }}" data-product-image="{{ $product->image }}">
+            <button type="button" class="btn btn-primary w-100 mt-2 add-to-cart-btn" data-product-id="{{ $product->id }}"><i class="bi bi-cart-plus me-1"></i>Place Order</button>
+          </div>
         </div>
       </div>
     </div>
     @endforeach
   </div>
 </div>
+<!-- Add to Cart Success Modal -->
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="addToCartModalLabel"><i class="bi bi-check-circle me-2"></i>Product Added to Cart</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">Product added to cart successfully!</p>
+        <div class="d-flex justify-content-center gap-3">
+          <button type="button" class="btn btn-outline-success" id="modalCheckCartBtn">Check Cart</button>
+          <button type="button" class="btn btn-outline-secondary" id="modalContinueShoppingBtn">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Low Stock Modal -->
+<div class="modal fade" id="lowStockModal" tabindex="-1" aria-labelledby="lowStockModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="lowStockModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Quantity Limit Exceeded</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">You cannot order more than 100 units at a time. Please enter a quantity of 100 or less.</p>
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const productId = this.getAttribute('data-product-id');
+      const qtyInput = document.getElementById('quantity_' + productId);
+      let quantity = qtyInput.value ? parseInt(qtyInput.value) : 1;
+      if (quantity > 100) {
+        // Show low stock modal and do not add to cart
+        var lowStockModalEl = document.getElementById('lowStockModal');
+        var lowStockModal = new bootstrap.Modal(lowStockModalEl);
+        lowStockModal.show();
+        return;
+      }
+      fetch("{{ route('cart.add') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({ product_id: productId, quantity: quantity })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          var modalEl = document.getElementById('addToCartModal');
+          var modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        }
+      });
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    var modalEl = document.getElementById('addToCartModal');
+    if (modalEl) {
+      document.getElementById('modalCheckCartBtn').onclick = function() {
+        window.location.href = "{{ route('cart.view') }}";
+      };
+      document.getElementById('modalContinueShoppingBtn').onclick = function() {
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.hide();
+      };
+    }
+  });
+</script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection
