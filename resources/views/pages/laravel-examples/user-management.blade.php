@@ -1,3 +1,4 @@
+
 <x-layout bodyClass="g-sidenav-show  bg-gray-200">
 
     <x-navbars.sidebar activePage="user-management"></x-navbars.sidebar>
@@ -345,3 +346,4 @@
     <x-plugins></x-plugins>
 
 </x-layout>
+

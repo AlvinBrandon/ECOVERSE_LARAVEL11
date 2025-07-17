@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoVerse WebSocket Tester</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .message {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .incoming {
+            background-color: #f1f1f1;
+        }
+        .outgoing {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            text-align: right;
+        }
+        .connection-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .connected {
+            background-color: #c8e6c9;
+            color: #388e3c;
+        }
+        .disconnected {
+            background-color: #ffcdd2;
+            color: #d32f2f;
+        }
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+        }
+        #debug {
+            height: 150px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>EcoVerse WebSocket Tester</h1>
+        <div class="mb-3">
+            <div id="connection-status" class="connection-status disconnected">Disconnected</div>
+            <button id="connect-btn" class="btn btn-primary">Connect</button>
+            <button id="disconnect-btn" class="btn btn-danger" disabled>Disconnect</button>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>Connection Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="user-id" class="form-label">User ID</label>
+                    <input type="number" class="form-control" id="user-id" value="1">
+                </div>
+                <div class="mb-3">
+                    <label for="room-id" class="form-label">Chat Room ID</label>
+                    <input type="number" class="form-control" id="room-id" value="1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>Messages</h5>
+            </div>
+            <div class="card-body">
+                <div id="messages" class="mb-3"></div>
+                
+                <div class="input-group">
+                    <input type="text" id="message-input" class="form-control" placeholder="Type a message...">
+                    <button id="send-btn" class="btn btn-success" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Debug Console</h5>
+                <button id="clear-debug" class="btn btn-sm btn-outline-secondary">Clear</button>
+            </div>
+            <div class="card-body p-0">
+                <div id="debug"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Echo and Pusher libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.4.0/dist/web/pusher.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let echo = null;
+            const connectBtn = document.getElementById('connect-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+            const sendBtn = document.getElementById('send-btn');
+            const messageInput = document.getElementById('message-input');
+            const messagesDiv = document.getElementById('messages');
+            const connectionStatus = document.getElementById('connection-status');
+            const debugDiv = document.getElementById('debug');
+            const clearDebugBtn = document.getElementById('clear-debug');
+            
+            // Debug logger
+            function log(message, type = 'info') {
+                const date = new Date();
+                const timestamp = date.toLocaleTimeString() + '.' + date.getMilliseconds().toString().padStart(3, '0');
+                const entry = document.createElement('div');
+                entry.className = `log-entry log-${type}`;
+                entry.innerHTML = `<span class="log-time">${timestamp}</span> <span class="log-message">${message}</span>`;
+                debugDiv.appendChild(entry);
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+            
+            // Clear debug log
+            clearDebugBtn.addEventListener('click', function() {
+                debugDiv.innerHTML = '';
+            });
+            
+            // Add a message to the messages div
+            function addMessage(message, isOutgoing = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+                messageDiv.textContent = message;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            
+            // Connect button event handler
+            connectBtn.addEventListener('click', function() {
+                const userId = document.getElementById('user-id').value;
+                const roomId = document.getElementById('room-id').value;
+                
+                if (!userId || !roomId) {
+                    log('User ID and Room ID are required', 'error');
+                    return;
+                }
+                
+                try {
+                    log('Initializing Echo...');
+                    
+                    // Initialize Echo
+                    window.Pusher = Pusher;
+                    echo = new Echo({
+                        broadcaster: 'reverb',
+                        key: 'ecoverse_key',
+                        wsHost: window.location.hostname,
+                        wsPort: 8080,
+                        forceTLS: false,
+                        disableStats: true,
+                        enabledTransports: ['ws', 'wss'],
+                    });
+                    
+                    log('Echo initialized, connecting to channels...');
+                    
+                    // Listen for new chat messages in the room
+                    echo.private(`chat.room.${roomId}`)
+                        .listen('.new.message', (e) => {
+                            log(`Received message: ${JSON.stringify(e)}`);
+                            addMessage(`${e.message.user ? e.message.user.name : 'User'}: ${e.message.message}`);
+                        });
+                    
+                    log(`Connected to chat.room.${roomId}`);
+                    
+                    // Listen for user status updates
+                    echo.channel('user.status')
+                        .listen('.status.update', (e) => {
+                            log(`User status update: ${e.user.name} is ${e.status}`);
+                        });
+                    
+                    log('Connected to user.status channel');
+                    
+                    // Update UI
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'connection-status connected';
+                    connectBtn.disabled = true;
+                    disconnectBtn.disabled = false;
+                    sendBtn.disabled = false;
+                    
+                    log('WebSocket connection established successfully!');
+                } catch (error) {
+                    log(`Error connecting: ${error.message}`, 'error');
+                    console.error(error);
+                }
+            });
+            
+            // Disconnect button event handler
+            disconnectBtn.addEventListener('click', function() {
+                if (echo) {
+                    echo.disconnect();
+                    echo = null;
+                    
+                    // Update UI
+                    connectionStatus.textContent = 'Disconnected';
+                    connectionStatus.className = 'connection-status disconnected';
+                    connectBtn.disabled = false;
+                    disconnectBtn.disabled = true;
+                    sendBtn.disabled = true;
+                    
+                    log('WebSocket connection closed');
+                }
+            });
+            
+            // Send button event handler
+            sendBtn.addEventListener('click', function() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                const userId = document.getElementById('user-id').value;
+                const roomId = document.getElementById('room-id').value;
+                
+                // Display the message locally
+                addMessage(`You: ${message}`, true);
+                
+                // In a real app, you'd use an AJAX call to send the message through your Laravel backend
+                log(`Would send message to room ${roomId}: ${message}`);
+                messageInput.value = '';
+                
+                // Simulate sending through PHP script via fetch API
+                fetch('/test_chat.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        roomId: roomId,
+                        userId: userId,
+                        message: message
+                    })
+                })
+                .then(response => {
+                    log('Message sent to server');
+                })
+                .catch(error => {
+                    log(`Error sending message: ${error.message}`, 'error');
+                });
+            });
+            
+            // Allow pressing Enter to send message
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !sendBtn.disabled) {
+                    sendBtn.click();
+                }
+            });
+            
+            log('WebSocket tester initialized');
+        });
+    </script>
+</body>
+</html>

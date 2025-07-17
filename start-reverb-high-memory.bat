@@ -1,0 +1,3 @@
+@echo off
+echo Starting Laravel Reverb WebSocket server with increased memory (1024M)...
+php -d memory_limit=1024M artisan reverb:start
