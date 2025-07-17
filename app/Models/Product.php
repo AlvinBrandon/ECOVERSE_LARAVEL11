@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Product extends Model
 {
@@ -14,9 +14,31 @@ class Product extends Model
         'description',
         'type',
         'price',
+        'wholesale_price',
+        'retail_price',
+        'customer_price',
         'stock',
         'image',
     ];
+
+    /**
+     * Get the price for the current user based on their role.
+     */
+    public function getPriceForUser($user = null)
+    {
+        $user = $user ?: Auth::user();
+        if (!$user) return $this->price;
+        switch ($user->role) {
+            case 'wholesaler':
+                return $this->wholesale_price ?? $this->price;
+            case 'retailer':
+                return $this->retail_price ?? $this->price;
+            case 'customer':
+                return $this->customer_price ?? $this->price;
+            default:
+                return $this->price;
+        }
+    }
 
     public function sales()
     {

@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\InventoryUpdated;
 
 class StockTransferController extends Controller
 {
@@ -51,6 +52,8 @@ class StockTransferController extends Controller
             'quantity_after' => $inventory->quantity,
             'note' => 'Stock transferred out',
         ]);
+        // Broadcast inventory update event for source
+        event(new InventoryUpdated('deduct', $inventory->product_id, $inventory->batch_id ?? null, $request->quantity, Auth::id()));
 
         $toInventory->quantity += $request->quantity;
         $toInventory->save();
@@ -63,6 +66,8 @@ class StockTransferController extends Controller
             'quantity_after' => $toInventory->quantity,
             'note' => 'Stock transferred in',
         ]);
+        // Broadcast inventory update event for destination
+        event(new InventoryUpdated('add', $toInventory->product_id, $toInventory->batch_id ?? null, $request->quantity, Auth::id()));
 
         StockTransfer::create([
             'product_id' => $inventory->product_id,

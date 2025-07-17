@@ -7,6 +7,9 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Vendor;
 use App\Models\Order;
+use App\Models\PurchaseOrder;
+use App\Models\RawMaterial;
+use App\Models\StockHistory;
 
 class AdminController extends Controller
 {
@@ -69,6 +72,43 @@ class AdminController extends Controller
             return $product->batches->pluck('quantity');
         })->values()->all();
 
+        // --- Raw Material & PO Dashboard Data ---
+        $adminPOs = PurchaseOrder::with(['rawMaterial', 'supplier'])
+            ->orderByDesc('created_at')->take(10)->get();
+        $pendingDeliveries = PurchaseOrder::with(['rawMaterial', 'supplier'])
+            ->where('status', 'delivered')->orderByDesc('delivered_at')->take(10)->get();
+        $rawMaterials = RawMaterial::all();
+        $supplierPayments = PurchaseOrder::with('supplier')
+            ->whereIn('status', ['complete', 'paid'])
+            ->get()
+            ->groupBy('supplier_id')
+            ->map(function($orders, $supplierId) {
+                $amount = $orders->sum('price');
+                $status = $orders->contains('status', 'paid') ? 'paid' : 'pending';
+                return [
+                    'supplier' => $orders->first()->supplier->name ?? 'N/A',
+                    'amount' => $amount,
+                    'status' => $status,
+                ];
+            })->values();
+        $invoices = PurchaseOrder::whereNotNull('invoice_path')->get()->map(function($po) {
+            return (object)[
+                'po_id' => $po->id,
+                'invoice_path' => $po->invoice_path,
+                'status' => $po->status,
+                'feedback' => null, // Placeholder for future feedback
+            ];
+        });
+        $analytics = [
+            'received_this_month' => PurchaseOrder::whereMonth('completed_at', now()->month)->where('status', 'complete')->sum('quantity'),
+            'pending_pos' => PurchaseOrder::where('status', 'pending')->count(),
+            'pending_deliveries' => PurchaseOrder::where('status', 'delivered')->count(),
+            'unpaid' => PurchaseOrder::where('status', 'complete')->count(),
+        ];
+
+        // Pending sales count for verification widget
+        $pendingSalesCount = \App\Models\Order::where('status', 'pending')->count();
+
         // Use the correct dashboard view for admin
         return view('dashboards.admin', compact(
             'totalUsers', 'totalProducts', 'totalVendors',
@@ -76,7 +116,10 @@ class AdminController extends Controller
             'userRegistrationLabels', 'userRegistrationCounts',
             'revenueTrendLabels', 'revenueTrendData',
             'systemHealth', 'notifications', 'activityLog',
-            'batchLabels', 'batchData'
+            'batchLabels', 'batchData',
+            // New for dashboard widgets:
+            'adminPOs', 'pendingDeliveries', 'rawMaterials', 'supplierPayments', 'invoices', 'analytics',
+            'pendingSalesCount'
         ));
     }
 
@@ -90,11 +133,20 @@ class AdminController extends Controller
     // Update a user's role
     public function updateRole(Request $request, $id)
     {
+        $roleMap = [
+            0 => 'customer',
+            1 => 'admin',
+            2 => 'retailer',
+            3 => 'staff',
+            4 => 'supplier',
+            5 => 'wholesaler',
+        ];
         $request->validate([
-            'role_as' => 'required|in:0,1,2',
+            'role_as' => 'required|in:0,1,2,3,4,5',
         ]);
         $user = User::findOrFail($id);
         $user->role_as = $request->role_as;
+        $user->role = $roleMap[$request->role_as] ?? 'customer';
         $user->save();
         return redirect()->route('admin.users')->with('success', 'User role updated successfully.');
     }
@@ -105,5 +157,16 @@ class AdminController extends Controller
         $aspiringVendors = Vendor::where('status', 'pending')->orderBy('created_at', 'desc')->get();
         $approvedVendors = Vendor::where('status', 'approved')->orderBy('created_at', 'desc')->get();
         return view('admin.vendors', compact('aspiringVendors', 'approvedVendors'));
+    }
+
+    // Delete a user by ID
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('success', 'User not found.');
+        }
+        $user->delete();
+        return redirect()->back()->with('success', 'User deleted successfully.');
     }
 }

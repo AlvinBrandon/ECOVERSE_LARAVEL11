@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+<div class="dashboard-header d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h5 class="mb-0" style="color:#fff;">Welcome, {{ Auth::user()->name }}</h5>
+    </div>
+</div>
 <style>
   body, .main-content, .container-fluid {
     background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%) !important;
