@@ -13,18 +13,8 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text">{{ $product->description }}</p>
-                        <p class="card-text"><strong>Price:</strong> ${{ number_format($product->price, 2) }}</p>
-                        <p class="card-text"><strong>Stock:</strong> {{ $product->stock }}</p>
+                        <p class="card-text"><strong>Price:</strong> UGX {{ number_format($product->price, 0) }}</p>
                         <a href="{{ route('products.show', $product->id) }}" class="btn btn-secondary mb-2">View Details</a>
-
-                        <!-- FORM TO PREVIEW ORDER -->
-                        <form action="{{ route('order.preview') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <label for="quantity_{{ $product->id }}">Quantity:</label>
-                            <input type="number" name="quantity" id="quantity_{{ $product->id }}" class="form-control mb-2" min="1" max="{{ $product->stock }}" value="1" required>
-                            <button type="submit" class="btn btn-primary w-100">Place Order</button>
-                        </form>
                     </div>
                 </div>
             </div>

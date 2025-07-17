@@ -191,7 +191,7 @@ Route::post('/order/place', [SalesController::class, 'placeOrder'])->name('order
 // web.php
 
 // Step 1: Form submission from product or cart
-//Route::post('/order/preview', [OrderController::class, 'preview'])->name('order.preview');
+Route::post('/order/preview', [OrderController::class, 'preview'])->name('order.preview');
 
 // Step 2: Confirm final order placement
 //Route::post('/order/confirm', [OrderController::class, 'confirm'])->name('order.confirm');
@@ -200,7 +200,7 @@ Route::post('/order/place', [SalesController::class, 'placeOrder'])->name('order
 Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/remove', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
-    Route::get('/cart', [App\Http\Controllers\CartController::class, 'view'])->name('cart.view');
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
 });
 

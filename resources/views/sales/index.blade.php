@@ -201,7 +201,7 @@
     var modalEl = document.getElementById('addToCartModal');
     if (modalEl) {
       document.getElementById('modalCheckCartBtn').onclick = function() {
-        window.location.href = "{{ route('cart.view') }}";
+        window.location.href = "{{ route('cart.index') }}";
       };
       document.getElementById('modalContinueShoppingBtn').onclick = function() {
         var modal = bootstrap.Modal.getOrCreateInstance(modalEl);

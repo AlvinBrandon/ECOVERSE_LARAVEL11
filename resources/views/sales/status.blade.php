@@ -82,7 +82,7 @@
               <th><i class="bi bi-cube me-1"></i>Quantity</th>
               <th><i class="bi bi-clipboard-check me-1"></i>Status</th>
               <th><i class="bi bi-calendar me-1"></i>Date</th>
-              <th><i class="bi bi-receipt me-1"></i>Action</th>
+             
             </tr>
           </thead>
           <tbody>
@@ -92,11 +92,7 @@
                 <td>{{ $order->quantity }}</td>
                 <td><span class="badge bg-gradient-success">{{ ucfirst($order->status) }}</span></td>
                 <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
-                <td>
-                  <a href="{{ route('sales.invoice', $order->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                    <i class="bi bi-receipt"></i> View Receipt
-                  </a>
-                </td>
+                
               </tr>
             @endforeach
           </tbody>

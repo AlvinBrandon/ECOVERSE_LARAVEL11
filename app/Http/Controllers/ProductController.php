@@ -10,7 +10,14 @@ class ProductController extends Controller
     // Display a listing of the products
     public function index()
     {
-        $products = Product::all();
+        $search = request('search');
+        if ($search) {
+            $products = Product::where('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->get();
+        } else {
+            $products = Product::all();
+        }
         return view('pages.products', compact('products'));
     }
 

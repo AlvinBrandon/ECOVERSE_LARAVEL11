@@ -111,7 +111,7 @@ class CartController extends Controller
                 'quantity' => $item['quantity'],
                 'total_price' => $item['price'] * $item['quantity'],
                 'address' => $request->address,
-                'status' => 'pending',
+                'status' => 'order placed',
                 'payment_method' => $paymentMethod,
             ]);
         }

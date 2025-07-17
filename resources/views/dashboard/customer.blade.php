@@ -1,6 +1,36 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Customer Dashboard Top Bar -->
+<div class="container-fluid py-2 bg-white border-bottom mb-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap">
+        <!-- Logo/Brand -->
+        <div class="d-flex align-items-center me-3">
+            <span class="fw-bold fs-3 text-primary me-2">ECOVERSE</span>
+        </div>
+        <!-- Search Bar -->
+        <form action="{{ route('products.index') }}" method="GET" class="flex-grow-1 mx-3" style="max-width: 500px;">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search"></i></span>
+                <input type="text" name="search" class="form-control border-start-0" placeholder="Search products, brands and categories" aria-label="Search">
+                <button class="btn btn-primary px-4" type="submit">Search</button>
+            </div>
+        </form>
+        <!-- User, Help, Cart -->
+        <div class="d-flex align-items-center ms-3">
+            <span class="me-4"><i class="fas fa-user me-1"></i> Hi, {{ auth()->user()->name ?? 'Customer' }}</span>
+            <a href="{{ route('help') }}" class="text-decoration-none text-dark me-4" title="Help"><i class="fas fa-question-circle fa-lg"></i></a>
+            <a href="{{ route('cart.index') }}" class="text-decoration-none text-dark position-relative" title="Cart">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+                @php $cartCount = session('cart') ? count(session('cart')) : 0; @endphp
+                @if($cartCount > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">{{ $cartCount }}</span>
+                @endif
+                <span class="ms-1">Cart</span>
+            </a>
+        </div>
+    </div>
+</div>
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
