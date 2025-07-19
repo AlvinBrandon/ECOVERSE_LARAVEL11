@@ -34,6 +34,12 @@ class DatabaseSeeder extends Seeder
         if (app()->environment('local') && DB::getDriverName() === 'mysql') {
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
+        // Seed raw materials
+        $this->call(RawMaterialSeeder::class);
+        
+        // Seed locations
+        $this->call(LocationSeeder::class);
+        
         // Seed new products and inventory
         Product::factory(20)->create()->each(function ($product) {
             Inventory::create([

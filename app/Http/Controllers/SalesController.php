@@ -105,14 +105,19 @@ class SalesController extends Controller
         }
          $total_price = $product->price * $request->quantity;
 
+        // Generate unique order number
+        $order_number = 'ORD-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
+
         Order::create([
             'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => $request->quantity,
-             'total_price' => $total_price,
-             'address' => $request->address, // ✅ Step 2: Save the address
+            'unit_price' => $product->price,
+            'total_price' => $total_price,
+            'address' => $request->address,
             'status' => 'pending',
             'delivery_method' => $request->delivery_method ?? null,
+            'order_number' => $order_number,
         ]);
 
         // Do NOT deduct inventory here. Deduct only after verification by the next role in the sales chain.
@@ -237,12 +242,24 @@ class SalesController extends Controller
             'quantity'=>'required|integer|min:1',
             'address'=>'required|string|max:255',
         ]);
+        
+        // Generate unique order number
+        $order_number = 'ORD-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
+        
+        // Get product to calculate prices
+        $product = \App\Models\Product::findOrFail($request->product_id);
+        $total_price = $product->price * $request->quantity;
+        
         Order::create([
             'user_id'=>Auth::id(),
             'product_id'=>$request->product_id,
             'quantity'=>$request->quantity,
+            'unit_price' => $product->price,
+            'total_price' => $total_price,
             'address'=>$request->address,
             'status'=>'pending',
+            'delivery_method' => null, // Default for simple orders
+            'order_number' => $order_number,
         ]);
         return redirect()->route('dashboard')->with('success','Order placed successfully!');
         
