@@ -26,6 +26,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
     Route::post('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('admin.users.updateRole');
     Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    
+    // Prediction routes
+    Route::get('/admin/predictions', [App\Http\Controllers\Admin\PredictionController::class, 'index'])->name('admin.predictions.dashboard');
+    Route::get('/admin/predictions/get', [App\Http\Controllers\Admin\PredictionController::class, 'getPredictions'])->name('admin.predictions.get');
+    Route::post('/admin/predictions/train', [App\Http\Controllers\Admin\PredictionController::class, 'train'])->name('admin.predictions.train');
+    Route::get('/admin/predictions/insights', [App\Http\Controllers\Admin\PredictionController::class, 'getInsights'])->name('admin.predictions.insights');
+    Route::post('/admin/predictions/custom', [App\Http\Controllers\Admin\PredictionController::class, 'getCustomPredictions'])->name('admin.predictions.custom');
 });
 
 use App\Http\Controllers\WholesalerReportController;

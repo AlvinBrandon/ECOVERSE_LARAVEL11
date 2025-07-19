@@ -39,6 +39,14 @@
     </div>
     <div class="col-md-4">
       <div class="dashboard-card text-center">
+        <i class="bi bi-cpu text-primary" style="font-size:2rem;"></i>
+        <h5 class="mt-2">ML Predictions</h5>
+        <p>Access packaging materials predictions and analytics.</p>
+        <a href="{{ route('admin.predictions.dashboard') }}" class="btn btn-primary mt-2"><i class="bi bi-robot me-1"></i> ML Dashboard</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dashboard-card text-center">
         <i class="bi bi-clipboard-check text-warning" style="font-size:2rem;"></i>
         <h5 class="mt-2">Purchase Orders (Admin)</h5>
         <p>Review, verify, and mark purchase orders as paid.</p>
