@@ -35,7 +35,7 @@ class SessionsController extends Controller
         if ($user->role === 'supplier') {
             return redirect()->route('supplier.dashboard');
         }
-        return redirect('/dashboard');
+        return redirect()->route('dashboard');
     }
 
     public function show(){

@@ -17,7 +17,10 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
-            $table->decimal('total_amount', 10, 2);
+            // $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_price', 12, 2); // <-- Add this
+            $table->string('address')->nullable(); // <-- Add this
+            $table->string('delivery_method')->nullable(); // <-- Add if needed
             $table->string('status')->default('pending');
             $table->string('order_number')->unique();
             $table->text('notes')->nullable();

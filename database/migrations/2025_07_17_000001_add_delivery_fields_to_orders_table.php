@@ -7,7 +7,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('delivery_method')->nullable(); // delivery, pickup
+            // $table->string('delivery_method')->nullable(); // delivery, pickup
             $table->string('delivery_status')->default('pending'); // pending, dispatched, delivered, pickup_arranged
             $table->text('dispatch_log')->nullable();
             $table->string('tracking_code')->nullable();

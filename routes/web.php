@@ -104,27 +104,42 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 });
 
 Route::get('/dashboard', function () {
-    if (Auth::check() && Auth::user()->role === 'admin') {
-        return app(\App\Http\Controllers\AdminController::class)->dashboard();
+    if (Auth::check()) {
+        $role = Auth::user()->role;
+        // dd($role);
+        switch ($role) {
+            case 'admin':
+                return app(\App\Http\Controllers\AdminController::class)->dashboard();
+            case 'supplier':
+                $data = \App\Http\Controllers\PurchaseOrderController::supplierDashboardData(Auth::id());
+                return view('dashboards.supplier', $data);
+            case 'staff':
+                return view('dashboards.staff');
+            case 'retailer':
+                return view('dashboards.retailer');
+            case 'wholesaler':
+                return view('dashboards.wholesaler');
+            default:
+                return view('dashboards.customer');
+        }
     }
-    $role = Auth::check() ? Auth::user()->role : 'customer';
-    if ($role === 'supplier') {
-        $data = \App\Http\Controllers\PurchaseOrderController::supplierDashboardData(Auth::id());
-        return view('dashboards.supplier', $data);
-    }
-    $view = match($role) {
-        'staff' => 'dashboards.staff',
-        'retailer' => 'dashboards.retailer',
-        'wholesaler' => 'dashboards.wholesaler', 
-        default => 'dashboards.customer',
-    };
-    return view($view);
+    return redirect()->route('login');
 })->middleware('auth')->name('dashboard');
+
 Route::get('sign-up', [RegisterController::class, 'create'])->middleware('guest')->name('register');
 
 Route::post('sign-up', [RegisterController::class, 'store'])->middleware('guest');
 Route::get('sign-in', [SessionsController::class, 'create'])->middleware('guest')->name('login');
-Route::post('sign-in', [SessionsController::class, 'store'])->middleware('guest');
+
+Route::post('sign-in', function (\Illuminate\Http\Request $request) {
+    $response = app(App\Http\Controllers\SessionsController::class)->store($request);
+    // After login, redirect to dashboard for all roles
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return $response;
+})->middleware('guest');
+
 Route::post('verify', [SessionsController::class, 'show'])->middleware('guest');
 Route::post('reset-password', [SessionsController::class, 'update'])->middleware('guest')->name('password.update');
 Route::get('verify', function () {

@@ -26,13 +26,13 @@ class DatabaseSeeder extends Seeder
         //]);
         // Remove old products and inventory
         // Disable foreign key checks for MySQL
-        if (app()->environment('local') && \DB::getDriverName() === 'mysql') {
-            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        if (app()->environment('local') && DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         }
-        \DB::table('inventories')->truncate();
-        \DB::table('products')->truncate();
-        if (app()->environment('local') && \DB::getDriverName() === 'mysql') {
-            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::table('inventories')->truncate();
+        DB::table('products')->truncate();
+        if (app()->environment('local') && DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
         // Seed new products and inventory
         Product::factory(20)->create()->each(function ($product) {
