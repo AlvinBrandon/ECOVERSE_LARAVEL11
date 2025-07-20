@@ -17,7 +17,11 @@ class VendorApplication extends Model
         'contact_email',
         'contact_phone',
         'description',
-        'status'
+        'status',
+        'registration_certificate',
+        'ursb_document',
+        'trading_license',
+        'tin'
     ];
 
     /**

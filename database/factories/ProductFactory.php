@@ -143,6 +143,7 @@ class ProductFactory extends Factory
             'type' => $product['type'],
             'image' => $product['image'],
             'price' => fake()->randomFloat(2, 1000, 10000),
+            'sku' => 'SKU-' . fake()->unique()->numerify('####-####'),
         ];
     }
 }

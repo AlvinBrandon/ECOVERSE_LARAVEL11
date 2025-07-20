@@ -35,4 +35,12 @@
         <a href="{{ route('chat.index') }}" class="btn btn-success mt-2"><i class="bi bi-chat me-1"></i> Start Chat</a>
       </div>
     </div>
+    <div class="col-md-6">
+      <div class="dashboard-card text-center">
+        <i class="bi bi-shop text-warning" style="font-size:2rem;"></i>
+        <h5 class="mt-2">Become a Vendor</h5>
+        <p>Apply to become a vendor for bulk purchase.</p>
+        <a href="{{ route('vendor.apply') }}" class="btn btn-warning mt-2"><i class="bi bi-shop me-1"></i> Apply Now</a>
+      </div>
+    </div>
 </div>

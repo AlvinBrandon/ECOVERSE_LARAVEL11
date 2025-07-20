@@ -1,466 +1,566 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Application</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #e91e63;
-            --primary-dark: #c2185b;
-            --secondary: #3949ab;
-            --light-bg: #f9fafb;
-            --dark-text: #2d3748;
-            --gray: #718096;
-            --light-gray: #e2e8f0;
-            --success: #38a169;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f0f2f5 0%, #f8f9fa 100%);
-            color: var(--dark-text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .vendor-container {
-            display: flex;
-            max-width: 1000px;
-            width: 100%;
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            min-height: 600px;
-        }
-        
-        .vendor-illustration {
-            flex: 1;
-            background: linear-gradient(135deg, #f0f2f5 0%, #e91e63 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .illustration-content {
-            text-align: center;
-            z-index: 2;
-        }
-        
-        .vendor-illustration img {
-            max-width: 320px;
-            width: 100%;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
-        }
-        
-        .vendor-illustration h2 {
-            color: white;
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .vendor-illustration p {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 16px;
-            max-width: 350px;
-            line-height: 1.6;
-        }
-        
-        .illustration-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            background: radial-gradient(circle at top right, var(--primary) 0%, transparent 50%);
-        }
-        
-        .vendor-form {
-            flex: 1;
-            padding: 40px;
-            background: white;
-        }
-        
-        .form-header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-        
-        .form-header h2 {
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .form-header h2:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-        
-        .form-header p {
-            color: var(--gray);
-            font-size: 16px;
-            margin-top: 20px;
-            line-height: 1.6;
-        }
-        
-        .form-step {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--gray);
-            margin-right: 10px;
-        }
-        
-        .step.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .step-text {
-            font-weight: 500;
-            color: var(--dark-text);
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark-text);
-            font-size: 15px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 15px;
-            transition: var(--transition);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.15);
-        }
-        
-        .select-wrapper {
-            position: relative;
-        }
-        
-        .select-wrapper:after {
-            content: '\f078';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            pointer-events: none;
-        }
-        
-        select.form-control {
-            appearance: none;
-            cursor: pointer;
-        }
-        
-        .file-upload {
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border: 2px dashed var(--light-gray);
-            border-radius: 8px;
-            background: var(--light-bg);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .file-upload:hover {
-            border-color: var(--primary);
-        }
-        
-        .file-upload input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        .file-upload span {
-            margin-left: 12px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .file-upload i {
-            color: var(--primary);
-            font-size: 20px;
-        }
-        
-        .file-info {
-            margin-top: 8px;
-            color: var(--gray);
-            font-size: 13px;
-            display: block;
-        }
-        
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 10px rgba(233, 30, 99, 0.3);
-            margin-top: 10px;
-        }
-        
-        .btn-submit:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(233, 30, 99, 0.4);
-        }
-        
-        .form-footer {
-            text-align: center;
-            margin-top: 25px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .form-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-        
-        .alert {
-            padding: 14px 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .alert-success {
-            background: rgba(56, 161, 105, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(56, 161, 105, 0.25);
-        }
-        
-        .alert i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        
-        @media (max-width: 768px) {
-            .vendor-container {
-                flex-direction: column;
-            }
-            
-            .vendor-illustration {
-                padding: 30px 20px;
-            }
-            
-            .vendor-illustration img {
-                max-width: 220px;
-            }
-            
-            .vendor-form {
-                padding: 30px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="vendor-container">
-        <div class="vendor-illustration">
-            <div class="illustration-bg"></div>
-            <div class="illustration-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/3759/3759263.png" alt="Vendor Application">
-                <h2>Join Our Vendor Network</h2>
-                <p>Expand your business reach by becoming a trusted supplier or wholesaler on our platform</p>
-            </div>
-        </div>
-        
-        <div class="vendor-form">
-            <div class="form-header">
-                <h2>Become a Vendor</h2>
-                <p>Fill in your company details to apply as a supplier or wholesaler. All fields are required.</p>
-            </div>
-            
-            <div class="form-step">
-                <div class="step active">1</div>
-                <div class="step-text">Company Information</div>
-            </div>
-            
-            @if(session('success'))
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
-            </div>
-            @endif
-            
-            <form action="{{ route('vendor.apply') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="form-group">
-                    <label for="name"><i class="fas fa-building"></i> Company Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your company name" value="{{ old('name') }}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Business Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your business email" value="{{ old('email') }}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="type"><i class="fas fa-tags"></i> Vendor Type</label>
-                    <div class="select-wrapper">
-                        <select class="form-control" id="type" name="type" required>
-                            <option value="" disabled {{ old('type') ? '' : 'selected' }}>Select your vendor type</option>
-                            <option value="supplier" {{ old('type') == 'supplier' ? 'selected' : '' }}>Supplier</option>
-                            <option value="wholesaler" {{ old('type') == 'wholesaler' ? 'selected' : '' }}>Wholesaler</option>
-                        </select>
+<div class="vendor-application-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-50">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <div class="badge bg-primary mb-3">
+                            <i class="fas fa-store me-2"></i>Partner with Us
+                        </div>
+                        <h1 class="display-4 fw-bold text-white mb-4">Join Our Vendor Network</h1>
+                        <p class="lead text-white-50 mb-4">Expand your business reach by becoming a verified supplier or wholesaler on our eco-friendly platform.</p>
+                        <div class="row text-white">
+                            <div class="col-md-6 mb-3">
+                                <div class="feature-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span>Verified Partner Status</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="feature-item">
+                                    <i class="fas fa-chart-line text-success me-2"></i>
+                                    <span>Growth Opportunities</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="feature-item">
+                                    <i class="fas fa-handshake text-success me-2"></i>
+                                    <span>Trusted Network</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="feature-item">
+                                    <i class="fas fa-globe text-success me-2"></i>
+                                    <span>Wider Market Reach</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="document"><i class="fas fa-file-contract"></i> URSB Registration</label>
-                    <div class="file-upload">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span>Upload URSB document</span>
-                        <input type="file" id="document" name="ursb_document" accept=".pdf,.jpg,.jpeg,.png" required>
-                    </div>
-                    <small class="file-info">Accepted formats: PDF, JPG, PNG (Max size: 5MB)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="address"><i class="fas fa-map-marker-alt"></i> Company Address</label>
-                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter your company physical address" value="{{ old('address') }}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="tin"><i class="fas fa-id-card"></i> Tax Identification Number (TIN)</label>
-                    <input type="text" class="form-control" id="tin" name="tin" placeholder="Enter your TIN" value="{{ old('tin') }}" required>
-                </div>
-                
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-paper-plane"></i> Submit Application
-                </button>
-            </form>
-            
-            <div class="form-footer">
-                <p>By submitting this application, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.querySelector('.file-upload input');
-            const fileUpload = document.querySelector('.file-upload');
-            
-            fileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    const fileName = this.files[0].name;
-                    fileUpload.querySelector('span').textContent = fileName;
-                }
-            });
-            
-            // Form validation
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function(e) {
-                let valid = true;
-                
-                document.querySelectorAll('input, select').forEach(input => {
-                    if (!input.value) {
-                        input.style.borderColor = '#e53e3e';
-                        valid = false;
-                    } else {
-                        input.style.borderColor = '';
-                    }
-                });
-                
-                if (!valid) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields.');
-                } else {
-                    // Simulate form submission
-                    e.preventDefault();
-                    alert('Application submitted successfully!');
-                }
-            });
-        });
-    </script>
-</body>
-</html>
-@endsection 
+    <!-- Application Form Section -->
+    <div class="form-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="application-card">
+                        <div class="card-header">
+                            <div class="text-center">
+                                <div class="header-icon">
+                                    <i class="fas fa-file-contract"></i>
+                                </div>
+                                <h2 class="mb-2">Vendor Application</h2>
+                                <p class="text-muted mb-0">Complete all sections below to submit your application</p>
+                            </div>
+                            
+                            <!-- Progress Steps -->
+                            <div class="progress-steps mt-4">
+                                <div class="step active">
+                                    <div class="step-number">1</div>
+                                    <div class="step-label">Company Info</div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-label">Documents</div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-label">Review</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @if(session('success'))
+                            <div class="alert alert-success alert-modern">
+                                <div class="alert-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h6 class="alert-title">Application Submitted Successfully!</h6>
+                                    <p class="mb-0">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            @if($errors->any())
+                            <div class="alert alert-danger alert-modern">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h6 class="alert-title">Please Fix the Following Errors:</h6>
+                                    <ul class="mb-0">
+                                        @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                            @endif
+                            
+                            <form action="{{ route('vendor.apply') }}" method="POST" enctype="multipart/form-data" class="vendor-form">
+                                @csrf
+                                
+                                <!-- Company Information Section -->
+                                <div class="form-section-card">
+                                    <div class="section-header">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-building text-primary me-2"></i>
+                                            Company Information
+                                        </h4>
+                                        <p class="section-subtitle">Tell us about your business</p>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="name" class="form-label">
+                                                    <i class="fas fa-building text-muted me-2"></i>Company Name *
+                                                </label>
+                                                <input type="text" class="form-control form-control-modern" id="name" name="name" 
+                                                       placeholder="Enter your company name" value="{{ old('name') }}" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="email" class="form-label">
+                                                    <i class="fas fa-envelope text-muted me-2"></i>Business Email *
+                                                </label>
+                                                <input type="email" class="form-control form-control-modern" id="email" name="email" 
+                                                       placeholder="Enter your business email" value="{{ old('email') }}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="type" class="form-label">
+                                                    <i class="fas fa-tags text-muted me-2"></i>Vendor Type *
+                                                </label>
+                                                <select class="form-select form-control-modern" id="type" name="type" required>
+                                                    <option value="">Select your vendor type</option>
+                                                    <option value="supplier" {{ old('type') == 'supplier' ? 'selected' : '' }}>Supplier</option>
+                                                    <option value="wholesaler" {{ old('type') == 'wholesaler' ? 'selected' : '' }}>Wholesaler</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="tin" class="form-label">
+                                                    <i class="fas fa-id-card text-muted me-2"></i>Tax ID (TIN) *
+                                                </label>
+                                                <input type="text" class="form-control form-control-modern" id="tin" name="tin" 
+                                                       placeholder="Enter your TIN number" value="{{ old('tin') }}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="address" class="form-label">
+                                            <i class="fas fa-map-marker-alt text-muted me-2"></i>Company Address *
+                                        </label>
+                                        <textarea class="form-control form-control-modern" id="address" name="address" rows="3" 
+                                                  placeholder="Enter your complete company address" required>{{ old('address') }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <!-- Document Upload Section -->
+                                <div class="form-section-card">
+                                    <div class="section-header">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-file-upload text-primary me-2"></i>
+                                            Required Documents
+                                        </h4>
+                                        <p class="section-subtitle">Upload all required business documents for verification</p>
+                                    </div>
+                                    
+                                    <div class="documents-grid">
+                                        <!-- Certificate of Registration -->
+                                        <div class="document-upload-card">
+                                            <div class="document-icon">
+                                                <i class="fas fa-certificate text-warning"></i>
+                                            </div>
+                                            <div class="document-content">
+                                                <h6 class="document-title">Certificate of Registration</h6>
+                                                <p class="document-desc">Official company registration certificate</p>
+                                                <input type="file" class="form-control document-input" id="registration_cert" 
+                                                       name="registration_certificate" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                <small class="upload-info">PDF, JPG, PNG (Max: 5MB)</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- URSB Document -->
+                                        <div class="document-upload-card">
+                                            <div class="document-icon">
+                                                <i class="fas fa-file-contract text-info"></i>
+                                            </div>
+                                            <div class="document-content">
+                                                <h6 class="document-title">URSB Registration</h6>
+                                                <p class="document-desc">Uganda Registration Services Bureau document</p>
+                                                <input type="file" class="form-control document-input" id="ursb_document" 
+                                                       name="ursb_document" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                <small class="upload-info">PDF, JPG, PNG (Max: 5MB)</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Trading License -->
+                                        <div class="document-upload-card">
+                                            <div class="document-icon">
+                                                <i class="fas fa-balance-scale text-success"></i>
+                                            </div>
+                                            <div class="document-content">
+                                                <h6 class="document-title">Trading License</h6>
+                                                <p class="document-desc">Valid business trading license</p>
+                                                <input type="file" class="form-control document-input" id="trading_license" 
+                                                       name="trading_license" accept=".pdf,.jpg,.jpeg,.png" required>
+                                                <small class="upload-info">PDF, JPG, PNG (Max: 5MB)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms and Submit -->
+                                <div class="form-section-card">
+                                    <div class="terms-section">
+                                        <div class="custom-checkbox">
+                                            <input type="checkbox" class="form-check-input" id="terms" required>
+                                            <label class="form-check-label" for="terms">
+                                                I hereby confirm that all information provided is accurate and I agree to the 
+                                                <a href="#" class="text-primary fw-semibold">Terms of Service</a> and 
+                                                <a href="#" class="text-primary fw-semibold">Privacy Policy</a>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-submit">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        Submit Application
+                                        <div class="btn-shine"></div>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modern Vendor Application Styles */
+.vendor-application-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.hero-section {
+    padding: 100px 0 50px 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-section {
+    background: #f8f9fa;
+    padding: 50px 0;
+    margin-top: -50px;
+    border-radius: 50px 50px 0 0;
+}
+
+.application-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem 2rem 2rem;
+    border: none;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    font-size: 2rem;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.step.active .step-number {
+    background: white;
+    color: #667eea;
+}
+
+.card-body {
+    padding: 3rem;
+}
+
+.form-section-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-title {
+    color: #2d3748;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #718096;
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-control-modern {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control-modern:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.document-upload-card {
+    background: white;
+    border: 2px dashed #e2e8f0;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.document-upload-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.document-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.document-title {
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.document-desc {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.document-input {
+    margin-bottom: 0.5rem;
+}
+
+.upload-info {
+    color: #a0aec0;
+    font-size: 0.8rem;
+}
+
+.terms-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.custom-checkbox .form-check-input {
+    margin-top: 0.25rem;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-submit:hover .btn-shine {
+    left: 100%;
+}
+
+.alert-modern {
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    margin-top: 0.25rem;
+}
+
+.alert-title {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0 30px 0;
+    }
+    
+    .card-header {
+        padding: 2rem 1rem 1.5rem 1rem;
+    }
+    
+    .card-body {
+        padding: 2rem 1rem;
+    }
+    
+    .progress-steps {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .documents-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-section-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+@endsection
