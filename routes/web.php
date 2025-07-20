@@ -13,6 +13,7 @@ use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ChatPollingController;
+use App\Http\Controllers\ChatNotificationController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesApprovalController;
@@ -127,7 +128,7 @@ Route::get('/dashboard', function () {
             case 'wholesaler':
                 return view('dashboards.wholesaler');
             default:
-                return view('dashboards.customer');
+                return app(\App\Http\Controllers\DashboardController::class)->customerDashboard();
         }
     }
     return redirect()->route('login');

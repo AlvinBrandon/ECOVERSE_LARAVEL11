@@ -6,6 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'Ecoverse')</title>
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
@@ -13,6 +19,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <style>
+        /* Global Poppins Font */
+        body, html, * {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+        
         .unit-label { font-size: 0.95em; color: #6366f1; font-weight: 500; margin-left: 2px; }
         .promo-bar { background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%); color: #fff; font-weight: 600; font-size: 1.05rem; padding: 0.4rem 0; letter-spacing: 1px; }
         .navbar-ecoverse { background: #fff; border-bottom: 1px solid #f3f3f3; box-shadow: 0 2px 8px #ff98001a; z-index: 1030; }
