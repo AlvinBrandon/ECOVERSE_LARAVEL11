@@ -14,31 +14,85 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // $role = Auth::user()->role;
-
-        
-        // return match($role) {
-        //     'admin' => redirect()->route('admin.dashboard'),
-        //     'staff' => redirect()->route('staff.dashboard'),
-        //     'supplier' => redirect()->route('supplier.dashboard'),
-        //     'retailer' => redirect()->route('retailer.dashboard'),
-        //     'wholesaler' => redirect()->route('wholesaler.dashboard'),
-        //     'customer' => redirect()->route('customer.dashboard'),
-        //     default => abort(403, 'Unauthorized action.'),
-        // };
         $user = Auth::user();
-        // Allow admin to view customer dashboard with ?as=customer
-        if ($user->role_as == 1 && request('as') === 'customer') {
-            return $this->customerDashboard();
+        
+        // Clear any cached data to ensure fresh role-based content
+        Cache::flush();
+        
+        // Refresh user data from database to get latest role changes
+        $user = $user->fresh();
+        
+        // Allow admin to view specific dashboard with ?as= parameter
+        if ($user->role_as == 1 && request('as')) {
+            return $this->viewDashboardAs(request('as'));
         }
-        if ($user->role_as == 1) {
-            // Use AdminController's dashboard method to ensure all variables are passed
-            return app(\App\Http\Controllers\AdminController::class)->dashboard();
-        } elseif ($user->role_as == 2) {
-            return view('vendor.admin');
-        } else {
-            return $this->customerDashboard();
-        }
+        
+        // Route to appropriate dashboard based on role_as
+        return match($user->role_as) {
+            1 => $this->adminDashboard(),
+            2 => $this->retailerDashboard(),
+            3 => $this->staffDashboard(),
+            4 => $this->supplierDashboard(),
+            5 => $this->wholesalerDashboard(),
+            0 => $this->customerDashboard(),
+            default => abort(403, 'Invalid user role.'),
+        };
+    }
+    
+    /**
+     * Allow admin to view other dashboards for testing/support
+     */
+    private function viewDashboardAs($role)
+    {
+        return match($role) {
+            'customer' => $this->customerDashboard(),
+            'retailer' => $this->retailerDashboard(),
+            'wholesaler' => $this->wholesalerDashboard(),
+            'supplier' => $this->supplierDashboard(),
+            'staff' => $this->staffDashboard(),
+            default => $this->adminDashboard(),
+        };
+    }
+    
+    /**
+     * Admin Dashboard
+     */
+    private function adminDashboard()
+    {
+        // Use AdminController's dashboard method to ensure all variables are passed
+        return app(\App\Http\Controllers\AdminController::class)->dashboard();
+    }
+    
+    /**
+     * Retailer Dashboard
+     */
+    private function retailerDashboard()
+    {
+        return view('dashboards.retailer');
+    }
+    
+    /**
+     * Staff Dashboard
+     */
+    private function staffDashboard()
+    {
+        return view('dashboards.staff');
+    }
+    
+    /**
+     * Supplier Dashboard
+     */
+    private function supplierDashboard()
+    {
+        return view('dashboards.supplier');
+    }
+    
+    /**
+     * Wholesaler Dashboard
+     */
+    private function wholesalerDashboard()
+    {
+        return view('dashboards.wholesaler');
     }
 
     public function customerDashboard()

@@ -19,7 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesApprovalController;
 use App\Http\Controllers\StaffOrderController;
 use App\Http\Controllers\CustomerOrderController;
-use App\Http\Controllers\OrderController;
+// use App\Http\Controllers\OrderController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -38,11 +38,28 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 use App\Http\Controllers\WholesalerReportController;
 use App\Http\Controllers\RetailerReportController;
+use App\Http\Controllers\Wholesaler\RetailerNetworkController;
+
 // Wholesaler analytics and retailer order verification
-Route::middleware(['auth', 'role:wholesaler,5'])->get('/wholesaler/reports', [WholesalerReportController::class, 'index'])->name('wholesaler.reports');
+Route::middleware(['auth', 'role:wholesaler,5'])->group(function () {
+    Route::get('/wholesaler/reports', [WholesalerReportController::class, 'index'])->name('wholesaler.reports');
+    Route::get('/wholesaler/retailer-network', [RetailerNetworkController::class, 'index'])->name('wholesaler.retailer-network');
+    Route::post('/wholesaler/retailer-network/verify/{order}', [RetailerNetworkController::class, 'verifyOrder'])->name('wholesaler.retailer-network.verify');
+    Route::post('/wholesaler/retailer-network/reject/{order}', [RetailerNetworkController::class, 'rejectOrder'])->name('wholesaler.retailer-network.reject');
+    Route::post('/wholesaler/retailer-network/bulk-verify', [RetailerNetworkController::class, 'bulkVerify'])->name('wholesaler.retailer-network.bulk-verify');
+});
 
 // Retailer analytics and customer order verification
 Route::middleware(['auth', 'role:retailer,2'])->get('/retailer/reports', [RetailerReportController::class, 'index'])->name('retailer.reports');
+
+// Retailer order management routes
+use App\Http\Controllers\RetailerOrderController;
+Route::middleware(['auth', 'role:retailer,2'])->prefix('retailer')->group(function () {
+    Route::get('/customer-orders', [RetailerOrderController::class, 'customerOrders'])->name('retailer.customer-orders');
+    Route::post('/orders/{order}/approve', [RetailerOrderController::class, 'approveOrder'])->name('retailer.orders.approve');
+    Route::post('/orders/{order}/reject', [RetailerOrderController::class, 'rejectOrder'])->name('retailer.orders.reject');
+    Route::get('/inventory', [RetailerOrderController::class, 'inventory'])->name('retailer.inventory');
+});
 
 // Chat routes
 Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
@@ -211,6 +228,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/sales/verify', [SalesApprovalController::class, 'index'])->name('admin.sales.pending');
     Route::post('/sales/{id}/verify', [SalesApprovalController::class, 'verify'])->name('admin.sales.verify');
     Route::post('/sales/{id}/reject', [SalesApprovalController::class, 'reject'])->name('admin.sales.reject');
+    Route::post('/sales/bulk-verify', [SalesApprovalController::class, 'bulkVerify'])->name('admin.sales.bulk-verify');
+    
+    // Analytics & Reports
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics');
+    Route::get('/analytics/export', [\App\Http\Controllers\Admin\AnalyticsController::class, 'export'])->name('admin.analytics.export');
 });
 
 // Purchase Order Workflow Routes
@@ -245,11 +267,18 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 });
 Route::get('/order/{product}', [SalesController::class, 'showOrderForm'])->name('order.form');
 Route::post('/order/place', [SalesController::class, 'placeOrder'])->name('order.place');
+
+// Order verification routes for retailers and wholesalers
+Route::middleware(['auth', 'role:retailer,wholesaler,admin'])->group(function () {
+    Route::post('/orders/{order}/verify', [SalesController::class, 'verifyOrder'])->name('orders.verify');
+    Route::post('/orders/{order}/reject', [SalesController::class, 'rejectOrder'])->name('orders.reject');
+});
+
 //Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 // web.php
 
 // Step 1: Form submission from product or cart
-Route::post('/order/preview', [OrderController::class, 'preview'])->name('order.preview');
+//Route::post('/order/preview', [OrderController::class, 'preview'])->name('order.preview');
 
 // Step 2: Confirm final order placement
 //Route::post('/order/confirm', [OrderController::class, 'confirm'])->name('order.confirm');

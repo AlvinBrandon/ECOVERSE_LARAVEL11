@@ -15,12 +15,17 @@ class Order extends Model
         'quantity',
         'unit_price',
         'total_price',
+        'total_amount',
         'address',
         'status',
         'payment_method',
         'order_number',
         'delivery_method',
         'notes',
+        'verified_at',
+        'verified_by',
+        'rejected_at',
+        'rejected_by',
     ];
 
     public function user()

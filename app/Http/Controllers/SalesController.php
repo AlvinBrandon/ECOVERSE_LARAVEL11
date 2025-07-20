@@ -114,6 +114,7 @@ class SalesController extends Controller
             'quantity' => $request->quantity,
             'unit_price' => $product->price,
             'total_price' => $total_price,
+            'total_amount' => $total_price, // Same as total_price for now
             'address' => $request->address,
             'status' => 'pending',
             'delivery_method' => $request->delivery_method ?? null,
@@ -262,6 +263,39 @@ class SalesController extends Controller
             'order_number' => $order_number,
         ]);
         return redirect()->route('dashboard')->with('success','Order placed successfully!');
-        
     }
-        }
+
+    /**
+     * Verify an order (for retailers, wholesalers, and admins)
+     */
+    public function verifyOrder(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        // Update order status to verified
+        $order->update([
+            'status' => 'verified',
+            'verified_at' => now(),
+            'verified_by' => Auth::id()
+        ]);
+
+        return redirect()->back()->with('success', 'Order verified successfully!');
+    }
+
+    /**
+     * Reject an order (for retailers, wholesalers, and admins)
+     */
+    public function rejectOrder(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        // Update order status to rejected
+        $order->update([
+            'status' => 'rejected',
+            'rejected_at' => now(),
+            'rejected_by' => Auth::id()
+        ]);
+
+        return redirect()->back()->with('success', 'Order rejected successfully!');
+    }
+}

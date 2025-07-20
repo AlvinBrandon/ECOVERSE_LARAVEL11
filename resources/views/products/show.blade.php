@@ -28,7 +28,7 @@
             <h1 class="mb-3">{{ $product->name }}</h1>
             
             <div class="mb-4">
-                <h3 class="text-primary mb-0">${{ number_format($product->price, 2) }}</h3>
+                <h3 class="text-primary mb-0">UGX {{ number_format($product->price, 2) }}</h3>
                 <span class="badge bg-{{ $product->stock > 0 ? 'success' : 'danger' }} mt-2">
                     {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}
                 </span>
@@ -120,7 +120,7 @@
                                     <h5 class="card-title">{{ $relatedProduct->name }}</h5>
                                     <p class="card-text text-muted">{{ Str::limit($relatedProduct->description, 100) }}</p>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <span class="h5 mb-0">${{ number_format($relatedProduct->price, 2) }}</span>
+                                        <span class="h5 mb-0">UGX {{ number_format($relatedProduct->price, 2) }}</span>
                                         <a href="{{ route('products.show', $relatedProduct) }}" class="btn btn-outline-primary btn-sm">View</a>
                                     </div>
                                 </div>

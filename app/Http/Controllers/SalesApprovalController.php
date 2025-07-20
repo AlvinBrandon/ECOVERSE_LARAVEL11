@@ -98,4 +98,97 @@ class SalesApprovalController extends Controller
         }
         return back()->with('success', 'Order rejected.');
     }
+
+    public function bulkVerify(Request $request)
+    {
+        $request->validate([
+            'selected_sales' => 'required|string',
+            'bulk_delivery_status' => 'required|in:pending,dispatched,delivered,pickup_arranged',
+            'bulk_tracking_prefix' => 'nullable|string|max:20',
+            'bulk_dispatch_log' => 'nullable|string|max:255',
+        ]);
+
+        $saleIds = explode(',', $request->selected_sales);
+        $sales = Order::whereIn('id', $saleIds)->with(['user', 'product'])->get();
+
+        if ($sales->isEmpty()) {
+            return back()->with('error', 'No valid sales found for bulk verification.');
+        }
+
+        $verifiedCount = 0;
+        $totalValue = 0;
+        $wholesalerOrders = [];
+
+        foreach ($sales as $sale) {
+            $product = $sale->product;
+            if (!$product) continue;
+
+            // Calculate total value with role-based pricing
+            $unitPrice = $product->getPriceForUser($sale->user) ?? $product->price;
+            $totalValue += $unitPrice * $sale->quantity;
+
+            // Generate unique tracking code
+            $trackingCode = $request->bulk_tracking_prefix 
+                ? $request->bulk_tracking_prefix . date('Ymd') . '-' . $sale->id
+                : 'TRK-' . date('Ymd') . '-' . $sale->id;
+
+            // Update sale details
+            $sale->delivery_status = $request->bulk_delivery_status;
+            $sale->tracking_code = $trackingCode;
+            $sale->dispatch_log = $request->bulk_dispatch_log ?? 'Bulk verified on ' . now()->format('Y-m-d H:i:s');
+
+            // Special handling for wholesaler orders
+            if ($sale->user && (isset($sale->user->role_as) ? $sale->user->role_as == 5 : $sale->user->role === 'wholesaler')) {
+                $product->seller_role = 'wholesaler';
+                $product->save();
+
+                // Track wholesaler orders for summary
+                $userName = $sale->user->name;
+                if (!isset($wholesalerOrders[$userName])) {
+                    $wholesalerOrders[$userName] = ['count' => 0, 'total' => 0];
+                }
+                $wholesalerOrders[$userName]['count']++;
+                $wholesalerOrders[$userName]['total'] += $unitPrice * $sale->quantity;
+
+                // Handle inventory
+                $inventory = $product->inventories()->first();
+                if ($inventory && $inventory->quantity >= $sale->quantity) {
+                    $inventory->quantity -= $sale->quantity;
+                    $inventory->save();
+                } else {
+                    // Create or update inventory record
+                    if (!$inventory) {
+                        $product->inventories()->create(['quantity' => 0]);
+                    }
+                }
+
+                // Add inventory for retailer visibility
+                $retailerInventory = $product->inventories()->where('id', '!=', $inventory ? $inventory->id : 0)->first();
+                if ($retailerInventory) {
+                    $retailerInventory->quantity += $sale->quantity;
+                    $retailerInventory->save();
+                } else {
+                    $product->inventories()->create(['quantity' => $sale->quantity]);
+                }
+            }
+
+            $sale->status = 'approved';
+            $sale->save();
+            $verifiedCount++;
+        }
+
+        // Create success message with summary
+        $message = "Successfully verified {$verifiedCount} orders with total value of UGX " . number_format($totalValue, 2);
+        
+        if (!empty($wholesalerOrders)) {
+            $message .= ". Wholesaler orders processed: ";
+            $summaries = [];
+            foreach ($wholesalerOrders as $name => $data) {
+                $summaries[] = "{$name} ({$data['count']} orders, UGX " . number_format($data['total'], 2) . ")";
+            }
+            $message .= implode(', ', $summaries);
+        }
+
+        return back()->with('success', $message);
+    }
 }

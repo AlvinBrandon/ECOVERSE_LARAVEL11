@@ -38,7 +38,7 @@
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text text-muted">{{ Str::limit($product->description, 100) }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="h5 mb-0">${{ number_format($product->price, 2) }}</span>
+                            <span class="h5 mb-0">UGX {{ number_format($product->price, 2) }}</span>
                             <span class="badge bg-{{ $product->stock > 0 ? 'success' : 'danger' }}">
                                 {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}
                             </span>

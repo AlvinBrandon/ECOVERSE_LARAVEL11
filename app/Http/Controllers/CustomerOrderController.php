@@ -9,8 +9,12 @@ class CustomerOrderController extends Controller
 {
     public function index()
     {
-        // Assuming 'customer_id' is the foreign key in orders table
-        $orders = Order::where('customer_id', auth()->id())->get();
+        // Get orders for the authenticated user using 'user_id' column
+        $orders = Order::with(['product', 'user'])
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
         return view('customer.orders', compact('orders'));
     }
 }

@@ -76,10 +76,14 @@ class VendorController extends Controller
             'status' => 'pending',
         ]);
 
-        // Integrate with Java server for URSB verification (if service exists)
+        // Integrate with Java server for document verification
         try {
             $javaService = new JavaVendorVerificationService();
-            $javaResponse = $javaService->verifyUrsb($documents['ursb_document'] ?? '', $request->email, $request->name);
+            $javaResponse = $javaService->verifyDocuments([
+                'registration_certificate' => $documents['registration_certificate'] ?? '',
+                'ursb_document' => $documents['ursb_document'] ?? '',
+                'trading_license' => $documents['trading_license'] ?? ''
+            ], $request->email, $request->name);
 
             // Optionally update vendor status based on Java server response
             if (isset($javaResponse['status']) && $javaResponse['status'] === 'success') {
@@ -154,4 +158,4 @@ class VendorController extends Controller
         }
         return view('vendor.status', compact('vendor'));
     }
-} 
+}

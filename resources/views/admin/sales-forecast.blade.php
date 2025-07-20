@@ -8,7 +8,7 @@
                 <div class="card-header pb-0">
                     <h6>Sales Forecast</h6>
                     <p class="text-sm">
-                        Next Month's Predicted Sales: ${{ number_format($nextMonthSales, 2) }}
+                        Next Month's Predicted Sales: UGX {{ number_format($nextMonthSales, 2) }}
                         <span class="text-xs text-muted">(Confidence: {{ number_format($confidence, 1) }}%)</span>
                     </p>
                 </div>

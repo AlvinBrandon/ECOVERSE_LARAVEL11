@@ -49,7 +49,7 @@
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Next Month's Sales</p>
-                                <h5 class="font-weight-bolder mb-0">${{ number_format($salesPrediction, 2) }}</h5>
+                                <h5 class="font-weight-bolder mb-0">UGX {{ number_format($salesPrediction, 2) }}</h5>
                             </div>
                         </div>
                         <div class="col-4 text-end">
@@ -139,7 +139,7 @@
                                 <tr>
                                     <td>{{ $product->name }}</td>
                                     <td>{{ $product->stock }}</td>
-                                    <td>${{ number_format($product->price, 2) }}</td>
+                                    <td>UGX {{ number_format($product->price, 2) }}</td>
                                     <td>
                                         <span class="badge bg-{{ $product->status === 'active' ? 'success' : 'warning' }}">
                                             {{ $product->status }}

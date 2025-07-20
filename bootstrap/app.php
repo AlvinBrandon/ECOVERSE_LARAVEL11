@@ -13,8 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'refresh.role' => \App\Http\Middleware\RefreshUserRole::class,
             // 'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
+        
+        // Add RefreshUserRole middleware to web group to run on all web requests
+        $middleware->appendToGroup('web', \App\Http\Middleware\RefreshUserRole::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

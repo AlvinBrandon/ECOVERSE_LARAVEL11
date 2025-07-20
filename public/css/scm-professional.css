@@ -1,0 +1,1787 @@
+/* Professional Supply Chain Management System Styling */
+/* ECOVERSE Color Palette - Artistic Earth Tones */
+
+/* ============================================= */
+/* Base & Layout Styles - ECOVERSE Theme */
+/* ============================================= */
+
+:root {
+  /* ECOVERSE Color Palette - Artistic Earth Tones */
+  --ecoverse-ateneo-blue: #073B6D;        /* Deep Navy Blue - Primary */
+  --ecoverse-copper: #CD806A;             /* Warm Copper - Secondary */
+  --ecoverse-fawn: #ECAC69;               /* Light Earth - Accent */
+  --ecoverse-bistre: #7D6725;             /* Spanish Bistre - Accent Dark */
+  
+  /* Color Variations for Design Depth */
+  --ecoverse-blue-light: #0A4A87;         /* Lighter Ateneo Blue */
+  --ecoverse-blue-dark: #042540;          /* Darker Ateneo Blue */
+  --ecoverse-copper-light: #D99485;       /* Lighter Copper */
+  --ecoverse-copper-dark: #B86B55;        /* Darker Copper */
+  --ecoverse-fawn-light: #F0BE85;         /* Lighter Fawn */
+  --ecoverse-fawn-dark: #E09A4D;          /* Darker Fawn */
+  --ecoverse-bistre-light: #9A7F2F;       /* Lighter Bistre */
+  --ecoverse-bistre-dark: #5F4F1C;        /* Darker Bistre */
+  
+  /* Neutral & Support Colors */
+  --ecoverse-white: #FFFFFF;
+  --ecoverse-light-gray: #F8F9FA;
+  --ecoverse-gray: #6C757D;
+  --ecoverse-dark-gray: #495057;
+  --ecoverse-black: #2C3E50;
+  
+  /* Status Colors Based on Palette */
+  --ecoverse-success: var(--ecoverse-bistre);     /* Success using Bistre */
+  --ecoverse-warning: var(--ecoverse-fawn);       /* Warning using Fawn */
+  --ecoverse-danger: var(--ecoverse-copper-dark); /* Danger using Dark Copper */
+  --ecoverse-info: var(--ecoverse-ateneo-blue);   /* Info using Ateneo Blue */
+  
+  /* Artistic Gradients */
+  --ecoverse-gradient-primary: linear-gradient(135deg, var(--ecoverse-ateneo-blue) 0%, var(--ecoverse-blue-light) 100%);
+  --ecoverse-gradient-secondary: linear-gradient(135deg, var(--ecoverse-copper) 0%, var(--ecoverse-copper-light) 100%);
+  --ecoverse-gradient-accent: linear-gradient(135deg, var(--ecoverse-fawn) 0%, var(--ecoverse-fawn-light) 100%);
+  --ecoverse-gradient-dark: linear-gradient(135deg, var(--ecoverse-bistre) 0%, var(--ecoverse-bistre-light) 100%);
+  
+  /* Complex Artistic Gradients */
+  --ecoverse-gradient-earth: linear-gradient(135deg, var(--ecoverse-bistre) 0%, var(--ecoverse-fawn) 50%, var(--ecoverse-copper) 100%);
+  --ecoverse-gradient-ocean: linear-gradient(135deg, var(--ecoverse-ateneo-blue) 0%, var(--ecoverse-blue-light) 50%, var(--ecoverse-copper) 100%);
+  --ecoverse-gradient-sunset: linear-gradient(135deg, var(--ecoverse-fawn) 0%, var(--ecoverse-copper) 50%, var(--ecoverse-bistre) 100%);
+  
+  /* Subtle Background Gradients */
+  --ecoverse-bg-light: linear-gradient(135deg, rgba(236, 172, 105, 0.05) 0%, rgba(205, 128, 106, 0.05) 100%);
+  --ecoverse-bg-medium: linear-gradient(135deg, rgba(7, 59, 109, 0.08) 0%, rgba(125, 103, 37, 0.08) 100%);
+  
+  /* Typography */
+  --ecoverse-font-family: 'Inter', 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+  --ecoverse-font-size-xs: 0.75rem;
+  --ecoverse-font-size-sm: 0.875rem;
+  --ecoverse-font-size-base: 1rem;
+  --ecoverse-font-size-lg: 1.125rem;
+  --ecoverse-font-size-xl: 1.25rem;
+  --ecoverse-font-size-2xl: 1.5rem;
+  --ecoverse-font-size-3xl: 1.875rem;
+  --ecoverse-font-size-4xl: 2.25rem;
+  
+  /* Spacing */
+  --ecoverse-spacing-xs: 0.25rem;
+  --ecoverse-spacing-sm: 0.5rem;
+  --ecoverse-spacing-md: 1rem;
+  --ecoverse-spacing-lg: 1.5rem;
+  --ecoverse-spacing-xl: 2rem;
+  --ecoverse-spacing-2xl: 3rem;
+  --ecoverse-spacing-3xl: 4rem;
+  
+  /* Enhanced Shadows with Earth Tones */
+  --ecoverse-shadow-sm: 0 1px 3px rgba(7, 59, 109, 0.12);
+  --ecoverse-shadow-md: 0 4px 12px rgba(7, 59, 109, 0.15);
+  --ecoverse-shadow-lg: 0 8px 25px rgba(7, 59, 109, 0.18);
+  --ecoverse-shadow-xl: 0 20px 40px rgba(7, 59, 109, 0.22);
+  --ecoverse-shadow-colored: 0 8px 25px rgba(125, 103, 37, 0.15);
+  
+  /* Border Radius */
+  --ecoverse-radius-sm: 0.375rem;
+  --ecoverse-radius-md: 0.5rem;
+  --ecoverse-radius-lg: 0.75rem;
+  --ecoverse-radius-xl: 1rem;
+  --ecoverse-radius-2xl: 1.5rem;
+}
+/* Global Typography - ECOVERSE Theme */
+body {
+  font-family: var(--ecoverse-font-family);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ecoverse-black);
+  background: var(--ecoverse-bg-light);
+  background-attachment: fixed;
+}
+
+/* Enhanced Typography Styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ecoverse-font-family);
+  font-weight: 600;
+  color: var(--ecoverse-ateneo-blue);
+  margin-bottom: var(--ecoverse-spacing-md);
+}
+
+/* ============================================= */
+/* ECOVERSE Card Components - Artistic Design */
+/* ============================================= */
+
+.scm-card {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-xl);
+  box-shadow: var(--ecoverse-shadow-md);
+  border: 1px solid rgba(7, 59, 109, 0.08);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.scm-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ecoverse-gradient-earth);
+}
+
+.scm-card:hover {
+  box-shadow: var(--ecoverse-shadow-xl);
+  transform: translateY(-8px) scale(1.02);
+}
+
+.scm-card.scm-fade-in {
+  animation: ecoverseFadeIn 0.8s ease-out;
+}
+
+@keyframes ecoverseFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scm-card-header {
+  background: var(--ecoverse-gradient-primary);
+  padding: var(--ecoverse-spacing-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.scm-card:hover .scm-card-header::before {
+  left: 100%;
+}
+
+.scm-card-body {
+  padding: var(--ecoverse-spacing-xl);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
+}
+
+.scm-card-title {
+  font-size: var(--ecoverse-font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--ecoverse-spacing-sm);
+  color: var(--ecoverse-white);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scm-card-subtitle {
+  font-size: var(--ecoverse-font-size-sm);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0;
+  font-weight: 400;
+}
+
+.scm-icon-wrapper {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--ecoverse-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================= */
+/* ECOVERSE Metric Cards - Enhanced Artistic Design */
+/* ============================================= */
+
+.scm-metric-card {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-xl);
+  padding: var(--ecoverse-spacing-xl);
+  box-shadow: var(--ecoverse-shadow-md);
+  border: 1px solid rgba(7, 59, 109, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-metric-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(236, 172, 105, 0.1) 0%, transparent 70%);
+  transition: transform 0.6s ease;
+}
+
+.scm-metric-card:hover {
+  box-shadow: var(--ecoverse-shadow-xl);
+  transform: translateY(-5px) scale(1.03);
+}
+
+.scm-metric-card:hover::before {
+  transform: scale(1.2) rotate(45deg);
+}
+.scm-metric-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--ecoverse-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: var(--ecoverse-white);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  background: var(--ecoverse-gradient-primary);
+  box-shadow: var(--ecoverse-shadow-colored);
+}
+
+.scm-metric-icon.bg-success {
+  background: var(--ecoverse-gradient-dark);
+}
+
+.scm-metric-icon.bg-warning {
+  background: var(--ecoverse-gradient-accent);
+}
+
+.scm-metric-icon.bg-info {
+  background: var(--ecoverse-gradient-secondary);
+}
+
+.scm-metric-value {
+  font-size: var(--ecoverse-font-size-3xl);
+  font-weight: 800;
+  margin-bottom: var(--ecoverse-spacing-xs);
+  color: var(--ecoverse-ateneo-blue);
+  line-height: 1.1;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, var(--ecoverse-ateneo-blue) 0%, var(--ecoverse-bistre) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.scm-metric-label {
+  font-size: var(--ecoverse-font-size-sm);
+  color: var(--ecoverse-gray);
+  margin-bottom: 0;
+  font-weight: 500;
+  position: relative;
+  z-index: 2;
+}
+
+.scm-metric-trend {
+  font-size: var(--ecoverse-font-size-xs);
+  margin-top: var(--ecoverse-spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 2;
+}
+
+.scm-metric-trend.positive {
+  color: var(--ecoverse-success);
+}
+
+.scm-metric-trend.negative {
+  color: var(--ecoverse-danger);
+}
+
+/* ============================================= */
+/* ECOVERSE Status Badges - Artistic Design */
+/* ============================================= */
+
+.scm-status-badge {
+  padding: var(--ecoverse-spacing-sm) var(--ecoverse-spacing-md);
+  border-radius: var(--ecoverse-radius-xl);
+  font-size: var(--ecoverse-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.scm-status-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.scm-status-badge:hover::before {
+  left: 100%;
+}
+
+.scm-status-active {
+  background: linear-gradient(135deg, var(--ecoverse-success) 0%, var(--ecoverse-bistre-light) 100%);
+  color: var(--ecoverse-white);
+  border: 2px solid var(--ecoverse-success);
+  box-shadow: 0 4px 15px rgba(125, 103, 37, 0.3);
+}
+
+.scm-status-pending {
+  background: linear-gradient(135deg, var(--ecoverse-fawn) 0%, var(--ecoverse-fawn-light) 100%);
+  color: var(--ecoverse-ateneo-blue);
+  border: 2px solid var(--ecoverse-fawn);
+  box-shadow: 0 4px 15px rgba(236, 172, 105, 0.3);
+}
+
+.scm-status-inactive {
+  background: linear-gradient(135deg, var(--ecoverse-gray) 0%, var(--ecoverse-dark-gray) 100%);
+  color: var(--ecoverse-white);
+  border: 2px solid var(--ecoverse-gray);
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.scm-status-urgent {
+  background: linear-gradient(135deg, var(--ecoverse-danger) 0%, var(--ecoverse-copper-dark) 100%);
+  color: var(--ecoverse-white);
+  border: 2px solid var(--ecoverse-danger);
+  box-shadow: 0 4px 15px rgba(205, 128, 106, 0.3);
+}
+
+/* ============================================= */
+/* ECOVERSE Buttons - Artistic Earth Design */
+/* ============================================= */
+
+.scm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ecoverse-spacing-sm);
+  padding: var(--ecoverse-spacing-md) var(--ecoverse-spacing-xl);
+  border-radius: var(--ecoverse-radius-xl);
+  font-size: var(--ecoverse-font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scm-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.scm-btn:hover::before {
+  left: 100%;
+}
+
+.scm-btn-primary {
+  background: var(--ecoverse-gradient-primary);
+  color: var(--ecoverse-white);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-btn-primary:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  color: var(--ecoverse-white);
+}
+
+.scm-btn-secondary {
+  background: var(--ecoverse-gradient-secondary);
+  color: var(--ecoverse-white);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-btn-secondary:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  color: var(--ecoverse-white);
+}
+
+.scm-btn-success {
+  background: var(--ecoverse-gradient-dark);
+  color: var(--ecoverse-white);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-btn-success:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  color: var(--ecoverse-white);
+}
+
+.scm-btn-info {
+  background: var(--ecoverse-gradient-ocean);
+  color: var(--ecoverse-white);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-btn-info:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  color: var(--ecoverse-white);
+}
+
+.scm-btn-warning {
+  background: var(--ecoverse-gradient-accent);
+  color: var(--ecoverse-ateneo-blue);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-btn-warning:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  color: var(--ecoverse-ateneo-blue);
+}
+
+.scm-btn-outline-light {
+  background: transparent;
+  color: var(--ecoverse-white);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.scm-btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--ecoverse-white);
+  border-color: var(--ecoverse-white);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* ============================================= */
+/* ECOVERSE Status Extensions */
+/* ============================================= */
+
+.scm-status-info {
+  background: linear-gradient(135deg, var(--ecoverse-ateneo-blue) 0%, var(--ecoverse-blue-light) 100%);
+  color: var(--ecoverse-white);
+  border: 2px solid var(--ecoverse-ateneo-blue);
+  box-shadow: 0 4px 15px rgba(7, 59, 109, 0.3);
+}
+
+.scm-status-warning {
+  background: linear-gradient(135deg, var(--ecoverse-fawn) 0%, var(--ecoverse-fawn-light) 100%);
+  color: var(--ecoverse-ateneo-blue);
+  border: 2px solid var(--ecoverse-fawn);
+  box-shadow: 0 4px 15px rgba(236, 172, 105, 0.3);
+}
+
+/* ============================================= */
+/* ECOVERSE Gradient Backgrounds */
+/* ============================================= */
+
+.bg-gradient-primary {
+  background: var(--ecoverse-gradient-primary) !important;
+}
+
+.bg-gradient-secondary {
+  background: var(--ecoverse-gradient-secondary) !important;
+}
+
+.bg-gradient-success {
+  background: var(--ecoverse-gradient-dark) !important;
+}
+
+.bg-gradient-info {
+  background: var(--ecoverse-gradient-ocean) !important;
+}
+
+.bg-gradient-warning {
+  background: var(--ecoverse-gradient-accent) !important;
+}
+
+.bg-gradient-danger {
+  background: linear-gradient(135deg, var(--ecoverse-danger) 0%, var(--ecoverse-copper-dark) 100%) !important;
+}
+
+.bg-gradient-earth {
+  background: var(--ecoverse-gradient-earth) !important;
+}
+
+.bg-gradient-sunset {
+  background: var(--ecoverse-gradient-sunset) !important;
+}
+
+/* ============================================= */
+/* ECOVERSE Empty State - Artistic Design */
+/* ============================================= */
+
+.scm-empty-state {
+  text-align: center;
+  padding: var(--ecoverse-spacing-3xl);
+  color: var(--ecoverse-gray);
+  background: var(--ecoverse-bg-light);
+  border-radius: var(--ecoverse-radius-2xl);
+  position: relative;
+}
+
+.scm-empty-state::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(236, 172, 105, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.scm-empty-state i {
+  color: var(--ecoverse-copper);
+  margin-bottom: var(--ecoverse-spacing-lg);
+  position: relative;
+  z-index: 2;
+  font-size: 3rem;
+}
+
+.scm-empty-state h5 {
+  color: var(--ecoverse-ateneo-blue);
+  margin-bottom: var(--ecoverse-spacing-sm);
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+}
+
+.scm-empty-state p {
+  margin-bottom: var(--ecoverse-spacing-lg);
+  position: relative;
+  z-index: 2;
+  color: var(--ecoverse-gray);
+}
+
+/* ============================================= */
+/* ECOVERSE Order Item Styling */
+/* ============================================= */
+
+.scm-order-item {
+  background: var(--ecoverse-white);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--ecoverse-radius-lg);
+  border: 1px solid rgba(7, 59, 109, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-order-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: var(--ecoverse-gradient-primary);
+  transition: width 0.3s ease;
+}
+
+.scm-order-item:hover {
+  background: linear-gradient(135deg, rgba(236, 172, 105, 0.02) 0%, rgba(205, 128, 106, 0.02) 100%);
+  transform: translateX(8px);
+  box-shadow: var(--ecoverse-shadow-lg);
+}
+
+.scm-order-item:hover::before {
+  width: 4px;
+}
+
+.scm-order-icon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--ecoverse-gradient-accent);
+  border-radius: var(--ecoverse-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ecoverse-ateneo-blue);
+  font-weight: 600;
+  box-shadow: var(--ecoverse-shadow-sm);
+}
+
+/* ============================================= */
+/* ECOVERSE Table Responsive Design */
+/* ============================================= */
+
+.scm-table-responsive {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--ecoverse-shadow-md);
+  border: 1px solid rgba(7, 59, 109, 0.05);
+}
+
+.scm-table-responsive table {
+  margin-bottom: 0;
+}
+
+.scm-table-responsive thead th {
+  background: var(--ecoverse-gradient-primary);
+  color: var(--ecoverse-white);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--ecoverse-font-size-xs);
+  padding: var(--ecoverse-spacing-md) var(--ecoverse-spacing-lg);
+  border: none;
+}
+
+.scm-table-responsive tbody tr {
+  transition: all 0.3s ease;
+}
+
+.scm-table-responsive tbody tr:hover {
+  background: var(--ecoverse-bg-light);
+  transform: scale(1.01);
+}
+
+.scm-table-responsive tbody td {
+  padding: var(--ecoverse-spacing-md) var(--ecoverse-spacing-lg);
+  vertical-align: middle;
+  border-color: rgba(7, 59, 109, 0.08);
+}
+
+/* ============================================= */
+/* ECOVERSE Outline Buttons */
+/* ============================================= */
+
+.scm-btn-outline {
+  background: transparent;
+  color: var(--ecoverse-ateneo-blue);
+  border: 2px solid var(--ecoverse-ateneo-blue);
+  backdrop-filter: blur(10px);
+}
+
+.scm-btn-outline:hover {
+  background: var(--ecoverse-ateneo-blue);
+  color: var(--ecoverse-white);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-lg);
+}
+
+/* ============================================= */
+/* ECOVERSE Button Sizes */
+/* ============================================= */
+
+.scm-btn-sm {
+  padding: var(--ecoverse-spacing-sm) var(--ecoverse-spacing-md);
+  font-size: var(--ecoverse-font-size-xs);
+  border-radius: var(--ecoverse-radius-md);
+}
+
+.scm-btn-lg {
+  padding: var(--ecoverse-spacing-lg) var(--ecoverse-spacing-2xl);
+  font-size: var(--ecoverse-font-size-lg);
+  border-radius: var(--ecoverse-radius-2xl);
+}
+
+/* ============================================= */
+/* ECOVERSE Tables - Enhanced Design */
+/* ============================================= */
+
+.scm-table-container {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-xl);
+  box-shadow: var(--ecoverse-shadow-md);
+  overflow: hidden;
+  border: 1px solid rgba(7, 59, 109, 0.05);
+}
+
+.scm-table {
+  width: 100%;
+  margin-bottom: 0;
+  background-color: transparent;
+  color: var(--ecoverse-black);
+}
+
+.scm-table thead th {
+  background: var(--ecoverse-gradient-primary);
+  color: var(--ecoverse-white);
+  font-weight: 700;
+  padding: var(--ecoverse-spacing-lg);
+  border: none;
+  font-size: var(--ecoverse-font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+}
+
+.scm-table tbody td {
+  padding: var(--ecoverse-spacing-lg);
+  border-bottom: 1px solid rgba(7, 59, 109, 0.08);
+  vertical-align: middle;
+  font-size: var(--ecoverse-font-size-sm);
+  transition: all 0.3s ease;
+}
+
+.scm-table tbody tr:hover {
+  background: var(--ecoverse-bg-light);
+  transform: scale(1.005);
+}
+
+.scm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================= */
+/* ECOVERSE Forms - Artistic Design */
+/* ============================================= */
+
+.scm-form-group {
+  margin-bottom: var(--ecoverse-spacing-lg);
+  position: relative;
+}
+
+.scm-form-label {
+  display: block;
+  margin-bottom: var(--ecoverse-spacing-sm);
+  font-weight: 600;
+  color: var(--ecoverse-ateneo-blue);
+  font-size: var(--ecoverse-font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scm-form-control {
+  display: block;
+  width: 100%;
+  padding: var(--ecoverse-spacing-md) var(--ecoverse-spacing-lg);
+  font-size: var(--ecoverse-font-size-base);
+  line-height: 1.6;
+  color: var(--ecoverse-black);
+  background-color: var(--ecoverse-white);
+  background-clip: padding-box;
+  border: 2px solid rgba(7, 59, 109, 0.15);
+  border-radius: var(--ecoverse-radius-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.scm-form-control:focus {
+  color: var(--ecoverse-black);
+  background-color: var(--ecoverse-white);
+  border-color: var(--ecoverse-ateneo-blue);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(7, 59, 109, 0.15);
+  transform: translateY(-2px);
+}
+
+.scm-form-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23073B6D' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--ecoverse-spacing-lg) center;
+  background-size: 16px 12px;
+  padding-right: calc(var(--ecoverse-spacing-lg) * 3);
+}
+
+/* ============================================= */
+/* ECOVERSE Navigation - Enhanced */
+/* ============================================= */
+.scm-navbar {
+  background: var(--ecoverse-gradient-primary);
+  box-shadow: var(--ecoverse-shadow-lg);
+  padding: var(--ecoverse-spacing-lg) 0;
+  backdrop-filter: blur(10px);
+  border-bottom: 3px solid var(--ecoverse-copper);
+}
+
+.scm-navbar-brand {
+  font-size: var(--ecoverse-font-size-xl);
+  font-weight: 800;
+  color: var(--ecoverse-white) !important;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--ecoverse-white) 0%, var(--ecoverse-fawn) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.scm-nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600;
+  padding: var(--ecoverse-spacing-sm) var(--ecoverse-spacing-lg) !important;
+  border-radius: var(--ecoverse-radius-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(236, 172, 105, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.scm-nav-link:hover {
+  color: var(--ecoverse-white) !important;
+  background: rgba(236, 172, 105, 0.2);
+  transform: translateY(-2px);
+  box-shadow: var(--ecoverse-shadow-md);
+}
+
+.scm-nav-link:hover::before {
+  left: 100%;
+}
+
+/* ============================================= */
+/* ECOVERSE Icons - Enhanced Design */
+/* ============================================= */
+
+.scm-icon-wrapper {
+  width: 3.5rem;
+  height: 3rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--scm-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* ============================================= */
+/* SCM Charts & Analytics */
+/* ============================================= */
+
+.scm-chart-container {
+  background: #ffffff;
+  border-radius: var(--scm-radius-lg);
+  padding: var(--scm-spacing-xl);
+  box-shadow: var(--scm-shadow-sm);
+  height: 100%;
+}
+
+.scm-chart-title {
+  font-size: var(--scm-font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--scm-spacing-lg);
+  color: var(--scm-dark);
+}
+
+/* ============================================= */
+/* SCM Pagination */
+/* ============================================= */
+
+.scm-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--scm-spacing-sm);
+  margin: var(--scm-spacing-xl) 0;
+}
+
+.scm-pagination .page-link {
+  color: var(--scm-primary);
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  padding: var(--scm-spacing-sm) var(--scm-spacing-md);
+  border-radius: var(--scm-radius-sm);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.scm-pagination .page-link:hover {
+  background-color: var(--scm-primary);
+  color: #ffffff;
+  border-color: var(--scm-primary);
+}
+
+.scm-pagination .page-item.active .page-link {
+  background-color: var(--scm-primary);
+  border-color: var(--scm-primary);
+  color: #ffffff;
+}
+
+/* ============================================= */
+/* ECOVERSE Advanced Animation Classes */
+/* ============================================= */
+
+.scm-floating-pulse {
+  animation: ecoverseFloating 3s ease-in-out infinite, ecoversePulse 2s infinite;
+}
+
+.scm-stagger-1 { animation-delay: 0.1s; }
+.scm-stagger-2 { animation-delay: 0.2s; }
+.scm-stagger-3 { animation-delay: 0.3s; }
+.scm-stagger-4 { animation-delay: 0.4s; }
+.scm-stagger-5 { animation-delay: 0.5s; }
+
+@keyframes ecoverseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(236, 172, 105, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(236, 172, 105, 0.6); }
+}
+
+.ecoverse-glow {
+  animation: ecoverseGlow 2s ease-in-out infinite;
+}
+
+@keyframes ecoverseShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.ecoverse-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: ecoverseShimmer 2s infinite;
+}
+
+/* ============================================= */
+/* ECOVERSE Progress Bars - Enhanced */
+/* ============================================= */
+
+.scm-progress {
+  height: 0.75rem;
+  background: linear-gradient(135deg, rgba(7, 59, 109, 0.1) 0%, rgba(125, 103, 37, 0.1) 100%);
+  border-radius: var(--ecoverse-radius-xl);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scm-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  border-radius: var(--ecoverse-radius-xl) var(--ecoverse-radius-xl) 0 0;
+}
+
+.scm-progress-bar {
+  height: 100%;
+  background: var(--ecoverse-gradient-earth);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--ecoverse-radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: ecoverseShimmer 2s infinite;
+}
+
+/* ============================================= */
+/* ECOVERSE Alerts - Artistic Design */
+/* ============================================= */
+
+.scm-alert {
+  padding: var(--ecoverse-spacing-xl);
+  margin-bottom: var(--ecoverse-spacing-lg);
+  border-radius: var(--ecoverse-radius-xl);
+  border: none;
+  box-shadow: var(--ecoverse-shadow-md);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.scm-alert::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: var(--ecoverse-gradient-primary);
+}
+
+.scm-alert-success {
+  background: linear-gradient(135deg, rgba(125, 103, 37, 0.1) 0%, rgba(125, 103, 37, 0.05) 100%);
+  color: var(--ecoverse-bistre);
+  border: 2px solid rgba(125, 103, 37, 0.2);
+}
+
+.scm-alert-success::before {
+  background: var(--ecoverse-gradient-dark);
+}
+
+.scm-alert-warning {
+  background: linear-gradient(135deg, rgba(236, 172, 105, 0.1) 0%, rgba(236, 172, 105, 0.05) 100%);
+  color: var(--ecoverse-ateneo-blue);
+  border: 2px solid rgba(236, 172, 105, 0.2);
+}
+
+.scm-alert-warning::before {
+  background: var(--ecoverse-gradient-accent);
+}
+
+.scm-alert-danger {
+  background: linear-gradient(135deg, rgba(205, 128, 106, 0.1) 0%, rgba(205, 128, 106, 0.05) 100%);
+  color: var(--ecoverse-copper-dark);
+  border: 2px solid rgba(205, 128, 106, 0.2);
+}
+
+.scm-alert-danger::before {
+  background: var(--ecoverse-gradient-secondary);
+}
+
+.scm-alert-info {
+  background: linear-gradient(135deg, rgba(7, 59, 109, 0.1) 0%, rgba(7, 59, 109, 0.05) 100%);
+  color: var(--ecoverse-ateneo-blue);
+  border: 2px solid rgba(7, 59, 109, 0.2);
+}
+
+.scm-alert-info::before {
+  background: var(--ecoverse-gradient-primary);
+}
+
+/* ============================================= */
+/* ECOVERSE Advanced Card Variants */
+/* ============================================= */
+
+.scm-card-glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(7, 59, 109, 0.1);
+}
+
+.scm-card-earth {
+  background: var(--ecoverse-bg-medium);
+  border: 2px solid rgba(125, 103, 37, 0.1);
+}
+
+.scm-card-floating {
+  animation: ecoverseFloating 4s ease-in-out infinite;
+}
+
+/* ============================================= */
+/* ECOVERSE Mini Metrics */
+/* ============================================= */
+
+.scm-mini-metric {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-lg);
+  padding: var(--ecoverse-spacing-lg);
+  text-align: center;
+  border: 2px solid rgba(7, 59, 109, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-mini-metric::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ecoverse-gradient-primary);
+}
+
+.scm-mini-metric:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--ecoverse-shadow-lg);
+}
+
+.scm-mini-value {
+  font-size: var(--ecoverse-font-size-xl);
+  font-weight: 800;
+  margin-bottom: var(--ecoverse-spacing-xs);
+  color: var(--ecoverse-ateneo-blue);
+}
+
+/* ============================================= */
+/* ECOVERSE Action Buttons */
+/* ============================================= */
+
+.scm-action-btn {
+  background: var(--ecoverse-white);
+  border: 2px solid rgba(7, 59, 109, 0.1);
+  border-radius: var(--ecoverse-radius-xl);
+  padding: var(--ecoverse-spacing-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+}
+
+.scm-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.scm-action-btn:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: var(--ecoverse-shadow-xl);
+  border-color: rgba(7, 59, 109, 0.2);
+}
+
+.scm-action-btn:hover::before {
+  left: 100%;
+}
+
+.scm-action-icon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--ecoverse-gradient-primary);
+  border-radius: var(--ecoverse-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ecoverse-white);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* ============================================= */
+/* ECOVERSE Performance List */
+/* ============================================= */
+
+.scm-performance-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ecoverse-spacing-md);
+}
+
+.scm-performance-item {
+  display: flex;
+  align-items: center;
+  padding: var(--ecoverse-spacing-lg);
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-lg);
+  border: 2px solid rgba(7, 59, 109, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-performance-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--ecoverse-gradient-primary);
+  transition: width 0.3s ease;
+}
+
+.scm-performance-item:hover {
+  transform: translateX(8px);
+  box-shadow: var(--ecoverse-shadow-lg);
+}
+
+.scm-performance-item:hover::before {
+  width: 8px;
+}
+
+.scm-performance-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--ecoverse-gradient-primary);
+  border-radius: var(--ecoverse-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ecoverse-white);
+  margin-right: var(--ecoverse-spacing-lg);
+  flex-shrink: 0;
+}
+
+/* ============================================= */
+/* ECOVERSE Earth Metrics */
+/* ============================================= */
+
+.scm-earth-metric {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-xl);
+  padding: var(--ecoverse-spacing-xl);
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-earth-metric::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--ecoverse-gradient-earth);
+  border-radius: var(--ecoverse-radius-xl) var(--ecoverse-radius-xl) 0 0;
+}
+
+.scm-earth-metric:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: var(--ecoverse-shadow-xl);
+  border-color: rgba(125, 103, 37, 0.2);
+}
+
+/* ============================================= */
+/* ECOVERSE Border Radius Extensions */
+/* ============================================= */
+
+:root {
+  --ecoverse-radius-full: 9999px;
+  --ecoverse-radius-3xl: 2rem;
+}
+
+.ecoverse-radius-full { border-radius: var(--ecoverse-radius-full) !important; }
+.ecoverse-radius-3xl { border-radius: var(--ecoverse-radius-3xl) !important; }
+
+/* ============================================= */
+/* SCM Responsive Design */
+/* ============================================= */
+
+@media (max-width: 768px) {
+  .scm-card-header {
+    padding: var(--scm-spacing-lg);
+  }
+  
+  .scm-card-body {
+    padding: var(--scm-spacing-lg);
+  }
+  
+  .scm-metric-card {
+    padding: var(--scm-spacing-lg);
+  }
+  
+  .scm-metric-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem;
+  }
+  
+  .scm-metric-value {
+    font-size: var(--scm-font-size-2xl);
+  }
+  
+  .scm-table-container {
+    overflow-x: auto;
+  }
+  
+  .scm-btn {
+    padding: var(--scm-spacing-sm) var(--scm-spacing-md);
+    font-size: var(--scm-font-size-xs);
+  }
+}
+
+/* ============================================= */
+/* SCM Animation Effects */
+/* ============================================= */
+
+@keyframes scm-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scm-fade-in {
+  animation: scm-fadeIn 0.6s ease-out;
+}
+
+.scm-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.scm-hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--scm-shadow-lg);
+}
+
+/* ============================================= */
+/* SCM Utility Classes */
+/* ============================================= */
+
+.scm-text-primary { color: var(--scm-primary) !important; }
+.scm-text-secondary { color: var(--scm-secondary) !important; }
+.scm-text-success { color: var(--scm-success) !important; }
+.scm-text-info { color: var(--scm-info) !important; }
+.scm-text-warning { color: var(--scm-warning) !important; }
+.scm-text-danger { color: var(--scm-danger) !important; }
+
+.scm-bg-primary { background-color: var(--scm-primary) !important; }
+.scm-bg-secondary { background-color: var(--scm-secondary) !important; }
+.scm-bg-success { background-color: var(--scm-success) !important; }
+.scm-bg-info { background-color: var(--scm-info) !important; }
+.scm-bg-warning { background-color: var(--scm-warning) !important; }
+.scm-bg-danger { background-color: var(--scm-danger) !important; }
+
+.scm-border-radius { border-radius: var(--scm-radius-lg) !important; }
+.scm-shadow { box-shadow: var(--scm-shadow-md) !important; }
+.scm-shadow-lg { box-shadow: var(--scm-shadow-lg) !important; }
+
+/* ============================================= */
+/* SCM Dashboard Specific Styles */
+/* ============================================= */
+
+.scm-dashboard-container {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: var(--scm-spacing-xl) 0;
+}
+
+.scm-dashboard-header {
+  background: var(--scm-gradient-primary);
+  color: #ffffff;
+  padding: var(--scm-spacing-2xl) 0;
+  margin-bottom: var(--scm-spacing-xl);
+  border-radius: 0 0 var(--scm-radius-xl) var(--scm-radius-xl);
+}
+
+.scm-section-title {
+  font-size: var(--scm-font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--scm-spacing-lg);
+  color: var(--scm-dark);
+  position: relative;
+  padding-bottom: var(--scm-spacing-sm);
+}
+
+.scm-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--scm-gradient-primary);
+  border-radius: var(--scm-radius-sm);
+}
+
+/* ============================================= */
+/* ECOVERSE Enhanced Animations */
+/* ============================================= */
+
+@keyframes ecoversePulse {
+  0% { box-shadow: 0 0 0 0 rgba(7, 59, 109, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(7, 59, 109, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(7, 59, 109, 0); }
+}
+
+@keyframes ecoverseFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ecoverseFloating {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.ecoverse-pulse {
+  animation: ecoversePulse 2s infinite;
+}
+
+.ecoverse-fade-in-up {
+  animation: ecoverseFadeInUp 0.8s ease-out;
+}
+
+.ecoverse-floating {
+  animation: ecoverseFloating 3s ease-in-out infinite;
+}
+
+.scm-hover-earth {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scm-hover-earth:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--ecoverse-shadow-xl);
+}
+
+/* ============================================= */
+/* ECOVERSE Advanced Visual Effects */
+/* ============================================= */
+
+/* Glass Morphism Cards */
+.scm-card-glass-advanced {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(7, 59, 109, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-card-glass-advanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
+
+/* Neon Glow Effects */
+@keyframes ecoverse-neon-pulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 5px var(--ecoverse-fawn),
+      0 0 10px var(--ecoverse-fawn),
+      0 0 15px var(--ecoverse-fawn),
+      0 0 20px var(--ecoverse-copper);
+  }
+  50% { 
+    box-shadow: 
+      0 0 10px var(--ecoverse-fawn),
+      0 0 20px var(--ecoverse-fawn),
+      0 0 30px var(--ecoverse-fawn),
+      0 0 40px var(--ecoverse-copper);
+  }
+}
+
+.ecoverse-neon {
+  animation: ecoverse-neon-pulse 2s ease-in-out infinite;
+}
+
+/* Earth Particle Effects */
+@keyframes earth-particles {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-40px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.scm-earth-particles::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  background: var(--ecoverse-fawn);
+  border-radius: 50%;
+  animation: earth-particles 3s infinite;
+}
+
+/* Gradient Text Effects */
+.ecoverse-gradient-text {
+  background: var(--ecoverse-gradient-earth);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.ecoverse-gradient-text-ocean {
+  background: var(--ecoverse-gradient-ocean);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.ecoverse-gradient-text-sunset {
+  background: var(--ecoverse-gradient-sunset);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* 3D Transform Effects */
+.scm-3d-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scm-3d-card:hover {
+  transform: rotateY(10deg) rotateX(5deg) translateZ(20px);
+}
+
+/* Earth Ecosystem Animations */
+@keyframes ecosystem-grow {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(1.1) rotate(180deg);
+    filter: brightness(1.2);
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    filter: brightness(1);
+  }
+}
+
+.ecoverse-ecosystem {
+  animation: ecosystem-grow 8s ease-in-out infinite;
+}
+
+/* Organic Shape Overlays */
+.scm-organic-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-organic-overlay::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(236, 172, 105, 0.1) 0%,
+    rgba(205, 128, 106, 0.05) 30%,
+    transparent 70%
+  );
+  animation: ecoverseFloating 6s ease-in-out infinite;
+  border-radius: 40% 60% 70% 30% / 60% 40% 60% 40%;
+}
+
+/* Advanced Hover Effects */
+.scm-hover-ecosystem {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.scm-hover-ecosystem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(125, 103, 37, 0.1),
+    rgba(236, 172, 105, 0.1),
+    rgba(205, 128, 106, 0.1),
+    transparent
+  );
+  transition: left 0.8s ease;
+}
+
+.scm-hover-ecosystem:hover::before {
+  left: 100%;
+}
+
+.scm-hover-ecosystem:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 
+    var(--ecoverse-shadow-xl),
+    0 0 30px rgba(125, 103, 37, 0.2);
+}
+
+/* ============================================= */
+/* ECOVERSE Premium Component Library */
+/* ============================================= */
+
+/* Premium Status Indicators */
+.scm-status-premium {
+  position: relative;
+  background: var(--ecoverse-gradient-earth);
+  color: var(--ecoverse-white);
+  padding: 8px 16px;
+  border-radius: var(--ecoverse-radius-full);
+  font-size: var(--ecoverse-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+}
+
+.scm-status-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: ecoverseShimmer 3s infinite;
+}
+
+/* Earth-Inspired Data Visualization */
+.scm-data-earth {
+  background: var(--ecoverse-white);
+  border-radius: var(--ecoverse-radius-2xl);
+  padding: var(--ecoverse-spacing-xl);
+  position: relative;
+  overflow: hidden;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.scm-data-earth::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--ecoverse-gradient-earth);
+  z-index: -1;
+  margin: -3px;
+  border-radius: inherit;
+}
+
+/* Sustainable Progress Indicators */
+.scm-progress-sustainable {
+  height: 12px;
+  background: linear-gradient(135deg, rgba(7, 59, 109, 0.1) 0%, rgba(125, 103, 37, 0.1) 100%);
+  border-radius: var(--ecoverse-radius-full);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(125, 103, 37, 0.1);
+}
+
+.scm-progress-sustainable::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+  border-radius: var(--ecoverse-radius-full) var(--ecoverse-radius-full) 0 0;
+}
+
+.scm-progress-sustainable .progress-bar {
+  height: 100%;
+  background: var(--ecoverse-gradient-earth);
+  border-radius: var(--ecoverse-radius-full);
+  position: relative;
+  overflow: hidden;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scm-progress-sustainable .progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: ecoverseShimmer 2s infinite;
+}
+
+/* Eco-Friendly Input Fields */
+.scm-input-eco {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(125, 103, 37, 0.2);
+  border-radius: var(--ecoverse-radius-lg);
+  padding: var(--ecoverse-spacing-md) var(--ecoverse-spacing-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.scm-input-eco:focus {
+  border-color: var(--ecoverse-bistre);
+  box-shadow: 
+    0 0 0 4px rgba(125, 103, 37, 0.1),
+    0 8px 25px rgba(125, 103, 37, 0.15);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.scm-input-eco::placeholder {
+  color: rgba(125, 103, 37, 0.7);
+  font-style: italic;
+}
+
+/* ============================================= */
+/* ECOVERSE Print Styles */
+/* ============================================= */
+
+@media print {
+  .scm-card,
+  .scm-metric-card,
+  .scm-table-container {
+    box-shadow: none !important;
+    border: 1px solid var(--ecoverse-ateneo-blue) !important;
+  }
+  
+  .scm-btn {
+    display: none !important;
+  }
+  
+  .scm-navbar {
+    display: none !important;
+  }
+  
+  .scm-card-header {
+    background: var(--ecoverse-ateneo-blue) !important;
+    color: white !important;
+  }
+}

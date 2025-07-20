@@ -5,7 +5,226 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Ecoverse')</title>
+    <title>@yield('title', 'Ecoverse - Professional Supply Chain Management')</title>
+    
+    <!-- Professional SCM Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Professional SCM CSS Framework -->
+    <link href="{{ asset('css/scm-professional.css') }}" rel="stylesheet">
+    
+    <!-- Base Body Styles -->
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: var(--scm-text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .scm-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .scm-card {
+            background: white;
+            border-radius: var(--scm-radius);
+            box-shadow: var(--scm-shadow);
+            border: 1px solid var(--scm-border);
+            overflow: hidden;
+        }
+        
+        .scm-card-header {
+            background: linear-gradient(135deg, var(--scm-primary) 0%, var(--scm-primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--scm-border);
+        }
+        
+        .scm-card-body {
+            padding: 1.5rem;
+        }
+        
+        .scm-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--scm-radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .scm-btn-primary {
+            background: var(--scm-primary);
+            color: white;
+        }
+        
+        .scm-btn-primary:hover {
+            background: var(--scm-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--scm-shadow-lg);
+        }
+        
+        .scm-btn-secondary {
+            background: var(--scm-secondary);
+            color: white;
+        }
+        
+        .scm-btn-outline {
+            background: transparent;
+            color: var(--scm-primary);
+            border: 1px solid var(--scm-primary);
+        }
+        
+        .scm-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--scm-border);
+            border-radius: var(--scm-radius);
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+        
+        .scm-input:focus {
+            outline: none;
+            border-color: var(--scm-primary);
+            box-shadow: 0 0 0 3px rgb(30 64 175 / 0.1);
+        }
+        
+        .scm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .scm-table th {
+            background: var(--scm-bg-secondary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--scm-text-primary);
+            border-bottom: 2px solid var(--scm-border);
+        }
+        
+        .scm-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--scm-border-light);
+        }
+        
+        .scm-table tbody tr:hover {
+            background: var(--scm-bg-primary);
+        }
+        
+        .scm-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .scm-badge-success {
+            background: rgb(34 197 94 / 0.1);
+            color: rgb(22 163 74);
+        }
+        
+        .scm-badge-warning {
+            background: rgb(251 191 36 / 0.1);
+            color: rgb(217 119 6);
+        }
+        
+        .scm-badge-danger {
+            background: rgb(239 68 68 / 0.1);
+            color: rgb(220 38 38);
+        }
+        
+        .scm-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .scm-grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .scm-grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        
+        .scm-grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        .scm-metric {
+            background: white;
+            border-radius: var(--scm-radius);
+            padding: 1.5rem;
+            box-shadow: var(--scm-shadow);
+            border: 1px solid var(--scm-border);
+        }
+        
+        .scm-metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--scm-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .scm-metric-label {
+            color: var(--scm-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .scm-navbar {
+            background: white;
+            border-bottom: 1px solid var(--scm-border);
+            box-shadow: var(--scm-shadow);
+            padding: 1rem 0;
+        }
+        
+        .scm-sidebar {
+            background: white;
+            border-right: 1px solid var(--scm-border);
+            min-height: 100vh;
+            padding: 1.5rem 0;
+        }
+        
+        .scm-content {
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+        
+        @media (max-width: 768px) {
+            .scm-container {
+                padding: 0 0.5rem;
+            }
+            
+            .scm-content {
+                padding: 1rem;
+            }
+            
+            .scm-grid-2,
+            .scm-grid-3,
+            .scm-grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
     
     <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -156,5 +375,53 @@
             });
         });
     </script>
+    
+    <!-- Role Change Notification System -->
+    @auth
+    <script>
+        // Check for role changes periodically
+        function checkRoleChange() {
+            const currentRole = '{{ auth()->user()->role_as }}';
+            const userId = '{{ auth()->id() }}';
+            
+            // Store current role in session storage
+            const storedRole = sessionStorage.getItem('user_role_' + userId);
+            
+            if (storedRole && storedRole !== currentRole) {
+                // Role has changed, show notification and redirect
+                const toast = `
+                    <div class="toast align-items-center text-white bg-success border-0 position-fixed top-0 start-50 translate-middle-x" style="z-index: 9999; margin-top: 20px;" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="bi bi-person-check me-2"></i>
+                                Your role has been updated! Redirecting to your new dashboard...
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto"></button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', toast);
+                const toastElement = document.body.lastElementChild;
+                const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+                bsToast.show();
+                
+                // Redirect to dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '{{ route('dashboard') }}';
+                }, 2000);
+            }
+            
+            // Always update stored role
+            sessionStorage.setItem('user_role_' + userId, currentRole);
+        }
+        
+        // Check role on page load
+        document.addEventListener('DOMContentLoaded', checkRoleChange);
+        
+        // Check role periodically (every 10 seconds)
+        setInterval(checkRoleChange, 10000);
+    </script>
+    @endauth
 </body>
 </html>

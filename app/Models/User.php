@@ -60,10 +60,40 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
-    public function isAdmin() { return $this->role === 'admin'; }
-    public function isSupplier() { return $this->role === 'supplier'; }
-    public function isStaff() { return $this->role === 'staff'; }
-    public function isWholesaler() { return $this->role === 'wholesaler'; }
+    public function isAdmin() { return $this->role === 'admin' || $this->role_as == 1; }
+    public function isSupplier() { return $this->role === 'supplier' || $this->role_as == 4; }
+    public function isStaff() { return $this->role === 'staff' || $this->role_as == 3; }
+    public function isWholesaler() { return $this->role === 'wholesaler' || $this->role_as == 5; }
+    public function isRetailer() { return $this->role === 'retailer' || $this->role_as == 2; }
+    public function isCustomer() { return $this->role === 'customer' || $this->role_as == 0; }
+    
+    /**
+     * Get user's current role name based on role_as
+     */
+    public function getCurrentRole()
+    {
+        return match($this->role_as) {
+            1 => 'admin',
+            2 => 'retailer', 
+            3 => 'staff',
+            4 => 'supplier',
+            5 => 'wholesaler',
+            0 => 'customer',
+            default => 'unknown',
+        };
+    }
+    
+    /**
+     * Refresh user role data - call this when role is updated
+     */
+    public function refreshRole()
+    {
+        $this->refresh();
+        // Clear any role-based cache
+        \Cache::forget("user_role_{$this->id}");
+        \Cache::forget("user_permissions_{$this->id}");
+        return $this;
+    }
 
     /**
      * The chat rooms that belong to the user.

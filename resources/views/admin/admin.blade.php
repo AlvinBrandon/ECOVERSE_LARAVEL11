@@ -53,7 +53,7 @@
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
                     <i class="fas fa-dollar-sign fa-2x mb-2"></i>
                     <h5 class="card-title">Total Revenue</h5>
-                    <p class="card-text display-5 fw-bold">${{ number_format($totalRevenue ?? 0, 2) }}</p>
+                    <p class="card-text display-5 fw-bold">UGX {{ number_format($totalRevenue ?? 0, 2) }}</p>
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
                                         <td>{{ $order->user->name ?? 'N/A' }}</td>
                                         <td>{{ $order->product->name ?? 'N/A' }}</td>
                                         <td>{{ $order->quantity }}</td>
-                                        <td>${{ number_format($order->total_price, 2) }}</td>
+                                        <td>UGX {{ number_format($order->total_price, 2) }}</td>
                                         <td><span class="badge bg-{{ $order->status === 'approved' ? 'success' : ($order->status === 'pending' ? 'warning text-dark' : 'secondary') }}">{{ ucfirst($order->status) }}</span></td>
                                         <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
                                     </tr>

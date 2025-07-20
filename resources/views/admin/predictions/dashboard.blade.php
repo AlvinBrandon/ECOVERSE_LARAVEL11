@@ -1093,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${prediction.category}</td>
                     <td>${Number(prediction.current_sales).toLocaleString()}</td>
                     <td><strong>${Number(prediction.predicted_sales).toLocaleString()}</strong></td>
-                    <td>$${Number(prediction.unit_cost).toFixed(2)}</td>
+                    <td>UGX ${Number(prediction.unit_cost).toFixed(2)}</td>
                     <td><span class="badge bg-primary">${Number(prediction.rating).toFixed(1)}/5</span></td>
                     <td>${prediction.eco_friendly === 'Yes' ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle text-muted"></i>'}</td>
                 `;
@@ -1313,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         callbacks: {
                             label: function(context) {
                                 const point = context.raw;
-                                return `${point.label}: $${point.x.toFixed(2)}, Rating: ${point.y}/5, Sales: ${point.sales.toLocaleString()}`;
+                                return `${point.label}: UGX ${point.x.toFixed(2)}, Rating: ${point.y}/5, Sales: ${point.sales.toLocaleString()}`;
                             }
                         }
                     }

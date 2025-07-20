@@ -10,6 +10,8 @@ use App\Models\Order;
 use App\Models\PurchaseOrder;
 use App\Models\RawMaterial;
 use App\Models\StockHistory;
+use Illuminate\Support\Facades\Auth;
+use App\Events\UserRoleChanged;
 
 class AdminController extends Controller
 {
@@ -64,13 +66,35 @@ class AdminController extends Controller
             ['type' => 'danger', 'icon' => 'trash', 'text' => 'User ' . (User::latest()->first()->name ?? 'N/A') . ' deleted batch'],
         ];
 
-        // Batch-level analytics (example, replace with real queries as needed)
-        $batchLabels = Product::with('batches')->get()->flatMap(function($product){
-            return $product->batches->pluck('batch_id');
-        })->unique()->values()->all();
-        $batchData = Product::with('batches')->get()->flatMap(function($product){
-            return $product->batches->pluck('quantity');
-        })->values()->all();
+        // Batch-level analytics - group by product names instead of batch IDs
+        $productInventory = Product::with('batches')->get()->map(function($product) {
+            $totalQuantity = $product->batches->sum('quantity');
+            return [
+                'name' => $product->name,
+                'quantity' => $totalQuantity
+            ];
+        })->filter(function($item) {
+            return $item['quantity'] > 0; // Only show products with inventory
+        });
+        
+        // If no products with batches, show regular product inventory
+        if ($productInventory->isEmpty()) {
+            $productInventory = Product::where('stock', '>', 0)->get()->map(function($product) {
+                return [
+                    'name' => $product->name,
+                    'quantity' => $product->stock
+                ];
+            })->take(10); // Limit to top 10 products
+        }
+        
+        $batchLabels = $productInventory->pluck('name')->all();
+        $batchData = $productInventory->pluck('quantity')->all();
+        
+        // Fallback data if still empty
+        if (empty($batchLabels)) {
+            $batchLabels = ['No Products Available'];
+            $batchData = [1];
+        }
 
         // --- Raw Material & PO Dashboard Data ---
         $adminPOs = PurchaseOrder::with(['rawMaterial', 'supplier'])
@@ -104,6 +128,21 @@ class AdminController extends Controller
             'pending_pos' => PurchaseOrder::where('status', 'pending')->count(),
             'pending_deliveries' => PurchaseOrder::where('status', 'delivered')->count(),
             'unpaid' => PurchaseOrder::where('status', 'complete')->count(),
+            // Enhanced sales analytics
+            'total_sales_this_month' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
+                ->where('orders.status', 'approved')
+                ->whereMonth('orders.created_at', now()->month)
+                ->sum(\DB::raw('products.price * orders.quantity')),
+            'total_revenue_all_time' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
+                ->where('orders.status', 'approved')
+                ->sum(\DB::raw('products.price * orders.quantity')),
+            'orders_this_week' => \App\Models\Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'top_selling_product' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
+                ->select('products.name', \DB::raw('SUM(orders.quantity) as total_sold'))
+                ->where('orders.status', 'approved')
+                ->groupBy('products.id', 'products.name')
+                ->orderByDesc('total_sold')
+                ->first(),
         ];
 
         // Pending sales count for verification widget
@@ -144,11 +183,34 @@ class AdminController extends Controller
         $request->validate([
             'role_as' => 'required|in:0,1,2,3,4,5',
         ]);
+        
         $user = User::findOrFail($id);
+        $oldRole = $user->role_as;
+        $oldRoleName = $roleMap[$oldRole] ?? 'customer';
+        $newRoleName = $roleMap[$request->role_as] ?? 'customer';
+        
         $user->role_as = $request->role_as;
-        $user->role = $roleMap[$request->role_as] ?? 'customer';
+        $user->role = $newRoleName;
         $user->save();
-        return redirect()->route('admin.users')->with('success', 'User role updated successfully.');
+        
+        // Fire event for role change
+        event(new UserRoleChanged($user, $oldRoleName, $newRoleName));
+        
+        // Clear any cached user data
+        $user->refreshRole();
+        
+        // Clear Laravel cache for user-specific data
+        \Cache::forget("user_dashboard_{$user->id}");
+        \Cache::forget("user_permissions_{$user->id}");
+        
+        // If updating current logged-in user, redirect to new dashboard
+        if (Auth::id() === $user->id) {
+            session()->flash('success', 'Your role has been updated. You are now viewing your new dashboard.');
+            return redirect()->route('dashboard');
+        }
+        
+        return redirect()->route('admin.users')->with('success', 
+            "User role updated from {$oldRoleName} to {$newRoleName} successfully. The user will see their new dashboard on next login.");
     }
 
     // Show aspiring vendor requests and approved vendors
