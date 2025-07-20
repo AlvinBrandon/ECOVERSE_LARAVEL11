@@ -21,8 +21,8 @@
     color: #fff !important;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
-    margin-bottom: 2rem;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    margin: 1rem 1rem 2rem 1rem;
   }
   .dashboard-icon {
     font-size: 2.5rem;

@@ -2,39 +2,172 @@
 
 @section('content')
 <style>
-  body, .main-content, .container-fluid, .container {
-    background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%) !important;
-  }
-  .dashboard-card, .po-card {
-    background: rgba(255,255,255,0.95);
-    border-radius: 1rem;
-    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.08);
-    padding: 2rem 1.5rem;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+body, .main-content, .container-fluid, .container {
+    background-color: #f8fafc !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+.po-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
     margin-bottom: 2rem;
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .dashboard-card:hover, .po-card:hover {
-    box-shadow: 0 8px 32px rgba(99,102,241,0.18), 0 2px 8px rgba(16,185,129,0.10);
-    transform: translateY(-4px) scale(1.025);
-    z-index: 2;
-    cursor: pointer;
-  }
-  .po-header {
-    background: linear-gradient(90deg, #6366f1 0%, #10b981 100%) !important;
-    color: #fff !important;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-    padding: 1.5rem 1.5rem 1rem 1.5rem;
-    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
     display: flex;
     align-items: center;
-    gap: 1rem;
-  }
-  .po-icon {
+    gap: 1.5rem;
+}
+
+.po-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
     font-size: 2.5rem;
-    margin-right: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    margin-bottom: 0;
+}
+
+.po-header p {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 1.1rem !important;
+    margin-bottom: 0;
+}
+
+.po-icon {
+    font-size: 3rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.po-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.table {
+    font-family: 'Poppins', sans-serif;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+    border: none;
+}
+
+.table tbody td {
+    padding: 1rem;
     vertical-align: middle;
-  }
+    border-color: #e2e8f0;
+    font-weight: 400;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.badge {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, #64748b, #475569) !important;
+}
+
+.bg-info {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.bg-dark {
+    background: linear-gradient(135deg, #374151, #1f2937) !important;
+}
+
+.btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    color: white;
+}
+
+.btn-dark {
+    background: linear-gradient(135deg, #374151, #1f2937);
+    color: white;
+}
+
+.btn-dark:hover {
+    background: linear-gradient(135deg, #1f2937, #111827);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(55, 65, 81, 0.3);
+    color: white;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    border: 1px solid #86efac;
+    color: #166534;
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Override any Bootstrap spacing */
+.py-4 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
 </style>
 <div class="container py-4">
   <div class="po-header">

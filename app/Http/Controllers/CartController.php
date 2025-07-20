@@ -55,6 +55,13 @@ class CartController extends Controller
         return back()->with('success', 'Product removed from cart.');
     }
 
+    // View cart page (index method for route compatibility)
+    public function index()
+    {
+        $cart = session()->get('cart', []);
+        return view('cart', compact('cart'));
+    }
+
     // View cart page
     public function view()
     {
@@ -109,10 +116,12 @@ class CartController extends Controller
                 'user_id' => $user->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
+                'unit_price' => $item['price'],
                 'total_price' => $item['price'] * $item['quantity'],
                 'address' => $request->address,
-                'status' => 'order placed',
+                'status' => 'pending',
                 'payment_method' => $paymentMethod,
+                'order_number' => 'ORD-' . strtoupper(substr(md5(uniqid()), 0, 8)),
             ]);
         }
 
