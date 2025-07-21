@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('content')
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -14,14 +15,14 @@
     min-height: 10vh;
   }
   
-  /* Admin Dashboard Layout Structure */
-  .admin-layout {
+  /* Staff Dashboard Layout Structure */
+  .staff-layout {
     display: flex;
     min-height: 100vh;
     position: relative;
   }
   
-  .admin-sidebar {
+  .staff-sidebar {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(16, 185, 129, 0.2);
@@ -36,7 +37,7 @@
     flex-direction: column;
   }
   
-  .admin-main {
+  .staff-main {
     flex: 1;
     margin-left: 280px;
     padding: 2rem;
@@ -326,40 +327,40 @@
   
   /* Responsive Design */
   @media (max-width: 1024px) {
-    .admin-layout {
+    .staff-layout {
       grid-template-columns: 1fr;
     }
     
-    .admin-sidebar {
+    .staff-sidebar {
       transform: translateX(-100%);
       transition: transform 0.3s ease;
     }
     
-    .admin-sidebar.open {
+    .staff-sidebar.open {
       transform: translateX(0);
     }
     
-    .admin-main {
+    .staff-main {
       margin-left: 0;
       width: 100%;
     }
   }
   
   /* Custom Scrollbar */
-  .admin-sidebar::-webkit-scrollbar {
+  .staff-sidebar::-webkit-scrollbar {
     width: 4px;
   }
   
-  .admin-sidebar::-webkit-scrollbar-track {
+  .staff-sidebar::-webkit-scrollbar-track {
     background: transparent;
   }
   
-  .admin-sidebar::-webkit-scrollbar-thumb {
+  .staff-sidebar::-webkit-scrollbar-thumb {
     background: rgba(16, 185, 129, 0.3);
     border-radius: 2px;
   }
   
-  .admin-sidebar::-webkit-scrollbar-thumb:hover {
+  .staff-sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(16, 185, 129, 0.5);
   }
   
@@ -449,18 +450,19 @@
     transition: width 0.3s ease;
   }
 </style>
-<!-- Admin Dashboard Layout -->
-<div class="admin-layout">
+
+<!-- Staff Dashboard Layout -->
+<div class="staff-layout">
   <!-- Sidebar Navigation -->
-  <nav class="admin-sidebar">
+  <nav class="staff-sidebar">
     <div class="sidebar-header">
-      <a href="{{ route('admin.dashboard') }}" class="sidebar-logo">
+      <a href="{{ route('dashboard') }}" class="sidebar-logo">
         <div class="logo-icon">
           <i class="bi bi-recycle"></i>
         </div>
         <div>
           <div style="font-weight: 700; font-size: 1.1rem;">Ecoverse</div>
-          <div style="font-size: 0.8rem; opacity: 0.7;">Admin Panel</div>
+          <div style="font-size: 0.8rem; opacity: 0.7;">Staff Panel</div>
         </div>
       </a>
     </div>
@@ -468,41 +470,45 @@
     <div class="sidebar-content">
       <div class="nav-section">
         <div class="nav-section-title">Overview</div>
-        <a href="{{ route('admin.dashboard') }}" class="nav-item active">
+        <a href="{{ route('dashboard') }}" class="nav-item active">
           <i class="bi bi-speedometer2"></i>
           Dashboard
-        </a>
-        <a href="{{ route('admin.analytics') }}" class="nav-item">
-          <i class="bi bi-bar-chart"></i>
-          Analytics
-        </a>
-        <a href="{{ route('admin.predictions.dashboard') }}" class="nav-item">
-          <i class="bi bi-graph-up"></i>
-          ML Predictions
-        </a>
-      </div>
-      
-      <div class="nav-section">
-        <div class="nav-section-title">Management</div>
-        <a href="{{ route('user-management') }}" class="nav-item">
-          <i class="bi bi-people"></i>
-          Users
         </a>
         <a href="{{ route('inventory.index') }}" class="nav-item">
           <i class="bi bi-box-seam"></i>
           Inventory
         </a>
-        <a href="{{ route('admin.sales.pending') }}" class="nav-item">
+        <a href="{{ route('staff.orders') }}" class="nav-item">
+          <i class="bi bi-clipboard-data"></i>
+          Orders Management
+        </a>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">Operations</div>
+        <a href="{{ route('inventory.create') }}" class="nav-item">
+          <i class="bi bi-plus-square"></i>
+          Add Inventory
+        </a>
+        <a href="{{ route('stock_transfer.create') }}" class="nav-item">
           <i class="bi bi-truck"></i>
-          Sales Orders
+          Stock Transfer
         </a>
-        <a href="{{ route('admin.purchase_orders.index') }}" class="nav-item">
-          <i class="bi bi-cart3"></i>
-          Purchase Orders
+        <a href="{{ route('inventory.deductForm') }}" class="nav-item">
+          <i class="bi bi-dash-square"></i>
+          Deduct Stock
         </a>
-        <a href="{{ route('admin.vendors') }}" class="nav-item">
-          <i class="bi bi-building"></i>
-          Vendors
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-section-title">Reports</div>
+        <a href="{{ route('inventory.history') }}" class="nav-item">
+          <i class="bi bi-clock-history"></i>
+          Inventory History
+        </a>
+        <a href="{{ route('inventory.analytics') }}" class="nav-item">
+          <i class="bi bi-bar-chart"></i>
+          Analytics
         </a>
       </div>
       
@@ -515,33 +521,25 @@
       </div>
       
       <div class="nav-section">
-        <div class="nav-section-title">System</div>
+        <div class="nav-section-title">Account</div>
         <a href="{{ route('profile') }}" class="nav-item">
           <i class="bi bi-person-gear"></i>
           Profile
-        </a>
-        <a href="{{ route('admin.sales.report') }}" class="nav-item">
-          <i class="bi bi-file-earmark-text"></i>
-          Sales Reports
-        </a>
-        <a href="{{ route('inventory.history') }}" class="nav-item">
-          <i class="bi bi-clock-history"></i>
-          Inventory History
         </a>
       </div>
     </div>
   </nav>
   
   <!-- Main Content -->
-  <main class="admin-main">
+  <main class="staff-main">
     <div class="main-content-wrapper">
       
       <!-- Dashboard Header -->
       <section class="dashboard-header">
         <div class="header-content">
           <div class="header-info">
-            <h1>Admin Dashboard</h1>
-            <p>Welcome back, {{ Auth::user()->name }}. Here's your system overview.</p>
+            <h1>Staff Dashboard</h1>
+            <p>Welcome back, {{ Auth::user()->name }}. Manage operations and support business processes.</p>
           </div>
           <div class="header-badges">
             <div class="status-badge">
@@ -560,102 +558,70 @@
       <section class="section-grid">
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-number">{{ $totalUsers ?? '6' }}</div>
-            <div class="stat-label">Total Users</div>
+            <div class="stat-number">42</div>
+            <div class="stat-label">Pending Orders</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ $totalProducts ?? '20' }}</div>
-            <div class="stat-label">Products</div>
+            <div class="stat-number">156</div>
+            <div class="stat-label">Inventory Items</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ $activePOs ?? '0' }}</div>
-            <div class="stat-label">Active Orders</div>
+            <div class="stat-number">8</div>
+            <div class="stat-label">Stock Transfers</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">{{ $pendingSalesCount ?? '0' }}</div>
-            <div class="stat-label">Pending Sales</div>
+            <div class="stat-number">23</div>
+            <div class="stat-label">Low Stock Alerts</div>
           </div>
+        </div>
+      </section>
+      
+      <!-- Core Operations Section -->
+      <section class="content-section" style="margin-bottom: 2rem;">
+        <h2 class="section-title">
+          <i class="bi bi-lightning"></i>
+          Core Operations
+        </h2>
+        <div class="action-grid">
+          <a href="{{ route('inventory.index') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-box-seam"></i>
+            </div>
+            <div class="action-title">Inventory Management</div>
+            <div class="action-description">Manage and update inventory, process materials</div>
+          </a>
+          
+          <a href="{{ route('staff.orders') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-clipboard-data"></i>
+            </div>
+            <div class="action-title">Order Management</div>
+            <div class="action-description">Track and manage waste orders placed by clients</div>
+          </a>
+          
+          <a href="{{ route('stock_transfer.create') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-truck"></i>
+            </div>
+            <div class="action-title">Logistics & Transfers</div>
+            <div class="action-description">Handle stock transfers and logistics operations</div>
+          </a>
+          
+          <a href="{{ route('inventory.analytics') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-bar-chart"></i>
+            </div>
+            <div class="action-title">Analytics & Reports</div>
+            <div class="action-description">View inventory analytics and performance reports</div>
+          </a>
         </div>
       </section>
       
       <!-- Quick Actions Section -->
       <section class="content-section" style="margin-bottom: 2rem;">
         <h2 class="section-title">
-          <i class="bi bi-lightning"></i>
-          Quick Actions
-        </h2>
-        <div class="action-grid">
-          <a href="{{ route('user-management') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-people"></i>
-            </div>
-            <div class="action-title">User Management</div>
-            <div class="action-description">Manage users, roles and permissions</div>
-          </a>
-          
-          <a href="{{ route('inventory.index') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-box-seam"></i>
-            </div>
-            <div class="action-title">Inventory Control</div>
-            <div class="action-description">Monitor stock levels and analytics</div>
-          </a>
-          
-          <a href="{{ route('admin.sales.pending') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-truck"></i>
-            </div>
-            <div class="action-title">Sales Orders</div>
-            <div class="action-description">Review and verify sales orders</div>
-          </a>
-          
-          <a href="{{ route('admin.purchase_orders.index') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-cart3"></i>
-            </div>
-            <div class="action-title">Purchase Orders</div>
-            <div class="action-description">Manage supplier purchase orders</div>
-          </a>
-          
-          <a href="{{ route('admin.analytics') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-bar-chart"></i>
-            </div>
-            <div class="action-title">Analytics & Reports</div>
-            <div class="action-description">View detailed system analytics</div>
-          </a>
-          
-          <a href="{{ route('admin.predictions.dashboard') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-robot"></i>
-            </div>
-            <div class="action-title">ML Predictions</div>
-            <div class="action-description">AI-powered sales predictions</div>
-          </a>
-          
-          <a href="{{ route('chat.index') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-chat-dots"></i>
-            </div>
-            <div class="action-title">Chat System</div>
-            <div class="action-description">Customer support and communication</div>
-          </a>
-          
-          <a href="{{ route('admin.vendors') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-building"></i>
-            </div>
-            <div class="action-title">Vendor Management</div>
-            <div class="action-description">Approve and manage vendors</div>
-          </a>
-        </div>
-      </section>
-      
-      <!-- Quick Create Section -->
-      <section class="content-section" style="margin-bottom: 2rem;">
-        <h2 class="section-title">
           <i class="bi bi-plus-circle"></i>
-          Quick Create
+          Quick Actions
         </h2>
         <div class="action-grid">
           <a href="{{ route('inventory.create') }}" class="action-card">
@@ -663,31 +629,31 @@
               <i class="bi bi-plus-square"></i>
             </div>
             <div class="action-title">Add Inventory</div>
-            <div class="action-description">Add new products to inventory</div>
-          </a>
-          
-          <a href="{{ route('admin.purchase_orders.create') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-cart-plus"></i>
-            </div>
-            <div class="action-title">New Purchase Order</div>
-            <div class="action-description">Create purchase order for suppliers</div>
+            <div class="action-description">Add new products to inventory system</div>
           </a>
           
           <a href="{{ route('inventory.deductForm') }}" class="action-card">
             <div class="action-icon">
               <i class="bi bi-dash-square"></i>
             </div>
-            <div class="action-title">Deduct Inventory</div>
+            <div class="action-title">Deduct Stock</div>
             <div class="action-description">Remove items from inventory</div>
           </a>
           
-          <a href="{{ route('register') }}" class="action-card">
+          <a href="{{ route('stock_transfer.create') }}" class="action-card">
             <div class="action-icon">
-              <i class="bi bi-person-plus"></i>
+              <i class="bi bi-arrow-left-right"></i>
             </div>
-            <div class="action-title">Add User</div>
-            <div class="action-description">Register new system user</div>
+            <div class="action-title">Stock Transfer</div>
+            <div class="action-description">Transfer stock between locations</div>
+          </a>
+          
+          <a href="{{ route('chat.index') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-chat-dots"></i>
+            </div>
+            <div class="action-title">Communication</div>
+            <div class="action-description">Chat with team members and management</div>
           </a>
         </div>
       </section>
@@ -704,28 +670,8 @@
             <div class="activity-item">
               <div class="activity-content">
                 <div class="activity-title">
-                  <a href="{{ route('user-management') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    {{ $totalUsers ?? '6' }} registered users
-                  </a>
-                </div>
-                <div class="activity-time">Active</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-content">
-                <div class="activity-title">
-                  <a href="{{ route('admin.sales.pending') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    {{ $pendingSalesCount ?? '0' }} pending sales orders
-                  </a>
-                </div>
-                <div class="activity-time">Awaiting review</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-content">
-                <div class="activity-title">
                   <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    {{ $totalProducts ?? '20' }} products in inventory
+                    156 items in inventory
                   </a>
                 </div>
                 <div class="activity-time">Current stock</div>
@@ -734,11 +680,31 @@
             <div class="activity-item">
               <div class="activity-content">
                 <div class="activity-title">
-                  <a href="{{ route('admin.purchase_orders.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    {{ $activePOs ?? '0' }} active purchase orders
+                  <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    42 pending orders
                   </a>
                 </div>
-                <div class="activity-time">In progress</div>
+                <div class="activity-time">Awaiting processing</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-title">
+                  <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    8 stock transfers today
+                  </a>
+                </div>
+                <div class="activity-time">Completed</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-content">
+                <div class="activity-title">
+                  <a href="{{ route('inventory.analytics') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    23 low stock alerts
+                  </a>
+                </div>
+                <div class="activity-time">Requires attention</div>
               </div>
             </div>
           </div>
@@ -758,20 +724,20 @@
               <span class="status-indicator operational">Operational</span>
             </div>
             <div class="status-item">
-              <a href="{{ route('admin.sales.pending') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                Sales Processing
+              <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                Order Processing
+              </a>
+              <span class="status-indicator operational">Operational</span>
+            </div>
+            <div class="status-item">
+              <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                Stock Transfer
               </a>
               <span class="status-indicator operational">Operational</span>
             </div>
             <div class="status-item">
               <a href="{{ route('chat.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                Chat System
-              </a>
-              <span class="status-indicator operational">Operational</span>
-            </div>
-            <div class="status-item">
-              <a href="{{ route('admin.predictions.dashboard') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                ML Predictions
+                Communication
               </a>
               <span class="status-indicator operational">Operational</span>
             </div>
@@ -782,51 +748,51 @@
         <div class="content-section">
           <h3 class="section-title">
             <i class="bi bi-graph-up"></i>
-            Business Metrics
+            Performance Metrics
           </h3>
           <div class="metrics-list">
             <div class="metric-item">
               <div class="metric-header">
-                <a href="{{ route('admin.sales.pending') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  Sales Processing Rate
+                <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                  Order Processing Rate
                 </a>
-                <span>{{ $pendingSalesCount > 0 ? '75%' : '100%' }}</span>
+                <span>85%</span>
               </div>
               <div class="metric-bar">
-                <div class="metric-fill" style="width: {{ $pendingSalesCount > 0 ? '75%' : '100%' }}; background: #10b981;"></div>
+                <div class="metric-fill" style="width: 85%; background: #10b981;"></div>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-header">
+                <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                  Inventory Accuracy
+                </a>
+                <span>92%</span>
+              </div>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 92%; background: #10b981;"></div>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-header">
+                <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                  Transfer Efficiency
+                </a>
+                <span>78%</span>
+              </div>
+              <div class="metric-bar">
+                <div class="metric-fill" style="width: 78%; background: #10b981;"></div>
               </div>
             </div>
             <div class="metric-item">
               <div class="metric-header">
                 <a href="{{ route('inventory.analytics') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  Inventory Efficiency
-                </a>
-                <span>{{ $totalProducts > 15 ? '85%' : '60%' }}</span>
-              </div>
-              <div class="metric-bar">
-                <div class="metric-fill" style="width: {{ $totalProducts > 15 ? '85%' : '60%' }}; background: #10b981;"></div>
-              </div>
-            </div>
-            <div class="metric-item">
-              <div class="metric-header">
-                <a href="{{ route('user-management') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  User Engagement
-                </a>
-                <span>{{ $totalUsers > 5 ? '92%' : '70%' }}</span>
-              </div>
-              <div class="metric-bar">
-                <div class="metric-fill" style="width: {{ $totalUsers > 5 ? '92%' : '70%' }}; background: #10b981;"></div>
-              </div>
-            </div>
-            <div class="metric-item">
-              <div class="metric-header">
-                <a href="{{ route('admin.analytics') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
                   System Performance
                 </a>
-                <span>96%</span>
+                <span>94%</span>
               </div>
               <div class="metric-bar">
-                <div class="metric-fill" style="width: 96%; background: #10b981;"></div>
+                <div class="metric-fill" style="width: 94%; background: #10b981;"></div>
               </div>
             </div>
           </div>

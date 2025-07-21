@@ -1,52 +1,196 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+body, .main-content, .container-fluid {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.dashboard-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+p, span, div, label, input, button {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.modern-button {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modern-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-secondary-modern {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+}
+
+.btn-accent-modern {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+/* Floating Elements - Welcome Page Style */
+.floating-elements {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.floating-icon {
+    position: absolute;
+    font-size: 1.5rem;
+    color: rgba(16, 185, 129, 0.4);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.animate-float-1 {
+    top: 15%;
+    left: 5%;
+    animation: float-1 8s ease-in-out infinite;
+}
+
+.animate-float-2 {
+    top: 70%;
+    right: 10%;
+    animation: float-2 10s ease-in-out infinite;
+}
+
+.animate-float-3 {
+    bottom: 25%;
+    left: 15%;
+    animation: float-3 9s ease-in-out infinite;
+}
+
+.animate-float-4 {
+    top: 40%;
+    right: 5%;
+    animation: float-4 7s ease-in-out infinite;
+}
+
+@keyframes float-1 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+    50% { transform: translateY(-20px) rotate(180deg); opacity: 0.6; }
+}
+
+@keyframes float-2 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+    50% { transform: translateY(-30px) rotate(-180deg); opacity: 0.5; }
+}
+
+@keyframes float-3 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+    50% { transform: translateY(-25px) rotate(180deg); opacity: 0.6; }
+}
+
+@keyframes float-4 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+    50% { transform: translateY(-15px) rotate(-90deg); opacity: 0.5; }
+}
+</style>
+
+<!-- Floating Elements for Visual Appeal -->
+<div class="floating-elements">
+    <div class="floating-icon animate-float-1">
+        <i class="bi bi-recycle"></i>
+    </div>
+    <div class="floating-icon animate-float-2">
+        <i class="bi bi-leaf"></i>
+    </div>
+    <div class="floating-icon animate-float-3">
+        <i class="bi bi-globe"></i>
+    </div>
+    <div class="floating-icon animate-float-4">
+        <i class="bi bi-lightning-charge"></i>
+    </div>
+</div>
+
 <!-- ECOVERSE Admin Dashboard Title Banner -->
-<div class="alert mb-4 d-flex align-items-center ecoverse-fade-in-up" style="background: var(--ecoverse-gradient-dark); border: none; color: var(--ecoverse-white); font-weight: 700; font-size: 1.2rem; border-radius: var(--ecoverse-radius-xl); padding: 24px; box-shadow: var(--ecoverse-shadow-lg); backdrop-filter: blur(10px);">
-  <i class="bi bi-speedometer2 me-3 fs-3" style="color: var(--ecoverse-white);"></i>
+<div class="alert mb-4 d-flex align-items-center dashboard-header">
+  <i class="bi bi-speedometer2 me-3 fs-2" style="color: #ffffff; filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));"></i>
   <div>
-    <strong style="text-transform: uppercase; letter-spacing: 1px;">ECOVERSE ADMIN CONTROL CENTER</strong>
-    <div style="font-size: 0.9rem; opacity: 0.95; font-weight: 400; color: rgba(255,255,255,0.9);">Sustainable system management & eco-analytics dashboard</div>
+    <strong class="admin-title" style="font-family: 'Poppins', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ECOVERSE ADMIN CONTROL CENTER</strong>
+    <div class="admin-subtitle" style="font-family: 'Poppins', sans-serif; font-size: 1rem; opacity: 0.95; font-weight: 400; color: rgba(255,255,255,0.9); margin-top: 0.5rem;">Sustainable system management & eco-analytics dashboard</div>
   </div>
 </div>
 
 <!-- ECOVERSE Professional Admin Header -->
-<div class="scm-card mb-4 ecoverse-fade-in-up scm-hover-earth" style="background: var(--ecoverse-gradient-earth); color: var(--ecoverse-white); border: none; animation-delay: 0.1s;">
-    <div class="scm-card-header" style="background: transparent; border: none;">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <div class="scm-icon-wrapper me-3" style="background: rgba(255,255,255,0.2); color: var(--ecoverse-white); backdrop-filter: blur(10px);">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-                <div>
-                    <h4 class="scm-card-title mb-1" style="color: var(--ecoverse-white); font-weight: 700;">ECOVERSE Supply Chain Control Center</h4>
-                    <p class="scm-card-subtitle" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">Welcome back, {{ Auth::user()->name }} | Pioneering sustainable administrative excellence</p>
-                </div>
+<div class="dashboard-card mb-4" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 2px solid rgba(16, 185, 129, 0.3); color: #ffffff; border-radius: 1.5rem; box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);">
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="me-3" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(16, 185, 129, 0.5); box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);">
+                <i class="bi bi-shield-check" style="font-size: 2rem;"></i>
             </div>
-            <div class="d-flex align-items-center">
-                <div class="scm-status-badge me-3 scm-floating-pulse" style="background: rgba(255,255,255,0.3); color: var(--ecoverse-white); border: 2px solid rgba(255,255,255,0.2); padding: 12px 20px; border-radius: var(--ecoverse-radius-full); backdrop-filter: blur(10px);">
-                    <i class="bi bi-check-circle me-2"></i>
-                    Eco-System Active
-                </div>
-                <div class="scm-status-badge" style="background: rgba(255,255,255,0.3); color: var(--ecoverse-white); border: 2px solid rgba(255,255,255,0.2); padding: 12px 20px; border-radius: var(--ecoverse-radius-full); backdrop-filter: blur(10px);">
-                    <i class="bi bi-activity me-2"></i>
-                    {{ $totalUsers ?? '0' }} Green Users
-                </div>
+            <div>
+                <h4 class="mb-1" style="font-family: 'Poppins', sans-serif; color: #ffffff; font-weight: 700; font-size: 1.8rem;">ECOVERSE Supply Chain Control Center</h4>
+                <p class="mb-0" style="font-family: 'Poppins', sans-serif; color: rgba(255,255,255,0.9); font-size: 1rem; font-weight: 400;">Welcome back, {{ Auth::user()->name }} | Pioneering sustainable administrative excellence</p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="me-3" style="background: rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 12px 20px; border-radius: 50px; font-family: 'Poppins', sans-serif; font-weight: 500;">
+                <i class="bi bi-check-circle me-2"></i>
+                Eco-System Active
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 12px 20px; border-radius: 50px; font-family: 'Poppins', sans-serif; font-weight: 500;">
+                <i class="bi bi-activity me-2"></i>
+                {{ $totalUsers ?? '0' }} Green Users
             </div>
         </div>
     </div>
 </div>
 
-<!-- ECOVERSE Primary Metrics with Earth Gradients -->
+<!-- ECOVERSE Primary Metrics with Modern Design -->
 <div class="row g-4 mb-4">
     <div class="col-lg-3 col-md-6">
-        <div class="scm-metric-card scm-hover-earth ecoverse-fade-in-up" style="background: var(--ecoverse-gradient-primary); color: var(--ecoverse-white); border: none; animation-delay: 0.1s;">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);">
             <div class="d-flex align-items-center">
-                <div class="scm-metric-icon" style="background: rgba(255,255,255,0.2); color: var(--ecoverse-white); backdrop-filter: blur(10px);">
-                    <i class="bi bi-people-fill"></i>
+                <div style="background: rgba(255,255,255,0.2); color: #ffffff; backdrop-filter: blur(10px); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.3);">
+                    <i class="bi bi-people-fill" style="font-size: 1.8rem;"></i>
                 </div>
                 <div class="ms-3 flex-grow-1">
-                    <h3 class="scm-metric-value" style="color: var(--ecoverse-white); background: linear-gradient(135deg, var(--ecoverse-white) 0%, var(--ecoverse-fawn-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ $totalUsers ?? 0 }}</h3>
-                    <p class="scm-metric-label" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">Eco-Champions</p>
-                    <div class="scm-metric-trend positive" style="color: var(--ecoverse-fawn-light);">
-                        <i class="bi bi-arrow-up"></i>
+                    <h3 style="font-family: 'Poppins', sans-serif; color: #ffffff; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem;">{{ $totalUsers ?? 0 }}</h3>
+                    <p style="font-family: 'Poppins', sans-serif; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">Eco-Champions</p>
+                    <div style="color: rgba(255,255,255,0.8); font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500;">
+                        <i class="bi bi-arrow-up me-1"></i>
                         <span>+12.5% Growth</span>
                     </div>
                 </div>
@@ -55,16 +199,16 @@
     </div>
     
     <div class="col-lg-3 col-md-6">
-        <div class="scm-metric-card scm-hover-earth ecoverse-fade-in-up" style="background: var(--ecoverse-gradient-accent); color: var(--ecoverse-ateneo-blue); border: none; animation-delay: 0.2s;">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);">
             <div class="d-flex align-items-center">
-                <div class="scm-metric-icon" style="background: rgba(7, 59, 109, 0.2); color: var(--ecoverse-ateneo-blue); backdrop-filter: blur(10px);">
-                    <i class="bi bi-box-seam-fill"></i>
+                <div style="background: rgba(255,255,255,0.2); color: #ffffff; backdrop-filter: blur(10px); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.3);">
+                    <i class="bi bi-box-seam-fill" style="font-size: 1.8rem;"></i>
                 </div>
                 <div class="ms-3 flex-grow-1">
-                    <h3 class="scm-metric-value" style="color: var(--ecoverse-ateneo-blue); background: linear-gradient(135deg, var(--ecoverse-ateneo-blue) 0%, var(--ecoverse-bistre) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ $totalProducts ?? 0 }}</h3>
-                    <p class="scm-metric-label" style="color: var(--ecoverse-ateneo-blue); margin-bottom: 0; font-weight: 600;">Eco-Products</p>
-                    <div class="scm-metric-trend positive" style="color: var(--ecoverse-bistre);">
-                        <i class="bi bi-arrow-up"></i>
+                    <h3 style="font-family: 'Poppins', sans-serif; color: #ffffff; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem;">{{ $totalProducts ?? 0 }}</h3>
+                    <p style="font-family: 'Poppins', sans-serif; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">Eco-Products</p>
+                    <div style="color: rgba(255,255,255,0.8); font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500;">
+                        <i class="bi bi-arrow-up me-1"></i>
                         <span>+8.3% Sustainable</span>
                     </div>
                 </div>
@@ -73,16 +217,16 @@
     </div>
     
     <div class="col-lg-3 col-md-6">
-        <div class="scm-metric-card scm-hover-earth ecoverse-fade-in-up" style="background: var(--ecoverse-gradient-dark); color: var(--ecoverse-white); border: none; animation-delay: 0.3s;">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); color: #ffffff; border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(30, 41, 59, 0.3);">
             <div class="d-flex align-items-center">
-                <div class="scm-metric-icon" style="background: rgba(255,255,255,0.2); color: var(--ecoverse-white); backdrop-filter: blur(10px);">
-                    <i class="bi bi-clipboard-check-fill"></i>
+                <div style="background: rgba(255,255,255,0.2); color: #ffffff; backdrop-filter: blur(10px); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.3);">
+                    <i class="bi bi-clipboard-check-fill" style="font-size: 1.8rem;"></i>
                 </div>
                 <div class="ms-3 flex-grow-1">
-                    <h3 class="scm-metric-value" style="color: var(--ecoverse-white); background: linear-gradient(135deg, var(--ecoverse-white) 0%, var(--ecoverse-fawn-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">{{ $activePOs ?? 0 }}</h3>
-                    <p class="scm-metric-label" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">Green Purchase Orders</p>
-                    <div class="scm-metric-trend positive" style="color: var(--ecoverse-fawn-light);">
-                        <i class="bi bi-arrow-up"></i>
+                    <h3 style="font-family: 'Poppins', sans-serif; color: #ffffff; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem;">{{ $activePOs ?? 0 }}</h3>
+                    <p style="font-family: 'Poppins', sans-serif; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">Green Purchase Orders</p>
+                    <div style="color: rgba(255,255,255,0.8); font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500;">
+                        <i class="bi bi-arrow-up me-1"></i>
                         <span>+15.7% Eco-Growth</span>
                     </div>
                 </div>
@@ -91,16 +235,16 @@
     </div>
     
     <div class="col-lg-3 col-md-6">
-        <div class="scm-metric-card scm-hover-earth ecoverse-fade-in-up" style="background: var(--ecoverse-gradient-secondary); color: var(--ecoverse-white); border: none; animation-delay: 0.4s;">
+        <div class="dashboard-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);">
             <div class="d-flex align-items-center">
-                <div class="scm-metric-icon" style="background: rgba(255,255,255,0.2); color: var(--ecoverse-white); backdrop-filter: blur(10px);">
-                    <i class="bi bi-graph-up-arrow"></i>
+                <div style="background: rgba(255,255,255,0.2); color: #ffffff; backdrop-filter: blur(10px); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.3);">
+                    <i class="bi bi-graph-up-arrow" style="font-size: 1.8rem;"></i>
                 </div>
                 <div class="ms-3 flex-grow-1">
-                    <h3 class="scm-metric-value" style="color: var(--ecoverse-white); background: linear-gradient(135deg, var(--ecoverse-white) 0%, var(--ecoverse-fawn-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">UGX 4.2M</h3>
-                    <p class="scm-metric-label" style="color: rgba(255,255,255,0.9); margin-bottom: 0;">Eco-Revenue</p>
-                    <div class="scm-metric-trend positive" style="color: var(--ecoverse-fawn-light);">
-                        <i class="bi bi-arrow-up"></i>
+                    <h3 style="font-family: 'Poppins', sans-serif; color: #ffffff; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem;">UGX 4.2M</h3>
+                    <p style="font-family: 'Poppins', sans-serif; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">Eco-Revenue</p>
+                    <div style="color: rgba(255,255,255,0.8); font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500;">
+                        <i class="bi bi-arrow-up me-1"></i>
                         <span>+8.5% Green Impact</span>
                     </div>
                 </div>
@@ -113,7 +257,7 @@
 <div class="row g-4 mb-4">
     <!-- Sustainable Sales Management -->
     <div class="col-xl-4 col-lg-6">
-        <div class="scm-card scm-hover-earth ecoverse-fade-in-up enhanced-action-card" style="background: linear-gradient(135deg, rgba(205, 128, 106, 0.1) 0%, rgba(205, 128, 106, 0.05) 100%); border: 2px solid rgba(205, 128, 106, 0.2); animation-delay: 0.1s;">
+        <div class="scm-card scm-hover-earth ecoverse-fade-in-up enhanced-action-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 2px solid rgba(16, 185, 129, 0.3); animation-delay: 0.1s;">
             <div class="scm-card-header" style="background: var(--ecoverse-gradient-secondary); color: var(--ecoverse-white);">
                 <div class="d-flex align-items-center">
                     <div class="scm-icon-wrapper me-3" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
@@ -142,20 +286,20 @@
 
     <!-- User Management -->
     <div class="col-xl-4 col-lg-6">
-        <div class="scm-card scm-hover-lift enhanced-action-card" style="background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%); border-left: 5px solid #2ecc71;">
-            <div class="scm-card-header" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white;">
+        <div class="scm-card scm-hover-lift enhanced-action-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 2px solid rgba(16, 185, 129, 0.3);">
+            <div class="scm-card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
                 <div class="d-flex align-items-center">
                     <i class="bi bi-people-fill me-3 fs-4"></i>
                     <h5 class="scm-card-title mb-0" style="color: white; font-weight: 600;">User Management</h5>
                 </div>
             </div>
             <div class="scm-card-body">
-                <p class="scm-card-text mb-3">Manage all users, roles and permissions across the supply chain system</p>
+                <p class="scm-card-text mb-3" style="color: rgba(255, 255, 255, 0.8);">Manage all users, roles and permissions across the supply chain system</p>
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <small class="text-muted">Total System Users</small>
-                    <span class="badge bg-success">{{ $totalUsers ?? '0' }} Users</span>
+                    <small class="text-muted" style="color: rgba(255, 255, 255, 0.7) !important;">Total System Users</small>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">{{ $totalUsers ?? '0' }} Users</span>
                 </div>
-                <a href="{{ route('user-management') }}" class="scm-btn scm-btn-success w-100" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); border: none;">
+                <a href="{{ route('user-management') }}" class="scm-btn scm-btn-success w-100" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
                     <i class="bi bi-person-lines-fill me-2"></i>Manage Users
                 </a>
             </div>
@@ -164,20 +308,20 @@
 
     <!-- Inventory Control -->
     <div class="col-xl-4 col-lg-6">
-        <div class="scm-card scm-hover-lift enhanced-action-card" style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(41, 128, 185, 0.1) 100%); border-left: 5px solid #3498db;">
-            <div class="scm-card-header" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white;">
+        <div class="scm-card scm-hover-lift enhanced-action-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 2px solid rgba(6, 182, 212, 0.3);">
+            <div class="scm-card-header" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white;">
                 <div class="d-flex align-items-center">
                     <i class="bi bi-box-seam-fill me-3 fs-4"></i>
                     <h5 class="scm-card-title mb-0" style="color: white; font-weight: 600;">Inventory Control</h5>
                 </div>
             </div>
             <div class="scm-card-body">
-                <p class="scm-card-text mb-3">Monitor stock levels, analytics and inventory management across all locations</p>
+                <p class="scm-card-text mb-3" style="color: rgba(255, 255, 255, 0.8);">Monitor stock levels, analytics and inventory management across all locations</p>
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <small class="text-muted">Active Products</small>
-                    <span class="badge bg-info">{{ $totalProducts ?? '0' }} Items</span>
+                    <small class="text-muted" style="color: rgba(255, 255, 255, 0.7) !important;">Active Products</small>
+                    <span class="badge" style="background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3);">{{ $totalProducts ?? '0' }} Items</span>
                 </div>
-                <a href="{{ route('inventory.index') }}" class="scm-btn scm-btn-info w-100" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border: none;">
+                <a href="{{ route('inventory.index') }}" class="scm-btn scm-btn-info w-100" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); border: none;">
                     <i class="bi bi-archive me-2"></i>View Inventory
                 </a>
             </div>
@@ -648,22 +792,6 @@
 <!-- Chart.js for analytics -->
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // // Sales Trends Chart (real data)
-  // const ctx1 = document.getElementById('salesTrendsChart').getContext('2d');
-  // new Chart(ctx1, {
-  //   type: 'line',
-  //   data: {
-  //     labels: @json($revenueTrendLabels),
-  //     datasets: [{
-  //       label: 'Sales',
-  //       data: @json($revenueTrendData),
-  //       borderColor: '#6366f1',
-  //       backgroundColor: 'rgba(99,102,241,0.1)',
-  //       tension: 0.4
-  //     }]
-  //   },
-  //   options: { plugins: { legend: { display: false } } }
-  // });
   // Batch Analytics Chart (Product Inventory Distribution)
   const ctx2 = document.getElementById('batchAnalyticsChart').getContext('2d');
   new Chart(ctx2, {
@@ -706,7 +834,8 @@
             font: {
               size: 12,
               family: 'Poppins'
-            }
+            },
+            color: '#ffffff'
           }
         },
         tooltip: {
@@ -727,6 +856,40 @@
       }
     }
   });
+
+  // Welcome page inspired animations for admin dashboard
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate cards on scroll
+    const cards = document.querySelectorAll('.enhanced-action-card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Add floating animation to icons
+    const icons = document.querySelectorAll('.bi');
+    icons.forEach(icon => {
+      icon.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.1) rotate(5deg)';
+        this.style.transition = 'all 0.3s ease';
+      });
+      
+      icon.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1) rotate(0deg)';
+      });
+    });
+
+    // Add glow effect to cards on hover
+    const allCards = document.querySelectorAll('.scm-card, .info-card, .dashboard-card');
+    allCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.boxShadow = '0 20px 60px rgba(16, 185, 129, 0.3)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.boxShadow = '';
+      });
+    });
+  });
 </script>
 
 <!-- Google Fonts - Poppins -->
@@ -735,10 +898,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* Modern Professional Dashboard Styling */
+/* Ecoverse Admin Dashboard - Welcome Page Theme Integration */
 body, .main-content, .container-fluid {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #10b981 100%) !important;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Global text color overrides */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+p, span, div:not(.badge), label, small {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Text gradient for headings */
+.text-gradient {
+    background: linear-gradient(135deg, #10b981, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Dashboard Container */
@@ -746,6 +933,26 @@ body, .main-content, .container-fluid {
     max-width: 1600px;
     margin: 0 auto;
     padding: 1.5rem;
+    position: relative;
+}
+
+/* Floating Particles Background Effect */
+.admin-dashboard-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="%2310b981" opacity="0.3"/><circle cx="80" cy="40" r="1.5" fill="%236366f1" opacity="0.4"/><circle cx="40" cy="80" r="1" fill="%23f59e0b" opacity="0.3"/><circle cx="70" cy="70" r="1.2" fill="%2310b981" opacity="0.5"/></svg>');
+    animation: float-particles 20s infinite linear;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes float-particles {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-100vh) rotate(360deg); }
 }
 
 @media (min-width: 1400px) {
@@ -762,13 +969,16 @@ body, .main-content, .container-fluid {
 
 /* Dashboard Header */
 .dashboard-header {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
-    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 1.5rem;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
     position: relative;
     overflow: hidden;
+    color: #ffffff;
 }
 
 .dashboard-header::before {
@@ -778,7 +988,7 @@ body, .main-content, .container-fluid {
     right: 0;
     width: 200px;
     height: 200px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
     border-radius: 50%;
 }
 
@@ -814,15 +1024,17 @@ body, .main-content, .container-fluid {
 
 /* Action Cards */
 .action-card {
-    background: white;
-    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
     padding: 2rem;
     height: 100%;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    color: #ffffff;
 }
 
 .action-card::before {
@@ -832,73 +1044,90 @@ body, .main-content, .container-fluid {
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--card-color);
+    background: linear-gradient(135deg, #10b981, #6366f1);
 }
 
-.action-card.card-primary { --card-color: #3b82f6; }
+.action-card.card-primary { --card-color: #10b981; }
 .action-card.card-success { --card-color: #10b981; }
 .action-card.card-info { --card-color: #06b6d4; }
 .action-card.card-warning { --card-color: #f59e0b; }
 .action-card.card-danger { --card-color: #ef4444; }
 
 .action-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.5);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .action-card .card-icon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin: 0 auto 1.5rem;
-    background: linear-gradient(135deg, var(--card-color), color-mix(in srgb, var(--card-color) 80%, black));
+    background: linear-gradient(135deg, #10b981, #059669);
     color: white;
-    box-shadow: 0 8px 25px color-mix(in srgb, var(--card-color) 30%, transparent);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
 }
 
 .action-card .card-content h5 {
     font-weight: 600;
     margin-bottom: 0.75rem;
-    color: #1e293b;
+    color: #ffffff;
+    font-size: 1.5rem;
 }
 
 .action-card .card-content p {
-    color: #64748b;
-    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
     margin-bottom: 1.5rem;
+    line-height: 1.6;
 }
 
 .btn-modern {
-    border-radius: 0.5rem;
+    border-radius: 50px;
     padding: 0.75rem 1.5rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: none;
     border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
 }
 
 .btn-modern:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+    color: white;
 }
 
 /* Info Cards */
 .info-card {
-    background: white;
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
     overflow: hidden;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
 }
 
 .card-header-custom {
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background: rgba(16, 185, 129, 0.2);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1.25rem 1.5rem;
     display: flex;
     justify-content: space-between;
@@ -908,9 +1137,13 @@ body, .main-content, .container-fluid {
 .card-header-custom h6 {
     margin: 0;
     font-weight: 600;
-    color: #1e293b;
+    color: #ffffff;
     display: flex;
     align-items: center;
+}
+
+.card-header-custom small {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .card-body-custom {
@@ -945,8 +1178,8 @@ body, .main-content, .container-fluid {
 
 .inventory-item, .financial-item {
     padding: 1rem 0;
-    border-bottom: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
 }
 
 .inventory-item:last-child, .financial-item:last-child {
@@ -954,22 +1187,23 @@ body, .main-content, .container-fluid {
 }
 
 .inventory-item:hover, .financial-item:hover {
-    background: #f8fafc;
+    background: rgba(16, 185, 129, 0.1);
     margin: 0 -1rem;
     padding: 1rem;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
+    backdrop-filter: blur(20px);
 }
 
 .item-title {
     font-weight: 600;
-    color: #1e293b;
+    color: #ffffff;
     font-size: 0.95rem;
     margin-bottom: 0.25rem;
 }
 
 .item-subtitle {
     font-size: 0.8rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -985,12 +1219,12 @@ body, .main-content, .container-fluid {
 .quantity-number {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #ffffff;
 }
 
 .quantity-unit {
     font-size: 0.8rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
 }
 
@@ -999,25 +1233,28 @@ body, .main-content, .container-fluid {
     font-size: 0.75rem;
     font-weight: 500;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     display: inline-flex;
     align-items: center;
+    backdrop-filter: blur(10px);
 }
 
 .stock-alert {
-    background: #fef2f2;
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
 }
 
 .stock-ok {
-    background: #f0fdf4;
-    color: #16a34a;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
 }
 
 /* Payment Amount */
 .payment-amount {
     font-weight: 700;
-    color: #059669;
+    color: #6ee7b7;
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
@@ -1027,38 +1264,44 @@ body, .main-content, .container-fluid {
     font-size: 0.75rem;
     font-weight: 500;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     display: inline-flex;
     align-items: center;
+    backdrop-filter: blur(10px);
 }
 
 .status-paid, .status-approved {
-    background: #f0fdf4;
-    color: #16a34a;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
 }
 
 .status-pending {
-    background: #fffbeb;
-    color: #d97706;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
 }
 
 .status-rejected {
-    background: #fef2f2;
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
 }
 
 /* PO Badge & Links */
 .po-badge {
-    background: #e2e8f0;
-    color: #475569;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
 .invoice-link {
-    color: #3b82f6;
+    color: #6ee7b7;
     text-decoration: none;
     font-size: 0.8rem;
     font-weight: 500;
@@ -1066,28 +1309,31 @@ body, .main-content, .container-fluid {
 }
 
 .invoice-link:hover {
-    color: #1d4ed8;
+    color: #10b981;
     text-decoration: underline;
 }
 
 .review-btn {
-    background: #f1f5f9;
-    color: #475569;
+    background: rgba(16, 185, 129, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
     margin-top: 0.5rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .review-btn:hover {
-    background: #e2e8f0;
-    color: #334155;
+    background: rgba(16, 185, 129, 0.3);
+    color: #10b981;
     text-decoration: none;
+    transform: translateY(-2px);
 }
 
 /* Enhanced Analytics Metrics */
@@ -1102,15 +1348,18 @@ body, .main-content, .container-fluid {
     display: flex;
     align-items: center;
     padding: 1rem;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 0.75rem;
     border-left: 4px solid var(--metric-color);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .metric-item:hover {
-    background: #f1f5f9;
+    background: rgba(255, 255, 255, 0.15);
     transform: translateX(4px);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
 }
 
 .metric-success { --metric-color: #10b981; }
@@ -1130,6 +1379,7 @@ body, .main-content, .container-fluid {
     font-size: 1.1rem;
     margin-right: 1rem;
     flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
 .metric-content {
@@ -1139,13 +1389,13 @@ body, .main-content, .container-fluid {
 .metric-number {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #ffffff;
     margin-bottom: 0.25rem;
 }
 
 .metric-label {
     font-size: 0.75rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -1154,18 +1404,18 @@ body, .main-content, .container-fluid {
 .empty-state {
     text-align: center;
     padding: 2rem 1rem;
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .empty-state i {
     font-size: 2.5rem;
-    color: #cbd5e1;
+    color: rgba(255, 255, 255, 0.4);
     margin-bottom: 1rem;
     display: block;
 }
 
 .empty-state h6 {
-    color: #475569;
+    color: #ffffff;
     margin-bottom: 0.5rem;
     font-weight: 600;
 }
@@ -1173,6 +1423,7 @@ body, .main-content, .container-fluid {
 .empty-state p {
     font-size: 0.875rem;
     margin: 0;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Action Buttons */
@@ -1184,28 +1435,34 @@ body, .main-content, .container-fluid {
 }
 
 .action-btn {
-    border-radius: 0.5rem;
+    border-radius: 50px;
     padding: 0.875rem 1rem;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
     border: none;
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.875rem;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
 }
 
 .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
     text-decoration: none;
+    color: white;
 }
 
 /* List Items */
 .list-group-item {
     padding: 1rem 0;
-    border-bottom: 1px solid #f1f5f9 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: transparent !important;
+    color: #ffffff;
 }
 
 .list-group-item:last-child {
@@ -1285,11 +1542,24 @@ body, .main-content, .container-fluid {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .enhanced-action-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.5);
 }
 
 .enhanced-action-card:hover::before {
@@ -1299,7 +1569,7 @@ body, .main-content, .container-fluid {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
     pointer-events: none;
 }
 
@@ -1461,18 +1731,18 @@ body, .main-content, .container-fluid {
 
 .inventory-list-container::-webkit-scrollbar-track, 
 .financial-list-container::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
 }
 
 .inventory-list-container::-webkit-scrollbar-thumb, 
 .financial-list-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: rgba(16, 185, 129, 0.6);
     border-radius: 3px;
 }
 
 .inventory-list-container::-webkit-scrollbar-thumb:hover, 
 .financial-list-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: rgba(16, 185, 129, 0.8);
 }
 </style>

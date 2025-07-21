@@ -11,6 +11,7 @@ class Batch extends Model
         'batch_id',
         'quantity',
         'expiry_date',
+        'status',
     ];
 
     public function product()

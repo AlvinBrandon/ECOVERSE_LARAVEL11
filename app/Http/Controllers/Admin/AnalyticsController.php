@@ -149,9 +149,7 @@ class AnalyticsController extends Controller
         $ordersGrowth = $previousOrders > 0 ? (($totalOrders - $previousOrders) / $previousOrders) * 100 : 0;
 
         // Inventory Impact (Products with low stock vs high sales)
-        $inventoryAlert = Product::with(['batches' => function($query) {
-                $query->where('status', 'active');
-            }])
+        $inventoryAlert = Product::with('batches')
             ->get()
             ->map(function($product) use ($startDate) {
                 $totalStock = $product->batches->sum('quantity');

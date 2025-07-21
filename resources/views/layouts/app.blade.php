@@ -260,11 +260,12 @@
 <body @auth data-user-id="{{ auth()->id() }}" data-user-role="{{ auth()->user()->role }}" @endauth>
     @auth
         @include('components.navbars.navs.auth', ['titlePage' => $titlePage ?? 'Dashboard'])
+        @include('components.navbars.sidebar', ['activePage' => $activePage ?? ''])
     @else
         @include('components.navbars.navs.guest')
     @endauth
 
-    <main class="py-4">
+    <main class="py-4 main-content" style="@auth margin-left: 280px; transition: all 0.3s ease; @endauth">
         @yield('content')
     </main>
 

@@ -21,6 +21,7 @@ class AdminController extends Controller
         $totalProducts = Product::count();
         $totalVendors = Vendor::count();
         $totalOrders = Order::count();
+        $activePOs = PurchaseOrder::where('status', 'pending')->count(); // Add this line
         // $totalRevenue = Order::sum('total_price');
         $recentOrders = Order::with('user', 'product')->latest()->take(5)->get();
 
@@ -151,7 +152,7 @@ class AdminController extends Controller
         // Use the correct dashboard view for admin
         return view('dashboards.admin', compact(
             'totalUsers', 'totalProducts', 'totalVendors',
-            'totalOrders',  'recentOrders',
+            'totalOrders', 'activePOs', 'recentOrders',
             'userRegistrationLabels', 'userRegistrationCounts',
             'revenueTrendLabels', 'revenueTrendData',
             'systemHealth', 'notifications', 'activityLog',
@@ -159,14 +160,14 @@ class AdminController extends Controller
             // New for dashboard widgets:
             'adminPOs', 'pendingDeliveries', 'rawMaterials', 'supplierPayments', 'invoices', 'analytics',
             'pendingSalesCount'
-        ));
+        ))->with('activePage', 'dashboard');
     }
 
     // Show all users and their roles
     public function users()
     {
         $users = User::all();
-        return view('admin.users', compact('users'));
+        return view('admin.users', compact('users'))->with('activePage', 'admin-users');
     }
 
     // Update a user's role

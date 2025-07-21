@@ -68,7 +68,60 @@ class DashboardController extends Controller
      */
     private function retailerDashboard()
     {
-        return view('dashboards.retailer');
+        $user = Auth::user();
+        
+        // Get today's sales count (orders placed today)
+        $salesToday = Order::whereDate('created_at', today())
+            ->count();
+        
+        // Get total customers (users with role_as = 0)
+        $totalCustomers = User::where('role_as', 0)->count();
+        
+        // Get low stock items (products with less than 10 in any related inventory)
+        // Since there's no stock column, we'll count products with low order activity
+        $lowStockItems = Product::whereNotIn('id', function($query) {
+            $query->select('product_id')
+                  ->from('orders')
+                  ->where('created_at', '>=', now()->subDays(30))
+                  ->groupBy('product_id')
+                  ->havingRaw('COUNT(*) > 5');
+        })->count();
+        
+        // Get today's revenue (approved orders total from today)
+        $revenueToday = Order::whereDate('created_at', today())
+            ->where('status', 'approved')
+            ->sum('total_price');
+        
+        // Get total orders for retailer context
+        $totalOrders = Order::count();
+        
+        // Get recent customer orders (last 10)
+        $recentOrders = Order::with(['user', 'product'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+        
+        // Get orders pending verification
+        $pendingOrders = Order::where('status', 'pending')->count();
+        
+        // Get approved orders
+        $approvedOrders = Order::where('status', 'approved')->count();
+        
+        // Calculate monthly metrics
+        $monthlyRevenue = Order::where('status', 'approved')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total_price');
+        
+        $monthlyOrders = Order::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        
+        return view('dashboards.retailer', compact(
+            'salesToday', 'totalCustomers', 'lowStockItems', 'revenueToday',
+            'totalOrders', 'recentOrders', 'pendingOrders', 'approvedOrders',
+            'monthlyRevenue', 'monthlyOrders'
+        ));
     }
     
     /**
@@ -92,7 +145,106 @@ class DashboardController extends Controller
      */
     private function wholesalerDashboard()
     {
-        return view('dashboards.wholesaler');
+        // Get wholesaler-specific data
+        $user = Auth::user();
+        
+        // Calculate bulk orders (orders from retailers for wholesaler products)
+        $bulkOrders = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->count();
+        
+        // Calculate active retailers (unique retailers who have ordered from wholesaler)
+        $activeRetailers = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->distinct('orders.user_id')
+            ->count('orders.user_id');
+        
+        // Calculate pending verifications (pending orders from retailers)
+        $pendingVerifications = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->where('orders.status', 'pending')
+            ->count();
+        
+        // Calculate monthly revenue from approved orders
+        $monthlyRevenue = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->where('orders.status', 'approved')
+            ->whereMonth('orders.created_at', now()->month)
+            ->whereYear('orders.created_at', now()->year)
+            ->sum('orders.total_price');
+        
+        // Calculate growth percentages (compare with previous month)
+        $previousMonth = now()->subMonth();
+        $previousBulkOrders = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->whereMonth('orders.created_at', $previousMonth->month)
+            ->whereYear('orders.created_at', $previousMonth->year)
+            ->count();
+        
+        $previousRetailers = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->whereMonth('orders.created_at', $previousMonth->month)
+            ->whereYear('orders.created_at', $previousMonth->year)
+            ->distinct('orders.user_id')
+            ->count('orders.user_id');
+        
+        $previousRevenue = Order::join('users', 'orders.user_id', '=', 'users.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->where(function($q) {
+                $q->where('users.role', 'retailer')
+                  ->orWhere('users.role_as', 2);
+            })
+            ->where('products.seller_role', 'wholesaler')
+            ->where('orders.status', 'approved')
+            ->whereMonth('orders.created_at', $previousMonth->month)
+            ->whereYear('orders.created_at', $previousMonth->year)
+            ->sum('orders.total_price');
+        
+        // Calculate growth percentages
+        $bulkOrdersGrowth = $previousBulkOrders > 0 ? 
+            round((($bulkOrders - $previousBulkOrders) / $previousBulkOrders) * 100, 1) : 0;
+        $retailersGrowth = $previousRetailers > 0 ? 
+            round((($activeRetailers - $previousRetailers) / $previousRetailers) * 100, 1) : 0;
+        $revenueGrowth = $previousRevenue > 0 ? 
+            round((($monthlyRevenue - $previousRevenue) / $previousRevenue) * 100, 1) : 0;
+        
+        // Get total generated reports count (placeholder - you can implement actual report tracking)
+        $generatedReports = 24; // This can be replaced with actual report count from database
+        
+        return view('dashboards.wholesaler', compact(
+            'bulkOrders', 'activeRetailers', 'pendingVerifications', 'monthlyRevenue',
+            'bulkOrdersGrowth', 'retailersGrowth', 'revenueGrowth', 'generatedReports'
+        ));
     }
 
     public function customerDashboard()

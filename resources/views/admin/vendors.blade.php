@@ -2,272 +2,386 @@
 
 @section('title', 'Vendor Management - Admin Dashboard')
 
-@push('styles')
+@section('content')
 <style>
-.vendor-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+  /* Modern Professional Vendor Management Styling */
+  body, .main-content, .container-fluid {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Page Header */
+  .page-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
     border-radius: 1rem;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.12);
-}
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
 
-.vendor-header h2 {
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+  .page-header h4 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
 
-.vendor-header p {
-    font-weight: 400;
-    opacity: 0.95;
-    font-size: 1.1rem;
-    margin-bottom: 0;
-}
+  .page-header .btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
 
-.vendor-card {
-    background: rgba(255,255,255,0.95);
-    border-radius: 1rem;
-    padding: 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.3);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.vendor-card:hover {
+  .page-header .btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-}
+  }
 
-.vendor-card-header {
-    border-radius: 1rem 1rem 0 0;
-    border-bottom: 2px solid rgba(0,0,0,0.05);
-    padding: 1.5rem 2rem;
-    font-weight: 600;
-    font-size: 1.15rem;
-}
+  /* Filter Section */
+  .filter-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
 
-.vendor-card-header.pending {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    color: white;
-}
+  .filter-section .form-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
 
-.vendor-card-header.approved {
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-    color: white;
-}
-
-.vendor-card-header.rejected {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    color: white;
-}
-
-.vendor-card-body {
-    padding: 0;
-}
-
-.vendor-table {
-    margin-bottom: 0;
-}
-
-.vendor-table thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-    font-weight: 600;
-    color: #495057;
-    padding: 1rem 1.5rem;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.vendor-table tbody td {
-    padding: 1rem 1.5rem;
-    vertical-align: middle;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    color: #495057;
-}
-
-.vendor-table tbody tr:hover {
-    background-color: rgba(102, 126, 234, 0.02);
-}
-
-.vendor-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.status-badge {
-    padding: 0.4rem 0.8rem;
+  .filter-section .form-control {
+    border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
-    font-size: 0.8rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .filter-section .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .filter-section .btn {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .filter-section .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Main Table Card */
+  .table-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: none;
+  }
+
+  .table-card .card-body {
+    padding: 0;
+  }
+
+  /* Table Styling */
+  .modern-table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .modern-table thead th {
+    background: #f8fafc;
+    color: #374151;
     font-weight: 600;
+    font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
+    padding: 1.25rem 1.5rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
 
-.status-badge.pending {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    color: white;
-}
+  .modern-table thead th i {
+    color: #6b7280;
+    margin-right: 0.5rem;
+  }
 
-.status-badge.approved {
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-    color: white;
-}
+  .modern-table tbody tr {
+    transition: all 0.2s ease;
+  }
 
-.status-badge.rejected {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    color: white;
-}
+  .modern-table tbody tr:hover {
+    background: #f9fafb;
+  }
 
-.vendor-actions {
+  .modern-table tbody td {
+    padding: 1.25rem 1.5rem;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    color: #374151;
+    vertical-align: middle;
+  }
+
+  .modern-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .status-badge.delivered, .status-badge.completed, .status-badge.success, .status-badge.approved {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .status-badge.processing {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-badge.dispatched, .status-badge.info {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+
+  .status-badge.cancelled, .status-badge.rejected, .status-badge.danger {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  /* Product Name Styling */
+  .product-name {
+    font-weight: 500;
+    color: #1f2937;
+  }
+
+  /* Quantity Styling */
+  .quantity {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  /* Date Styling */
+  .order-date {
+    color: #6b7280;
+    font-size: 0.8rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .page-header {
+      padding: 1.5rem;
+    }
+
+    .page-header h4 {
+      font-size: 1.25rem;
+    }
+
+    .filter-section {
+      padding: 1rem;
+    }
+
+    .modern-table thead th,
+    .modern-table tbody td {
+      padding: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.625rem;
+      font-size: 0.7rem;
+    }
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h5 {
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+
+  /* Action Buttons Enhancement */
+  .btn-primary {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-success {
+    background: #10b981;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-danger {
+    background: #ef4444;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-info {
+    background: #3b82f6;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn-info:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Action buttons in table */
+  .vendor-actions {
     display: flex;
     gap: 0.5rem;
-}
+  }
 
-.action-btn {
-    padding: 0.4rem 0.8rem;
+  .action-btn {
+    padding: 0.375rem 0.75rem;
     border: none;
-    border-radius: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-}
+    gap: 0.25rem;
+  }
 
-.action-btn.approve {
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  .action-btn.approve {
+    background: #10b981;
     color: white;
-}
+  }
 
-.action-btn.reject {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  .action-btn.reject {
+    background: #ef4444;
     color: white;
-}
+  }
 
-.action-btn.view {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  .action-btn.view {
+    background: #3b82f6;
     color: white;
-}
+  }
 
-.action-btn:hover {
+  .action-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     color: white;
     text-decoration: none;
-}
+  }
 
-.empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: #6c757d;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state h5 {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-    margin-bottom: 0;
-    font-size: 0.95rem;
-}
-
-.stats-summary {
-    background: rgba(255,255,255,0.95);
+  /* Stats cards */
+  .stats-summary {
+    background: white;
     border-radius: 1rem;
-    padding: 1.5rem 2rem;
+    padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.3);
-}
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
 
-.stats-item {
+  .stats-item {
     text-align: center;
-}
+  }
 
-.stats-number {
+  .stats-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #495057;
+    color: #374151;
     margin-bottom: 0.25rem;
-}
+  }
 
-.stats-label {
-    font-size: 0.9rem;
-    color: #6c757d;
+  .stats-label {
+    font-size: 0.875rem;
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-weight: 600;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .vendor-header {
-        padding: 1.5rem;
-        text-align: center;
-    }
-    
-    .vendor-header h2 {
-        font-size: 1.5rem;
-    }
-    
-    .vendor-card-header {
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
-    }
-    
-    .vendor-table thead th,
-    .vendor-table tbody td {
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
-    }
-    
-    .vendor-actions {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .action-btn {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.6rem;
-    }
-}
-
-/* Bootstrap Icons */
-.bi {
-    vertical-align: -0.125em;
-}
+    font-weight: 500;
+  }
 </style>
-@endpush
 
-@section('content')
 <div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="vendor-header">
-        <div class="d-flex justify-content-between align-items-center">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between">
             <div>
-                <h2 class="mb-2">
-                    <i class="bi bi-people-fill me-3"></i>Vendor Management
-                </h2>
-                <p class="mb-0">Manage vendor applications and approvals for your marketplace</p>
+                <h4><i class="bi bi-people-fill me-2"></i>Vendor Management</h4>
+                <p class="mb-0 opacity-75">Manage vendor applications and approvals for your marketplace</p>
             </div>
-            <div class="d-none d-md-block">
-                <i class="bi bi-shop" style="font-size: 3rem; opacity: 0.3;"></i>
-            </div>
+            <a href="{{ route('dashboard') }}" class="btn">
+                <i class="bi bi-house-door me-1"></i>Home
+            </a>
         </div>
     </div>
 
@@ -295,141 +409,125 @@
         </div>
     </div>
 
-    <!-- Vendor Management Cards -->
-    <div class="row">
-        <!-- Pending Vendor Requests -->
-        <div class="col-lg-6 mb-4">
-            <div class="vendor-card">
-                <div class="vendor-card-header pending">
-                    <i class="bi bi-clock-history me-2"></i>Aspiring Vendor Requests
-                </div>
-                <div class="vendor-card-body">
-                    @if($aspiringVendors->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table vendor-table">
-                                <thead>
-                                    <tr>
-                                        <th><i class="bi bi-person me-1"></i>Name</th>
-                                        <th><i class="bi bi-envelope me-1"></i>Email</th>
-                                        <th><i class="bi bi-tag me-1"></i>Type</th>
-                                        <th><i class="bi bi-calendar me-1"></i>Applied</th>
-                                        <th><i class="bi bi-gear me-1"></i>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($aspiringVendors as $vendor)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="bg-warning bg-opacity-10 p-2 rounded-circle me-2">
-                                                        <i class="bi bi-person text-warning"></i>
-                                                    </div>
-                                                    <strong>{{ $vendor->name }}</strong>
-                                                </div>
-                                            </td>
-                                            <td>{{ $vendor->email }}</td>
-                                            <td>
-                                                <span class="badge bg-secondary">{{ ucfirst($vendor->type) }}</span>
-                                            </td>
-                                            <td>
-                                                <small>{{ $vendor->created_at->format('M d, Y') }}</small>
-                                                <br>
-                                                <small class="text-muted">{{ $vendor->created_at->format('H:i') }}</small>
-                                            </td>
-                                            <td>
-                                                <div class="vendor-actions">
-                                                    <button class="action-btn approve" onclick="approveVendor({{ $vendor->id }})">
-                                                        <i class="bi bi-check-lg"></i>Approve
-                                                    </button>
-                                                    <button class="action-btn reject" onclick="rejectVendor({{ $vendor->id }})">
-                                                        <i class="bi bi-x-lg"></i>Reject
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="bi bi-inbox"></i>
-                            <h5>No Pending Requests</h5>
-                            <p>All vendor applications have been reviewed</p>
-                        </div>
-                    @endif
-                </div>
+    <!-- Pending Vendor Requests Table -->
+    <div class="card table-card mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3 px-3 pt-3">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2 text-warning"></i>Aspiring Vendor Requests</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-person"></i>Name</th>
+                            <th><i class="bi bi-envelope"></i>Email</th>
+                            <th><i class="bi bi-tag"></i>Type</th>
+                            <th><i class="bi bi-calendar"></i>Applied</th>
+                            <th><i class="bi bi-gear"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($aspiringVendors as $vendor)
+                            <tr>
+                                <td>
+                                    <span class="product-name">{{ $vendor->name }}</span>
+                                </td>
+                                <td>{{ $vendor->email }}</td>
+                                <td>
+                                    <span class="status-badge pending">{{ ucfirst($vendor->type) }}</span>
+                                </td>
+                                <td>
+                                    <span class="order-date">{{ $vendor->created_at->format('M d, Y H:i') }}</span>
+                                </td>
+                                <td>
+                                    <div class="vendor-actions">
+                                        <button class="action-btn approve" onclick="approveVendor({{ $vendor->id }})">
+                                            <i class="bi bi-check-lg"></i>Approve
+                                        </button>
+                                        <button class="action-btn reject" onclick="rejectVendor({{ $vendor->id }})">
+                                            <i class="bi bi-x-lg"></i>Reject
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h5>No Pending Requests</h5>
+                                        <p>All vendor applications have been reviewed</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        <!-- Approved Vendors -->
-        <div class="col-lg-6 mb-4">
-            <div class="vendor-card">
-                <div class="vendor-card-header approved">
-                    <i class="bi bi-check-circle me-2"></i>Approved Vendors
-                </div>
-                <div class="vendor-card-body">
-                    @if($approvedVendors->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table vendor-table">
-                                <thead>
-                                    <tr>
-                                        <th><i class="bi bi-person me-1"></i>Name</th>
-                                        <th><i class="bi bi-envelope me-1"></i>Email</th>
-                                        <th><i class="bi bi-tag me-1"></i>Type</th>
-                                        <th><i class="bi bi-calendar me-1"></i>Approved</th>
-                                        <th><i class="bi bi-gear me-1"></i>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($approvedVendors as $vendor)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="bg-success bg-opacity-10 p-2 rounded-circle me-2">
-                                                        <i class="bi bi-person-check text-success"></i>
-                                                    </div>
-                                                    <strong>{{ $vendor->name }}</strong>
-                                                </div>
-                                            </td>
-                                            <td>{{ $vendor->email }}</td>
-                                            <td>
-                                                <span class="badge bg-success">{{ ucfirst($vendor->type) }}</span>
-                                            </td>
-                                            <td>
-                                                <small>{{ $vendor->updated_at->format('M d, Y') }}</small>
-                                                <br>
-                                                <small class="text-muted">{{ $vendor->updated_at->format('H:i') }}</small>
-                                            </td>
-                                            <td>
-                                                <div class="vendor-actions">
-                                                    <button class="action-btn view" onclick="viewVendor({{ $vendor->id }})">
-                                                        <i class="bi bi-eye"></i>View
-                                                    </button>
-                                                    <button class="action-btn reject" onclick="suspendVendor({{ $vendor->id }})">
-                                                        <i class="bi bi-pause"></i>Suspend
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="empty-state">
-                            <i class="bi bi-shop"></i>
-                            <h5>No Approved Vendors</h5>
-                            <p>Approved vendors will appear here</p>
-                        </div>
-                    @endif
-                </div>
+    <!-- Approved Vendors Table -->
+    <div class="card table-card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-3 px-3 pt-3">
+                <h5 class="mb-0"><i class="bi bi-check-circle me-2 text-success"></i>Approved Vendors</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-person"></i>Name</th>
+                            <th><i class="bi bi-envelope"></i>Email</th>
+                            <th><i class="bi bi-tag"></i>Type</th>
+                            <th><i class="bi bi-calendar"></i>Approved</th>
+                            <th><i class="bi bi-gear"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($approvedVendors as $vendor)
+                            <tr>
+                                <td>
+                                    <span class="product-name">{{ $vendor->name }}</span>
+                                </td>
+                                <td>{{ $vendor->email }}</td>
+                                <td>
+                                    <span class="status-badge approved">{{ ucfirst($vendor->type) }}</span>
+                                </td>
+                                <td>
+                                    <span class="order-date">{{ $vendor->updated_at->format('M d, Y H:i') }}</span>
+                                </td>
+                                <td>
+                                    <div class="vendor-actions">
+                                        <button class="action-btn view" onclick="viewVendor({{ $vendor->id }})">
+                                            <i class="bi bi-eye"></i>View
+                                        </button>
+                                        <button class="action-btn reject" onclick="suspendVendor({{ $vendor->id }})">
+                                            <i class="bi bi-pause"></i>Suspend
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="bi bi-shop"></i>
+                                        <h5>No Approved Vendors</h5>
+                                        <p>Approved vendors will appear here</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-@push('scripts')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
 <script>
 function approveVendor(vendorId) {
     if (confirm('Are you sure you want to approve this vendor?')) {
@@ -465,5 +563,4 @@ function suspendVendor(vendorId) {
     }
 }
 </script>
-@endpush
 @endsection 
