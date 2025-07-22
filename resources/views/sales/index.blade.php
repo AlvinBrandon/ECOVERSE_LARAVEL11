@@ -441,11 +441,16 @@
             $showProduct = true; // Wholesaler sees all products
           } elseif ($user->role === 'retailer' && $product->seller_role === 'wholesaler') {
             $showProduct = true;
-          } elseif ($user->role === 'customer' && $product->seller_role === 'retailer') {
+          } elseif ($user->role === 'customer') {
+            // Customers see products that are available in retailer inventory
+            // Since controller already filters these, show all products passed to view
             $showProduct = true;
           } elseif ($user->role === 'admin') {
             $showProduct = true;
           }
+        } else {
+          // Guest users see retailer inventory products (already filtered by controller)
+          $showProduct = true;
         }
       @endphp
       @if($showProduct)
@@ -486,7 +491,8 @@
                     $deliveryRequired = true;
                   } elseif ($user->role === 'retailer' && $product->seller_role === 'wholesaler') {
                     $deliveryOptional = true;
-                  } elseif ($user->role === 'customer' && $product->seller_role === 'retailer') {
+                  } elseif ($user->role === 'customer') {
+                    // Customers buying from retailer inventory always require delivery
                     $deliveryRequired = true;
                   }
                 }

@@ -70,15 +70,22 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
+        // Get products that this retailer has inventory for
+        $retailerProductIds = \App\Models\Inventory::where('owner_id', $user->id)
+            ->where(function($query) {
+                $query->where('owner_type', 'App\Models\User')
+                      ->orWhere('owner_type', 'retailer');
+            })
+            ->pluck('product_id')
+            ->toArray();
+        
         // Get recent sales count (customer orders for retailer products placed in last 7 days)
         $salesToday = Order::where('created_at', '>=', now()->subDays(7))
             ->whereHas('user', function($query) {
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->count();
         
         // Get total customers (users with role_as = 0 or role = customer)
@@ -88,10 +95,13 @@ class DashboardController extends Controller
         })->count();
         
         // Get low stock items for retailer products
-        $lowStockItems = Product::where('seller_role', 'retailer')
-            ->whereHas('inventories', function($query) {
-                $query->where('quantity', '<', 10);
-            })->count();
+        $lowStockItems = \App\Models\Inventory::where('owner_id', $user->id)
+            ->where(function($query) {
+                $query->where('owner_type', 'App\Models\User')
+                      ->orWhere('owner_type', 'retailer');
+            })
+            ->where('quantity', '<', 10)
+            ->count();
         
         // Get recent revenue (approved customer orders for retailer products from last 7 days)
         $revenueToday = Order::where('created_at', '>=', now()->subDays(7))
@@ -100,19 +110,19 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
-            ->sum('total_price');
+            ->whereIn('product_id', $retailerProductIds)
+            ->with('product')
+            ->get()
+            ->sum(function($order) {
+                return $order->product->price * $order->quantity;
+            });
         
         // Get total customer orders for retailer products
         $totalOrders = Order::whereHas('user', function($query) {
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->count();
         
         // Get recent customer orders for retailer products (last 10)
@@ -121,9 +131,7 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
@@ -134,9 +142,7 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->count();
         
         // Get approved customer orders for retailer products
@@ -145,9 +151,7 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->count();
         
         // Calculate monthly metrics for customer orders to retailer products
@@ -158,10 +162,12 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
-            ->sum('total_price');
+            ->whereIn('product_id', $retailerProductIds)
+            ->with('product')
+            ->get()
+            ->sum(function($order) {
+                return $order->product->price * $order->quantity;
+            });
         
         $monthlyOrders = Order::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
@@ -169,9 +175,7 @@ class DashboardController extends Controller
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
-            })
+            ->whereIn('product_id', $retailerProductIds)
             ->count();
 
         return view('dashboards.retailer', compact(
@@ -180,11 +184,52 @@ class DashboardController extends Controller
             'monthlyRevenue', 'monthlyOrders'
         ));
     }    /**
-     * Staff Dashboard
+     * Staff Dashboard - Only handles wholesaler purchase orders and factory operations
      */
     private function staffDashboard()
     {
-        return view('dashboards.staff');
+        // Staff should only see wholesaler purchase orders from factories
+        $wholesalerOrders = Order::whereHas('user', function($query) {
+            $query->where('role', 'wholesaler')
+                  ->orWhere('role_as', 5);
+        })
+        ->whereHas('product', function($query) {
+            $query->where('seller_role', 'factory');
+        })
+        ->count();
+        
+        $pendingWholesalerOrders = Order::whereHas('user', function($query) {
+            $query->where('role', 'wholesaler')
+                  ->orWhere('role_as', 5);
+        })
+        ->whereHas('product', function($query) {
+            $query->where('seller_role', 'factory');
+        })
+        ->where('status', 'pending')
+        ->count();
+        
+        // Purchase orders from suppliers
+        $totalPurchaseOrders = \App\Models\PurchaseOrder::count();
+        $pendingPurchaseOrders = \App\Models\PurchaseOrder::where('status', 'pending')->count();
+        
+        // Recent wholesaler orders
+        $recentWholesalerOrders = Order::with(['user', 'product'])
+            ->whereHas('user', function($query) {
+                $query->where('role', 'wholesaler')
+                      ->orWhere('role_as', 5);
+            })
+            ->whereHas('product', function($query) {
+                $query->where('seller_role', 'factory');
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+            
+        return view('dashboards.staff', compact(
+            'wholesalerOrders', 'pendingWholesalerOrders', 
+            'totalPurchaseOrders', 'pendingPurchaseOrders',
+            'recentWholesalerOrders'
+        ));
     }
     
     /**

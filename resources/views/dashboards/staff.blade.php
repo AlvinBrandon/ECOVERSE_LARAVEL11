@@ -454,7 +454,11 @@
         </a>
         <a href="{{ route('staff.orders') }}" class="nav-item">
           <i class="bi bi-clipboard-data"></i>
-          Manage Orders
+          Wholesaler Orders
+        </a>
+        <a href="{{ route('admin.purchase_orders.index') }}" class="nav-item">
+          <i class="bi bi-file-earmark-text"></i>
+          Purchase Orders
         </a>
       </div>
       
@@ -477,7 +481,7 @@
         <div class="header-content">
           <div class="header-info">
             <h1>Staff Dashboard</h1>
-            <p>Welcome back, {{ Auth::user()->name }}. Collection & Processing: Add waste, update stock, handle logistics.</p>
+            <p>Welcome back, {{ Auth::user()->name }}. Manage wholesaler operations, factory orders, and supplier logistics.</p>
           </div>
           <div class="header-badges">
             <div class="status-badge">
@@ -496,7 +500,7 @@
       <section class="content-section" style="margin-bottom: 2rem;">
         <h2 class="section-title">
           <i class="bi bi-lightning"></i>
-          Quick Operations
+          Wholesaler Operations
         </h2>
         <div class="action-grid">
           <a href="{{ route('inventory.index') }}" class="action-card">
@@ -504,23 +508,23 @@
               <i class="bi bi-box-seam"></i>
             </div>
             <div class="action-title">Inventory Management</div>
-            <div class="action-description">Manage and update inventory, process materials</div>
-          </a>
-          
-          <a href="{{ route('stock_transfer.create') }}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-truck"></i>
-            </div>
-            <div class="action-title">Logistics & Transfer</div>
-            <div class="action-description">Handle stock transfers and logistics operations</div>
+            <div class="action-description">Manage wholesaler inventory and stock levels</div>
           </a>
           
           <a href="{{ route('staff.orders') }}" class="action-card">
             <div class="action-icon">
               <i class="bi bi-clipboard-data"></i>
             </div>
-            <div class="action-title">Order Management</div>
-            <div class="action-description">Track and manage waste orders placed by clients</div>
+            <div class="action-title">Wholesaler Orders</div>
+            <div class="action-description">Process factory-to-wholesaler purchase orders</div>
+          </a>
+          
+          <a href="{{ route('admin.purchase_orders.index') }}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-truck"></i>
+            </div>
+            <div class="action-title">Supplier Purchase Orders</div>
+            <div class="action-description">Manage raw material orders from suppliers</div>
           </a>
         </div>
       </section>
@@ -570,8 +574,8 @@
             <div class="activity-item">
               <div class="activity-content">
                 <div class="activity-title">
-                  <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    Inventory management available
+                  <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    Wholesaler orders management
                   </a>
                 </div>
                 <div class="activity-time">Active</div>
@@ -580,8 +584,8 @@
             <div class="activity-item">
               <div class="activity-content">
                 <div class="activity-title">
-                  <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    Order management system
+                  <a href="{{ route('admin.purchase_orders.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    Supplier purchase orders
                   </a>
                 </div>
                 <div class="activity-time">Available</div>
@@ -590,8 +594,8 @@
             <div class="activity-item">
               <div class="activity-content">
                 <div class="activity-title">
-                  <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                    Stock transfer operations
+                  <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                    Factory inventory operations
                   </a>
                 </div>
                 <div class="activity-time">Ready</div>
@@ -608,20 +612,20 @@
           </h3>
           <div class="status-list">
             <div class="status-item">
-              <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                Inventory System
-              </a>
-              <span class="status-indicator operational">Operational</span>
-            </div>
-            <div class="status-item">
               <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                Order Processing
+                Wholesaler Orders
               </a>
               <span class="status-indicator operational">Operational</span>
             </div>
             <div class="status-item">
-              <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                Transfer System
+              <a href="{{ route('admin.purchase_orders.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                Purchase Order System
+              </a>
+              <span class="status-indicator operational">Operational</span>
+            </div>
+            <div class="status-item">
+              <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                Factory Inventory
               </a>
               <span class="status-indicator operational">Operational</span>
             </div>
@@ -632,41 +636,35 @@
         <div class="content-section">
           <h3 class="section-title">
             <i class="bi bi-graph-up"></i>
-            Operational Metrics
+            Wholesaler Operations
           </h3>
           <div class="metrics-list">
             <div class="metric-item">
               <div class="metric-header">
-                <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  Inventory Processing
-                </a>
-                <span>95%</span>
-              </div>
-              <div class="metric-bar">
-                <div class="metric-fill" style="width: 95%; background: #10b981;"></div>
-              </div>
-            </div>
-            <div class="metric-item">
-              <div class="metric-header">
                 <a href="{{ route('staff.orders') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  Order Management
+                  Active Wholesaler Orders
                 </a>
-                <span>88%</span>
+                <span>{{ $totalWholesalerOrders ?? 0 }}</span>
               </div>
-              <div class="metric-bar">
-                <div class="metric-fill" style="width: 88%; background: #10b981;"></div>
-              </div>
+              <div class="metric-description">Orders from factories to wholesalers</div>
             </div>
             <div class="metric-item">
               <div class="metric-header">
-                <a href="{{ route('stock_transfer.create') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
-                  Transfer Efficiency
+                <a href="{{ route('admin.purchase_orders.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                  Pending Purchase Orders
                 </a>
-                <span>92%</span>
+                <span>{{ $totalPurchaseOrders ?? 0 }}</span>
               </div>
-              <div class="metric-bar">
-                <div class="metric-fill" style="width: 92%; background: #10b981;"></div>
+              <div class="metric-description">Purchase orders to suppliers</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-header">
+                <a href="{{ route('inventory.index') }}" style="color: rgba(255, 255, 255, 0.9); text-decoration: none;">
+                  Revenue (This Month)
+                </a>
+                <span>${{ number_format($totalRevenue ?? 0, 2) }}</span>
               </div>
+              <div class="metric-description">Wholesaler operations revenue</div>
             </div>
           </div>
         </div>
@@ -745,9 +743,15 @@
   .metric-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
+  }
+  
+  .metric-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.25rem;
   }
   
   .metric-bar {

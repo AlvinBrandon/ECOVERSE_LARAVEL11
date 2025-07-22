@@ -14,15 +14,23 @@ class CustomerOrderController extends Controller
      */
     public function index()
     {
-        // Retailers should only verify orders from customers
+        $retailer = Auth::user();
+        
+        // Retailers should only see orders for products they have in inventory
         $customerOrders = Order::with(['user', 'product'])
             ->where('status', 'pending')
             ->whereHas('user', function($query) {
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
             })
-            ->whereHas('product', function($query) {
-                $query->where('seller_role', 'retailer');
+            ->whereHas('product', function($query) use ($retailer) {
+                // Only show orders for products that this retailer has in inventory
+                $query->whereIn('id', function($subQuery) use ($retailer) {
+                    $subQuery->select('product_id')
+                        ->from('inventories')
+                        ->where('owner_id', $retailer->id)
+                        ->where('quantity', '>', 0);
+                });
             })
             ->latest()
             ->paginate(15); // Add pagination with 15 items per page
@@ -38,6 +46,7 @@ class CustomerOrderController extends Controller
      */
     public function verify($id)
     {
+        $retailer = Auth::user();
         $order = Order::findOrFail($id);
         
         // Ensure this is a customer order
@@ -48,12 +57,16 @@ class CustomerOrderController extends Controller
             return back()->with('error', 'You can only verify customer orders.');
         }
 
-        // Ensure this is for a retailer product
-        if ($order->product->seller_role !== 'retailer') {
+        // Check if retailer has inventory for this product
+        $retailerInventory = \App\Models\Inventory::where('owner_id', $retailer->id)
+            ->where('product_id', $order->product_id)
+            ->first();
+            
+        if (!$retailerInventory) {
             if (request()->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'You can only verify orders for your own products.'], 400);
+                return response()->json(['success' => false, 'message' => 'You do not have inventory for this product.'], 400);
             }
-            return back()->with('error', 'You can only verify orders for your own products.');
+            return back()->with('error', 'You do not have inventory for this product.');
         }
 
         $product = $order->product;
@@ -63,36 +76,26 @@ class CustomerOrderController extends Controller
         $order->tracking_code = request('tracking_code', $order->tracking_code);
         $order->dispatch_log = request('dispatch_log', $order->dispatch_log);
 
-        // Deduct from retailer inventory
-        $inventory = $product->inventories()->first();
-        if ($inventory) {
-            $quantityBefore = $inventory->quantity;
+        // Check if sufficient stock is available
+        if ($retailerInventory->quantity >= $order->quantity) {
+            $quantityBefore = $retailerInventory->quantity;
+            $retailerInventory->quantity = max(0, $retailerInventory->quantity - $order->quantity);
+            $retailerInventory->save();
             
-            // Check if sufficient stock is available
-            if ($inventory->quantity >= $order->quantity) {
-                $inventory->quantity = max(0, $inventory->quantity - $order->quantity);
-                $inventory->save();
-                
-                // Create stock history record for the deduction
-                \App\Models\StockHistory::create([
-                    'inventory_id' => $inventory->id,
-                    'user_id' => Auth::id(),
-                    'action' => 'deduct',
-                    'quantity_before' => $quantityBefore,
-                    'quantity_after' => $inventory->quantity,
-                    'note' => 'Stock deducted for customer order #' . $order->id . ' approval by retailer',
-                ]);
-            } else {
-                if (request()->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Insufficient stock available. Only ' . $inventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.'], 400);
-                }
-                return back()->with('error', 'Insufficient stock available. Only ' . $inventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.');
-            }
+            // Create stock history record for the deduction
+            \App\Models\StockHistory::create([
+                'inventory_id' => $retailerInventory->id,
+                'user_id' => Auth::id(),
+                'action' => 'deduct',
+                'quantity_before' => $quantityBefore,
+                'quantity_after' => $retailerInventory->quantity,
+                'note' => 'Stock deducted for customer order #' . $order->id . ' approval by retailer',
+            ]);
         } else {
             if (request()->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'No inventory record found for this product. Please contact administrator.'], 400);
+                return response()->json(['success' => false, 'message' => 'Insufficient stock available. Only ' . $retailerInventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.'], 400);
             }
-            return back()->with('error', 'No inventory record found for this product. Please contact administrator.');
+            return back()->with('error', 'Insufficient stock available. Only ' . $retailerInventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.');
         }
 
         $order->status = 'approved';

@@ -74,54 +74,36 @@ class SalesApprovalController extends Controller
             // Wholesaler orders should only deduct from factory inventory
             // No need to create separate "retailer inventory" records
         }
-        // If the buyer is a retailer, create a new retailer product for customers to buy
+        // If the buyer is a retailer, create retailer-specific inventory (NOT duplicate products)
         elseif ($sale->user && (isset($sale->user->role_as) ? $sale->user->role_as == 2 : $sale->user->role === 'retailer')) {
-            // Check if this retailer already has a customer-facing product for this item
-            $retailerProduct = Product::where('name', $product->name)
-                ->where('seller_role', 'retailer')
-                ->where('created_by', $sale->user->id)
-                ->first();
+            // Instead of creating duplicate products, create retailer-specific inventory
+            $retailerInventory = $product->inventories()->where('owner_id', $sale->user->id)->first();
             
-            if ($retailerProduct) {
-                // Update existing retailer product inventory
-                $inventory = $retailerProduct->inventories()->first();
-                if ($inventory) {
-                    $inventory->quantity += $sale->quantity;
-                    $inventory->save();
-                } else {
-                    $retailerProduct->inventories()->create([
-                        'quantity' => $sale->quantity,
-                        'batch_id' => 'RTL-' . uniqid(),
-                        'expiry_date' => null,
-                    ]);
-                }
+            if ($retailerInventory) {
+                // Update existing retailer inventory
+                $before = $retailerInventory->quantity;
+                $retailerInventory->quantity += $sale->quantity;
+                $retailerInventory->save();
             } else {
-                // Create new retailer product for customers
-                $retailerProduct = Product::create([
-                    'name' => $product->name,
-                    'description' => $product->description,
-                    'price' => $product->price * 1.2, // 20% markup for retail
-                    'type' => $product->type,
-                    'seller_role' => 'retailer',
-                    'image' => $product->image,
-                    'created_by' => $sale->user->id,
-                ]);
-                
-                // Create initial inventory for the retailer product
-                $retailerProduct->inventories()->create([
+                // Create new retailer inventory for the SAME product
+                $retailerInventory = $product->inventories()->create([
                     'quantity' => $sale->quantity,
                     'batch_id' => 'RTL-' . uniqid(),
+                    'owner_id' => $sale->user->id,
+                    'owner_type' => 'retailer',
+                    'retail_markup' => 0.20, // 20% markup for retail
                     'expiry_date' => null,
                 ]);
+                $before = 0;
             }
             
             // Create stock history for retailer inventory
             \App\Models\StockHistory::create([
-                'inventory_id' => $retailerProduct->inventories()->first()->id,
+                'inventory_id' => $retailerInventory->id,
                 'user_id' => $sale->user->id,
                 'action' => 'add',
-                'quantity_before' => ($retailerProduct->inventories()->first()->quantity ?? 0) - $sale->quantity,
-                'quantity_after' => $retailerProduct->inventories()->first()->quantity,
+                'quantity_before' => $before,
+                'quantity_after' => $retailerInventory->quantity,
                 'note' => 'Stock added from wholesaler order #' . $sale->id . ' approval',
             ]);
         }

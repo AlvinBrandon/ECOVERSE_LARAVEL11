@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class RetailerOrderController extends Controller
@@ -14,14 +15,22 @@ class RetailerOrderController extends Controller
      */
     public function customerOrders()
     {
-        // For retailers, show orders from customers that they need to fulfill
-        // We need to find orders for products that this retailer has in inventory
-        // Or orders that are placed through this retailer
+        $retailer = Auth::user();
         
+        // For retailers, show orders from customers for products that this retailer has in inventory
         $customerOrders = Order::with(['product', 'user'])
             ->whereHas('user', function($query) {
                 // Orders from customers (role_as = 0)
                 $query->where('role_as', 0);
+            })
+            ->whereHas('product', function($query) use ($retailer) {
+                // Only show orders for products that this retailer has in inventory
+                $query->whereIn('id', function($subQuery) use ($retailer) {
+                    $subQuery->select('product_id')
+                        ->from('inventories')
+                        ->where('owner_id', $retailer->id)
+                        ->where('quantity', '>', 0);
+                });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -34,6 +43,25 @@ class RetailerOrderController extends Controller
      */
     public function approveOrder(Request $request, Order $order)
     {
+        $retailer = Auth::user();
+        
+        // Check if retailer has enough inventory
+        $retailerInventory = \App\Models\Inventory::where('owner_id', $retailer->id)
+            ->where('product_id', $order->product_id)
+            ->first();
+            
+        if (!$retailerInventory || $retailerInventory->quantity < $order->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Insufficient inventory to fulfill this order'
+            ], 400);
+        }
+        
+        // Deduct inventory
+        $retailerInventory->quantity -= $order->quantity;
+        $retailerInventory->save();
+        
+        // Update order status
         $order->update([
             'status' => 'approved',
             'verified_at' => now(),
@@ -42,7 +70,7 @@ class RetailerOrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Order approved successfully'
+            'message' => 'Order approved successfully and inventory updated'
         ]);
     }
 
@@ -70,68 +98,69 @@ class RetailerOrderController extends Controller
     {
         $user = Auth::user();
         
-        // Get only products that retailers should see:
-        // 1. Products they sell (seller_role = 'retailer') 
-        // 2. Products they can buy from wholesalers (seller_role = 'wholesaler')
-        $products = Product::whereIn('seller_role', ['retailer', 'wholesaler'])->get();
-
+        // Get ALL products (no duplication needed!) - only factory/wholesaler products
+        $products = Product::whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get();
+        
         $inventory = $products->map(function($product) use ($user) {
-            // Different logic based on product type:
-            // For wholesaler products: show what retailer purchased from wholesalers
-            // For retailer products: show what customers bought from this retailer
+            // Calculate purchases from wholesalers (what this retailer bought)
+            $purchased = Order::where('product_id', $product->id)
+                ->where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->sum('quantity');
+                
+            // For now, let's use the actual retailer inventory as current stock
+            // since customer-to-retailer tracking might not be fully implemented
+            $retailerInventoryRecord = $product->inventories()
+                ->where('owner_id', $user->id)
+                ->where('owner_type', 'retailer')
+                ->first();
+                
+            $currentInventory = $retailerInventoryRecord ? $retailerInventoryRecord->quantity : 0;
             
-            $purchased = 0;
-            $sold = 0;
-            $currentInventory = 0;
-            
-            if ($product->seller_role === 'wholesaler') {
-                // For wholesaler products: calculate what this retailer purchased
-                $purchased = Order::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->where('status', 'approved')
-                    ->sum('quantity');
+            // Calculate what was sold (for display purposes, but not used in current stock calc)
+            $sold = Order::where('product_id', $product->id)
+                ->whereHas('user', function($query) {
+                    $query->where('role_as', 0); // customers
+                })
+                ->where('status', 'approved')
+                ->sum('quantity');
                 
-                // For wholesaler products: calculate what customers bought from this retailer
-                $sold = Order::where('product_id', $product->id)
-                    ->where('status', 'approved')
-                    ->whereHas('user', function($query) {
-                        $query->where('role', 'customer')
-                              ->orWhere('role_as', 0);
-                    })
-                    ->sum('quantity');
-                
-                $currentInventory = $purchased - $sold;
-                
-            } else if ($product->seller_role === 'retailer') {
-                // For retailer products: only show what customers bought (no purchased quantity)
-                $purchased = 0; // Retailers don't "purchase" their own products
-                $sold = Order::where('product_id', $product->id)
-                    ->where('status', 'approved')
-                    ->whereHas('user', function($query) {
-                        $query->where('role', 'customer')
-                              ->orWhere('role_as', 0);
-                    })
-                    ->sum('quantity');
-                
-                // For retailer products, current inventory should be from the global inventory system
-                // since they manage their own stock
-                $currentInventory = $product->stock ?? 0;
+            // If we have purchases but no inventory record, calculate as purchased - sold
+            if ($purchased > 0 && !$retailerInventoryRecord) {
+                $currentInventory = max(0, $purchased - $sold);
             }
             
+            $retailerMarkup = $retailerInventoryRecord->retail_markup ?? 0.20; // Default 20% markup
+            $retailPrice = $product->price * (1 + $retailerMarkup);
+            
+            // Stock status logic
             $lowStockThreshold = 50;
+            $criticalStockThreshold = 10;
+            
+            if ($currentInventory <= $criticalStockThreshold) {
+                $status = 'critical';
+            } elseif ($currentInventory <= $lowStockThreshold) {
+                $status = 'low';
+            } else {
+                $status = 'good';
+            }
             
             return [
                 'product' => $product,
-                'quantity' => max(0, $currentInventory), // Don't show negative inventory
                 'purchased' => $purchased,
                 'sold' => $sold,
+                'quantity' => $currentInventory,
+                'price' => $retailPrice, // Retail price with markup
+                'status' => $status,
                 'low_stock' => $currentInventory < $lowStockThreshold,
-                'critical_stock' => $currentInventory < 10,
-                'status' => $currentInventory < 10 ? 'critical' : ($currentInventory < $lowStockThreshold ? 'low' : 'good'),
-                'price' => $product->price ?? 0,
             ];
+        })->filter(function($item) {
+            // Only show products where retailer has inventory or has made purchases
+            return $item['purchased'] > 0 || $item['quantity'] > 0;
         });
-
+        
         return view('retailer.inventory', compact('inventory'));
     }
 }

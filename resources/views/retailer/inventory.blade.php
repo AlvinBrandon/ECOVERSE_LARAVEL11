@@ -295,14 +295,14 @@
     <div class="d-flex align-items-center justify-content-between">
       <div>
         <h2><i class="bi bi-boxes me-2"></i>Inventory Management</h2>
-        <p>Monitor stock levels and manage product availability</p>
+        <p>Monitor stock levels and manage product availability ({{ $inventory->count() }} products)</p>
       </div>
       <div class="d-flex gap-2">
         <button class="btn" onclick="refreshInventory()">
           <i class="bi bi-arrow-clockwise me-1"></i>Refresh
         </button>
         <a href="{{ route('sales.index') }}" class="btn">
-          <i class="bi bi-plus-circle me-1"></i>Reorder Products
+          <i class="bi bi-plus-circle me-1"></i>Order Products
         </a>
         <a href="{{ route('dashboard') }}" class="btn">
           <i class="bi bi-house-door me-1"></i>Home
@@ -312,6 +312,8 @@
   </div>
 
   <!-- Inventory Statistics -->
+  <!-- Note: Current Stock shows actual retailer inventory, not purchased-sold calculation -->
+  <!-- This is because customer-to-retailer tracking may not be fully implemented -->
   <div class="row g-4 mb-4">
     <div class="col-lg-3 col-md-6">
       <div class="stats-card" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white;">
@@ -434,6 +436,11 @@
                     <div>
                       <div class="fw-semibold">{{ $item['product']->name }}</div>
                       <small class="text-muted">{{ $item['product']->category ?? 'Uncategorized' }}</small>
+                      @if($item['quantity'] > 0)
+                        <div><span class="badge bg-success mt-1">✓ In Stock</span></div>
+                      @else
+                        <div><span class="badge bg-warning mt-1">⚡ Available to Order</span></div>
+                      @endif
                     </div>
                   </div>
                 </td>
@@ -555,12 +562,12 @@ function filterInventory(status) {
 
 // Inventory management functions
 function reorderProduct(productId) {
-    window.location.href = `/sales/create?product_id=${productId}`;
+    window.location.href = `/order/${productId}`;
 }
 
 function urgentReorder(productId) {
     if(confirm('This will create an urgent reorder request. Continue?')) {
-        window.location.href = `/sales/create?product_id=${productId}&urgent=true`;
+        window.location.href = `/order/${productId}?urgent=true`;
     }
 }
 

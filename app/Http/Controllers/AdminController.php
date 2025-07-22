@@ -10,7 +10,7 @@ use App\Models\Order;
 use App\Models\PurchaseOrder;
 use App\Models\RawMaterial;
 use App\Models\StockHistory;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth,cache,DB};
 use App\Events\UserRoleChanged;
 
 class AdminController extends Controller
@@ -68,24 +68,33 @@ class AdminController extends Controller
         ];
 
         // Batch-level analytics - group by product names instead of batch IDs
-        $productInventory = Product::with('batches')->get()->map(function($product) {
-            $totalQuantity = $product->batches->sum('quantity');
-            return [
-                'name' => $product->name,
-                'quantity' => $totalQuantity
-            ];
-        })->filter(function($item) {
-            return $item['quantity'] > 0; // Only show products with inventory
-        });
+        // ONLY show factory/wholesaler products, NOT retailer products
+        $productInventory = Product::with('batches')
+            ->whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get()
+            ->map(function($product) {
+                $totalQuantity = $product->batches->sum('quantity');
+                return [
+                    'name' => $product->name,
+                    'quantity' => $totalQuantity
+                ];
+            })->filter(function($item) {
+                return $item['quantity'] > 0; // Only show products with inventory
+            });
         
         // If no products with batches, show regular product inventory
         if ($productInventory->isEmpty()) {
-            $productInventory = Product::where('stock', '>', 0)->get()->map(function($product) {
-                return [
-                    'name' => $product->name,
-                    'quantity' => $product->stock
-                ];
-            })->take(10); // Limit to top 10 products
+            $productInventory = Product::where('stock', '>', 0)
+                ->whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+                ->orWhereNull('seller_role')
+                ->get()
+                ->map(function($product) {
+                    return [
+                        'name' => $product->name,
+                        'quantity' => $product->stock
+                    ];
+                })->take(10); // Limit to top 10 products
         }
         
         $batchLabels = $productInventory->pluck('name')->all();
@@ -133,13 +142,13 @@ class AdminController extends Controller
             'total_sales_this_month' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
                 ->where('orders.status', 'approved')
                 ->whereMonth('orders.created_at', now()->month)
-                ->sum(\DB::raw('products.price * orders.quantity')),
+                ->sum(DB::raw('products.price * orders.quantity')),
             'total_revenue_all_time' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
                 ->where('orders.status', 'approved')
-                ->sum(\DB::raw('products.price * orders.quantity')),
+                ->sum(DB::raw('products.price * orders.quantity')),
             'orders_this_week' => \App\Models\Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
             'top_selling_product' => \App\Models\Order::join('products', 'orders.product_id', '=', 'products.id')
-                ->select('products.name', \DB::raw('SUM(orders.quantity) as total_sold'))
+                ->select('products.name', DB::raw('SUM(orders.quantity) as total_sold'))
                 ->where('orders.status', 'approved')
                 ->groupBy('products.id', 'products.name')
                 ->orderByDesc('total_sold')
@@ -201,8 +210,8 @@ class AdminController extends Controller
         $user->refreshRole();
         
         // Clear Laravel cache for user-specific data
-        \Cache::forget("user_dashboard_{$user->id}");
-        \Cache::forget("user_permissions_{$user->id}");
+        Cache::forget("user_dashboard_{$user->id}");
+        Cache::forget("user_permissions_{$user->id}");
         
         // If updating current logged-in user, redirect to new dashboard
         if (Auth::id() === $user->id) {

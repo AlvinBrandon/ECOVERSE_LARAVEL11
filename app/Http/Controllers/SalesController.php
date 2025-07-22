@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Inventory;
 use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
@@ -37,12 +38,25 @@ class SalesController extends Controller
                 // Retailers can only buy from wholesaler products
                 $query->where('seller_role', 'wholesaler');
             } elseif ($user->role === 'customer') {
-                // Customers can only buy from retailer products
-                $query->where('seller_role', 'retailer');
+                // Customers can only buy products that retailers have in stock
+                // Get product IDs that retailers have inventory for
+                $retailerProductIds = \App\Models\Inventory::whereHas('owner', function($q) {
+                    $q->where('role', 'retailer');
+                })->where('quantity', '>', 0)
+                  ->pluck('product_id')
+                  ->unique();
+                
+                $query->whereIn('id', $retailerProductIds);
             }
         } else {
-            // Guest users see products available for direct purchase (retailer products)
-            $query->where('seller_role', 'retailer');
+            // Guest users see products available for direct purchase (from retailer inventory)
+            $retailerProductIds = \App\Models\Inventory::whereHas('owner', function($q) {
+                $q->where('role', 'retailer');
+            })->where('quantity', '>', 0)
+              ->pluck('product_id')
+              ->unique();
+            
+            $query->whereIn('id', $retailerProductIds);
         }
         
         if (request()->filled('type')) {
@@ -76,9 +90,15 @@ class SalesController extends Controller
                 return back()->with('error', 'Retailers can only purchase products sold by wholesalers.');
             }
         } elseif ($buyerRole === 'customer') {
-            // Customers can only buy from retailer products
-            if ($sellerRole !== 'retailer') {
-                return back()->with('error', 'Customers can only purchase products sold by retailers.');
+            // Customers can only buy products that retailers have in stock
+            $retailerHasStock = \App\Models\Inventory::whereHas('owner', function($q) {
+                $q->where('role', 'retailer');
+            })->where('product_id', $product->id)
+              ->where('quantity', '>', 0)
+              ->exists();
+            
+            if (!$retailerHasStock) {
+                return back()->with('error', 'This product is not available from any retailer.');
             }
         } else {
             // Fallback for other roles - apply original restrictions

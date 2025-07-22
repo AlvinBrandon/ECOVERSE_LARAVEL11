@@ -267,8 +267,8 @@
     <div class="d-flex align-items-center">
       <i class="bi bi-clipboard-check me-3" style="font-size: 2.5rem;"></i>
       <div>
-        <h2>Staff - Manage Orders</h2>
-        <p>Update order statuses and track customer purchases</p>
+        <h2>Staff - Wholesaler Purchase Orders</h2>
+        <p>Manage factory-to-wholesaler orders and purchase orders from suppliers</p>
       </div>
     </div>
   </div>
@@ -282,59 +282,136 @@
         </div>
     @endif
 
-    @if($orders->count() > 0)
-      @foreach($orders as $order)
-        <div class="order-card">
-          <div class="order-info">
-            <div class="order-detail">
-              <strong>Order ID</strong>
-              <span>#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
-            </div>
-            <div class="order-detail">
-              <strong>Customer</strong>
-              <span>{{ $order->user->name }}</span>
-            </div>
-            <div class="order-detail">
-              <strong>Product</strong>
-              <span>{{ $order->product->name ?? 'N/A' }}</span>
-            </div>
-            <div class="order-detail">
-              <strong>Current Status</strong>
-              <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $order->status)) }}">
-                {{ $order->status }}
-              </span>
-            </div>
-          </div>
-
-          <div class="status-form">
-            <form action="{{ route('staff.orders.updateStatus', $order->id) }}" method="POST" class="d-flex align-items-center gap-3 w-100">
-              @csrf
-              <div class="d-flex align-items-center gap-2">
-                <label for="status-{{ $order->id }}" class="form-label mb-0" style="font-weight: 500; color: #374151; white-space: nowrap;">
-                  Update Status:
-                </label>
-                <select name="status" id="status-{{ $order->id }}" class="form-select">
-                  <option value="Order Placed" {{ $order->status == 'Order Placed' ? 'selected' : '' }}>Order Placed</option>
-                  <option value="Processing" {{ $order->status == 'Processing' ? 'selected' : '' }}>Processing</option>
-                  <option value="Out for Delivery" {{ $order->status == 'Out for Delivery' ? 'selected' : '' }}>Out for Delivery</option>
-                  <option value="Delivered" {{ $order->status == 'Delivered' ? 'selected' : '' }}>Delivered</option>
-                </select>
+    <!-- Wholesaler Orders from Factory -->
+    <div class="mb-4">
+      <h3 class="mb-3" style="color: #1f2937; font-weight: 600;">
+        <i class="bi bi-building me-2"></i>
+        Wholesaler Orders (Factory → Wholesaler)
+      </h3>
+      
+      @if(isset($wholesalerOrders) && $wholesalerOrders->count() > 0)
+        @foreach($wholesalerOrders as $order)
+          <div class="order-card">
+            <div class="order-info">
+              <div class="order-detail">
+                <strong>Order ID</strong>
+                <span>#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
               </div>
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-arrow-clockwise me-2"></i>
-                Update Status
-              </button>
-            </form>
+              <div class="order-detail">
+                <strong>Wholesaler</strong>
+                <span>{{ $order->user->name }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Product</strong>
+                <span>{{ $order->product->name ?? 'N/A' }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Quantity</strong>
+                <span>{{ $order->quantity }} units</span>
+              </div>
+              <div class="order-detail">
+                <strong>Total Amount</strong>
+                <span>UGX {{ number_format($order->total_price ?? 0) }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Current Status</strong>
+                <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $order->status)) }}">
+                  {{ $order->status }}
+                </span>
+              </div>
+            </div>
+
+            <div class="status-form">
+              <form action="{{ route('staff.orders.updateStatus', $order->id) }}" method="POST" class="d-flex align-items-center gap-3 w-100">
+                @csrf
+                <div class="d-flex align-items-center gap-2">
+                  <label for="status-{{ $order->id }}" class="form-label mb-0" style="font-weight: 500; color: #374151; white-space: nowrap;">
+                    Update Status:
+                  </label>
+                  <select name="status" id="status-{{ $order->id }}" class="form-select">
+                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="approved" {{ $order->status == 'approved' ? 'selected' : '' }}>Approved</option>
+                    <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
+                    <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-arrow-clockwise me-2"></i>
+                  Update Status
+                </button>
+              </form>
+            </div>
           </div>
+        @endforeach
+      @else
+        <div class="text-center py-5" style="background: rgba(249, 250, 251, 0.8); border-radius: 1rem; border: 1px solid rgba(229, 231, 235, 0.6);">
+          <i class="bi bi-building" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
+          <h5 style="color: #6b7280; font-weight: 500;">No wholesaler orders found</h5>
+          <p style="color: #9ca3af;">Wholesaler orders from factory will appear here.</p>
         </div>
-      @endforeach
-    @else
-      <div class="text-center py-5">
-        <i class="bi bi-inbox" style="font-size: 4rem; color: #9ca3af; margin-bottom: 1rem;"></i>
-        <h4 style="color: #6b7280; font-weight: 500;">No orders found</h4>
-        <p style="color: #9ca3af;">Orders will appear here when customers place them.</p>
-      </div>
-    @endif
+      @endif
+    </div>
+
+    <!-- Purchase Orders from Suppliers -->
+    <div class="mb-4">
+      <h3 class="mb-3" style="color: #1f2937; font-weight: 600;">
+        <i class="bi bi-truck me-2"></i>
+        Purchase Orders (Supplier → Factory)
+      </h3>
+      
+      @if(isset($purchaseOrders) && $purchaseOrders->count() > 0)
+        @foreach($purchaseOrders as $po)
+          <div class="order-card">
+            <div class="order-info">
+              <div class="order-detail">
+                <strong>PO ID</strong>
+                <span>#PO-{{ str_pad($po->id, 6, '0', STR_PAD_LEFT) }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Supplier</strong>
+                <span>{{ $po->supplier->name ?? 'N/A' }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Raw Material</strong>
+                <span>{{ $po->rawMaterial->name ?? 'N/A' }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Quantity</strong>
+                <span>{{ $po->quantity }} {{ $po->rawMaterial->unit ?? 'units' }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Total Price</strong>
+                <span>UGX {{ number_format($po->price ?? 0) }}</span>
+              </div>
+              <div class="order-detail">
+                <strong>Status</strong>
+                <span class="status-badge status-{{ strtolower(str_replace(' ', '-', $po->status)) }}">
+                  {{ ucfirst($po->status) }}
+                </span>
+              </div>
+            </div>
+            
+            <div style="padding: 1rem; background: rgba(243, 244, 246, 0.5); border-radius: 0.5rem; margin-top: 1rem;">
+              <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">
+                <i class="bi bi-info-circle me-1"></i>
+                Purchase Orders are managed through the Admin Purchase Order system.
+                <a href="{{ route('admin.purchase_orders.index') }}" class="text-decoration-none" style="color: #10b981;">
+                  View in PO Management →
+                </a>
+              </p>
+            </div>
+          </div>
+        @endforeach
+      @else
+        <div class="text-center py-5" style="background: rgba(249, 250, 251, 0.8); border-radius: 1rem; border: 1px solid rgba(229, 231, 235, 0.6);">
+          <i class="bi bi-truck" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
+          <h5 style="color: #6b7280; font-weight: 500;">No purchase orders found</h5>
+          <p style="color: #9ca3af;">Purchase orders from suppliers will appear here.</p>
+        </div>
+      @endif
+    </div>
   </div>
 </div>
 

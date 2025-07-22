@@ -112,11 +112,12 @@
   .scm-metric-value {
     font-size: 2 rem !important;
     font-weight: 800 !important;
-    color: #10b981 !important;
+    color: #ffffff !important;
     margin-bottom: 0.5rem !important;
     line-height: 1 !important;
     background: none !important;
-    -webkit-text-fill-color: #10b981 !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
   
   .scm-metric-label {
@@ -126,10 +127,11 @@
   }
   
   .scm-metric-trend {
-    color: #10b981 !important;
+    color: #ffffff !important;
     font-size: 0.875rem;
     font-weight: 500;
     margin-top: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
   
   /* Action Cards */
@@ -307,7 +309,8 @@
   }
   
   .text-success {
-    color: #10b981 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
   
   /* Empty State */
@@ -502,7 +505,7 @@
                   <p class="scm-card-text">Browse and order recycled products from our comprehensive eco-friendly catalog</p>
                   <div class="d-flex justify-content-between align-items-center mb-3">
                       <small class="text-muted">Available Products</small>
-                      <span class="badge bg-primary">500+ Items</span>
+                      <span class="badge bg-primary">10+ Items</span>
                   </div>
                   <a href="{{ route('sales.index') }}" class="scm-btn scm-btn-primary w-100">
                       <i class="bi bi-bag-check me-2"></i>Shop Now

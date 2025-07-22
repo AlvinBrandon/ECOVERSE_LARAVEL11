@@ -43,7 +43,12 @@ class InventoryController extends Controller
     public function index()
     {
         // Group products and sum their inventory quantities (all batches)
-        $products = Product::with('inventories')->get();
+        // ONLY show factory/wholesaler products, NOT retailer products
+        $products = Product::with('inventories')
+            ->whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get();
+            
         $productInventory = $products->map(function($product) {
             return [
                 'product' => $product,
@@ -60,7 +65,10 @@ class InventoryController extends Controller
 
     public function create()
     {
-        $products = Product::all();
+        // Only show factory/wholesaler products for inventory management, NOT retailer products
+        $products = Product::whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get();
         $rawMaterials = RawMaterial::all();
         return view('inventory.create', compact('products', 'rawMaterials'));
     }
@@ -148,7 +156,10 @@ class InventoryController extends Controller
 
     public function deductForm()
     {
-        $products = Product::all();
+        // Only show factory/wholesaler products for inventory deduction, NOT retailer products
+        $products = Product::whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get();
         return view('inventory.deduct', compact('products'));
     }
 
@@ -237,8 +248,12 @@ class InventoryController extends Controller
     public function analytics()
     {
         // Sum all inventory quantities * product price
+        // ONLY calculate for factory/wholesaler products, NOT retailer products
         $totalValue = 0;
-        $products = Product::with('inventories')->get();
+        $products = Product::with('inventories')
+            ->whereIn('seller_role', ['wholesaler', 'admin', 'factory'])
+            ->orWhereNull('seller_role')
+            ->get();
         foreach ($products as $product) {
             $totalQty = $product->inventories->sum('quantity');
             $totalValue += $totalQty * ($product->price ?? 0);
