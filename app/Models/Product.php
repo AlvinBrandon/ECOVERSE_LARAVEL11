@@ -19,6 +19,10 @@ class Product extends Model
         'customer_price',
         'stock',
         'image',
+        'category_id',
+        'seller_role',
+        'status',
+        'created_by',
     ];
 
     /**

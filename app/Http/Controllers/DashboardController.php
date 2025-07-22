@@ -21,9 +21,8 @@ class DashboardController extends Controller
         Cache::flush();
         
         // Refresh user data from database to get latest role changes
-        $user = $user->fresh();
+        $user = User::find($user->id);
         
-        // Allow admin to view specific dashboard with ?as= parameter
         if ($user->role_as == 1 && request('as')) {
             return $this->viewDashboardAs(request('as'));
         }

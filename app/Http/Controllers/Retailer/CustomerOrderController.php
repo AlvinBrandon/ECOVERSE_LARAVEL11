@@ -15,7 +15,7 @@ class CustomerOrderController extends Controller
     public function index()
     {
         // Retailers should only verify orders from customers
-        $orders = Order::with(['user', 'product'])
+        $customerOrders = Order::with(['user', 'product'])
             ->where('status', 'pending')
             ->whereHas('user', function($query) {
                 $query->where('role', 'customer')
@@ -25,9 +25,12 @@ class CustomerOrderController extends Controller
                 $query->where('seller_role', 'retailer');
             })
             ->latest()
-            ->get();
+            ->paginate(15); // Add pagination with 15 items per page
 
-        return view('retailer.customer-orders', compact('orders'));
+        // Also provide non-paginated collection for compatibility
+        $orders = $customerOrders->getCollection();
+
+        return view('retailer.customer-orders', compact('orders', 'customerOrders'));
     }
 
     /**
@@ -39,11 +42,17 @@ class CustomerOrderController extends Controller
         
         // Ensure this is a customer order
         if (!$order->user || ($order->user->role !== 'customer' && $order->user->role_as !== 0)) {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'You can only verify customer orders.'], 400);
+            }
             return back()->with('error', 'You can only verify customer orders.');
         }
 
         // Ensure this is for a retailer product
         if ($order->product->seller_role !== 'retailer') {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'You can only verify orders for your own products.'], 400);
+            }
             return back()->with('error', 'You can only verify orders for your own products.');
         }
 
@@ -74,14 +83,28 @@ class CustomerOrderController extends Controller
                     'note' => 'Stock deducted for customer order #' . $order->id . ' approval by retailer',
                 ]);
             } else {
+                if (request()->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Insufficient stock available. Only ' . $inventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.'], 400);
+                }
                 return back()->with('error', 'Insufficient stock available. Only ' . $inventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.');
             }
         } else {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'No inventory record found for this product. Please contact administrator.'], 400);
+            }
             return back()->with('error', 'No inventory record found for this product. Please contact administrator.');
         }
 
         $order->status = 'approved';
         $order->save();
+
+        // Handle AJAX requests
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Customer order verified and product delivered.'
+            ]);
+        }
 
         return back()->with('success', 'Customer order verified and product delivered.');
     }

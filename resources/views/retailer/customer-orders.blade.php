@@ -558,7 +558,7 @@ function filterOrders(status) {
 // Order management functions
 function approveOrder(orderId) {
     if(confirm('Are you sure you want to approve this order?')) {
-        fetch(`/retailer/orders/${orderId}/approve`, {
+        fetch(`/retailer/customer-orders/verify/${orderId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
