@@ -89,7 +89,7 @@
             @foreach ($sales as $sale)
               <tr>
                 <td>{{ $sale->product->name }}</td>
-                <td>{{ $sale->quantity }}</td>
+                <td>{{ $sale->quantity }} pcs</td>
                 <td>UGX {{ number_format($sale->total_price) }}</td>
                 <td>{{ $sale->user->name ?? 'N/A' }}</td>
                 <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>

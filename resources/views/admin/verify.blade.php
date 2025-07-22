@@ -204,6 +204,12 @@
     border: 1px solid rgba(16, 185, 129, 0.2);
   }
 
+  .alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
   .badge {
     font-family: 'Poppins', sans-serif !important;
     font-weight: 500;
@@ -523,6 +529,13 @@
       <div class="alert alert-success">
         <i class="bi bi-check-circle me-2"></i>
         {{ session('success') }}
+      </div>
+    @endif
+
+    @if(session('error'))
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ session('error') }}
       </div>
     @endif
 

@@ -280,7 +280,7 @@
     <section class="stats-grid">
       <div class="stat-card">
         <div class="stat-number">{{ $salesToday ?? 0 }}</div>
-        <div class="stat-label">Sales Today</div>
+        <div class="stat-label">Recent Sales (7 days)</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">{{ number_format($totalCustomers ?? 0) }}</div>
@@ -292,7 +292,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-number">UGX {{ number_format($revenueToday ?? 0) }}</div>
-        <div class="stat-label">Revenue Today</div>
+        <div class="stat-label">Recent Revenue (7 days)</div>
       </div>
     </section>
 

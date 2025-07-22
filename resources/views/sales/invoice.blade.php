@@ -84,7 +84,7 @@
     </thead>
     <tbody>
       <tr>
-        <td>{{ $sale->quantity }}</td>
+        <td>{{ $sale->quantity }} pcs</td>
         <td>UGX {{ number_format($sale->product->price) }}</td>
         <td class="invoice-total">UGX {{ number_format($sale->total_price) }}</td>
       </tr>

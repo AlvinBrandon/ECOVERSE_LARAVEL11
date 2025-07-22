@@ -367,7 +367,7 @@
                   <span class="product-name">{{ $order->product->name }}</span>
                 </td>
                 <td>
-                  <span class="quantity">{{ $order->quantity }}</span>
+                  <span class="quantity">{{ $order->quantity }} pcs</span>
                 </td>
                 <td>{{ ucfirst($order->delivery_method ?? 'Delivery') }}</td>
                 <td>

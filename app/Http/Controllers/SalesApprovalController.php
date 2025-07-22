@@ -11,8 +11,13 @@ class SalesApprovalController extends Controller
 {
     public function index()
     {
+        // Admins should only verify orders from wholesalers (buying from factories)
         $sales = Order::with(['user', 'product'])
             ->where('status', 'pending')
+            ->whereHas('user', function($query) {
+                $query->where('role', 'wholesaler')
+                      ->orWhere('role_as', 5);
+            })
             ->latest()
             ->get();
 
@@ -33,27 +38,41 @@ class SalesApprovalController extends Controller
         if ($sale->user && (isset($sale->user->role_as) ? $sale->user->role_as == 5 : $sale->user->role === 'wholesaler')) {
             $product->seller_role = 'wholesaler';
             $product->save();
-            // Deduct from available inventory
-            $inventory = $product->inventories()->first();
-            if ($inventory) {
-                $inventory->quantity = max(0, $inventory->quantity - $sale->quantity);
-                $inventory->save();
+            
+            // Calculate total available inventory across all records
+            $totalAvailableStock = $product->inventories()->sum('quantity');
+            
+            // Check if sufficient total stock is available
+            if ($totalAvailableStock >= $sale->quantity) {
+                // Deduct from inventory records starting with the ones with highest stock
+                $inventories = $product->inventories()->where('quantity', '>', 0)->orderBy('quantity', 'desc')->get();
+                $remainingToDeduct = $sale->quantity;
+                
+                foreach ($inventories as $inventory) {
+                    if ($remainingToDeduct <= 0) break;
+                    
+                    $quantityBefore = $inventory->quantity;
+                    $deductFromThis = min($inventory->quantity, $remainingToDeduct);
+                    $inventory->quantity -= $deductFromThis;
+                    $remainingToDeduct -= $deductFromThis;
+                    $inventory->save();
+                    
+                    // Create stock history record for each deduction
+                    \App\Models\StockHistory::create([
+                        'inventory_id' => $inventory->id,
+                        'user_id' => Auth::id(),
+                        'action' => 'deduct',
+                        'quantity_before' => $quantityBefore,
+                        'quantity_after' => $inventory->quantity,
+                        'note' => 'Stock deducted for wholesaler order #' . $sale->id . ' approval by admin (partial: ' . $deductFromThis . ' units)',
+                    ]);
+                }
             } else {
-                // If no inventory exists, create with zero (should not happen in normal flow)
-                $product->inventories()->create([
-                    'quantity' => 0,
-                ]);
+                return back()->with('error', 'Insufficient stock available. Only ' . $totalAvailableStock . ' units in stock, but order requires ' . $sale->quantity . ' units.');
             }
-            // Add/Update inventory for retailer visibility (retailer gets the ordered quantity)
-            $retailerInventory = $product->inventories()->where('id', '!=', $inventory ? $inventory->id : 0)->first();
-            if ($retailerInventory) {
-                $retailerInventory->quantity = $sale->quantity;
-                $retailerInventory->save();
-            } else {
-                $product->inventories()->create([
-                    'quantity' => $sale->quantity,
-                ]);
-            }
+            
+            // Wholesaler orders should only deduct from factory inventory
+            // No need to create separate "retailer inventory" records
         }
         // If the buyer is a retailer, update seller_role and inventory for customer visibility
         elseif ($sale->user && (isset($sale->user->role_as) ? $sale->user->role_as == 2 : $sale->user->role === 'retailer')) {
@@ -150,26 +169,29 @@ class SalesApprovalController extends Controller
                 $wholesalerOrders[$userName]['count']++;
                 $wholesalerOrders[$userName]['total'] += $unitPrice * $sale->quantity;
 
-                // Handle inventory
-                $inventory = $product->inventories()->first();
-                if ($inventory && $inventory->quantity >= $sale->quantity) {
-                    $inventory->quantity -= $sale->quantity;
-                    $inventory->save();
-                } else {
-                    // Create or update inventory record
-                    if (!$inventory) {
-                        $product->inventories()->create(['quantity' => 0]);
+                // Handle inventory - use total stock calculation
+                $totalAvailableStock = $product->inventories()->sum('quantity');
+                
+                if ($totalAvailableStock >= $sale->quantity) {
+                    // Deduct from inventory records starting with the ones with highest stock
+                    $inventories = $product->inventories()->where('quantity', '>', 0)->orderBy('quantity', 'desc')->get();
+                    $remainingToDeduct = $sale->quantity;
+                    
+                    foreach ($inventories as $inventory) {
+                        if ($remainingToDeduct <= 0) break;
+                        
+                        $deductFromThis = min($inventory->quantity, $remainingToDeduct);
+                        $inventory->quantity -= $deductFromThis;
+                        $remainingToDeduct -= $deductFromThis;
+                        $inventory->save();
                     }
+                } else {
+                    // Skip this order if insufficient stock
+                    continue;
                 }
 
-                // Add inventory for retailer visibility
-                $retailerInventory = $product->inventories()->where('id', '!=', $inventory ? $inventory->id : 0)->first();
-                if ($retailerInventory) {
-                    $retailerInventory->quantity += $sale->quantity;
-                    $retailerInventory->save();
-                } else {
-                    $product->inventories()->create(['quantity' => $sale->quantity]);
-                }
+                // Wholesaler orders only deduct from factory inventory
+                // No additional "retailer inventory" should be created
             }
 
             $sale->status = 'approved';

@@ -1,10 +1,348 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+  /* Modern Professional Cart Styling */
+  body, .main-content, .container-fluid {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .container {
+    background: transparent !important;
+  }
+
+  /* Page Header */
+  .page-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
+
+  .page-header h3 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+
+  .page-header .btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .page-header .btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Main Table Card */
+  .table-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: none;
+    margin-bottom: 2rem;
+  }
+
+  .table-card .table-responsive {
+    padding: 0;
+  }
+
+  /* Table Styling */
+  .modern-table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .modern-table thead th {
+    background: #f8fafc;
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1.25rem 1.5rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .modern-table thead th i {
+    color: #6b7280;
+    margin-right: 0.5rem;
+  }
+
+  .modern-table tbody tr {
+    transition: all 0.2s ease;
+  }
+
+  .modern-table tbody tr:hover {
+    background: #f9fafb;
+  }
+
+  .modern-table tbody td {
+    padding: 1.25rem 1.5rem;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    color: #374151;
+    vertical-align: middle;
+  }
+
+  .modern-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Product Name Styling */
+  .product-name {
+    font-weight: 500;
+    color: #1f2937;
+  }
+
+  /* Quantity Styling */
+  .quantity {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  /* Price Styling */
+  .price {
+    font-weight: 600;
+    color: #059669;
+  }
+
+  /* Alert Styling */
+  .alert {
+    border-radius: 0.75rem;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .alert-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #166534;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+  }
+
+  /* Button Enhancements */
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline-primary {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline-primary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Checkout Section */
+  .checkout-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    text-align: center;
+  }
+
+  .checkout-section .btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  /* Modal Enhancements */
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: none;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-bottom: none;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-header .modal-title {
+    color: white;
+    font-weight: 600;
+  }
+
+  .modal-header .btn-close {
+    filter: invert(1);
+  }
+
+  .modal-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  /* Form Controls in Modals */
+  .modal .form-control,
+  .modal .form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .modal .form-control:focus,
+  .modal .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Image Styling */
+  .product-image {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .product-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: #a78bfa;
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-state h5 {
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.25rem;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 0.875rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .page-header {
+      padding: 1.5rem;
+    }
+
+    .page-header h3 {
+      font-size: 1.25rem;
+    }
+
+    .checkout-section {
+      padding: 1.5rem;
+    }
+
+    .modern-table thead th,
+    .modern-table tbody td {
+      padding: 1rem;
+      font-size: 0.8rem;
+    }
+  }
+</style>
+
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3><i class="bi bi-cart me-2"></i>Your Shopping Cart</h3>
-        <a href="/dashboard" class="btn btn-outline-primary"><i class="bi bi-house-door me-1"></i>Home</a>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h3><i class="bi bi-cart me-2"></i>Your Shopping Cart</h3>
+                <p class="mb-0 opacity-75">Review and manage your selected items</p>
+            </div>
+            <a href="/dashboard" class="btn btn-outline-primary">
+                <i class="bi bi-house-door me-1"></i>Home
+            </a>
+        </div>
     </div>
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -13,46 +351,71 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
     @if(empty($cart))
-        <div class="alert alert-info">Your cart is empty. <a href="{{ route('sales.index') }}">Continue shopping</a>.</div>
+        <div class="alert alert-info">
+            <div class="empty-state">
+                <i class="bi bi-cart-x"></i>
+                <h5>Your cart is empty</h5>
+                <p>Start shopping to add items to your cart. <a href="{{ route('sales.index') }}" class="text-decoration-underline">Continue shopping</a>.</p>
+            </div>
+        </div>
     @else
-    <div class="table-responsive mb-4">
-        <table class="table align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Product</th>
-                    <th>Image</th>
-                    <th>Unit Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($cart as $item)
-                <tr>
-                    <td>{{ $item['name'] }}</td>
-                    <td>
-                        @if($item['image'])
-                            <img src="/assets/img/products/{{ $item['image'] }}" alt="{{ $item['name'] }}" style="max-width:60px;max-height:60px;object-fit:contain;">
-                        @endif
-                    </td>
-                    <td>UGX {{ number_format($item['price']) }}</td>
-                    <td>{{ $item['quantity'] }}</td>
-                    <td>UGX {{ number_format($item['price'] * $item['quantity']) }}</td>
-                    <td>
-                        <form action="{{ route('cart.remove') }}" method="POST" style="display:inline;">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Remove</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table modern-table align-middle">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-cube"></i>Product</th>
+                        <th><i class="bi bi-image"></i>Image</th>
+                        <th><i class="bi bi-currency-dollar"></i>Unit Price</th>
+                        <th><i class="bi bi-123"></i>Quantity</th>
+                        <th><i class="bi bi-calculator"></i>Total</th>
+                        <th><i class="bi bi-gear"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($cart as $item)
+                    <tr>
+                        <td>
+                            <span class="product-name">{{ $item['name'] }}</span>
+                        </td>
+                        <td>
+                            @if($item['image'])
+                                <img src="/assets/img/products/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="product-image" style="max-width:60px;max-height:60px;object-fit:contain;">
+                            @else
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="price">UGX {{ number_format($item['price']) }}</span>
+                        </td>
+                        <td>
+                            <span class="quantity">{{ $item['quantity'] }}</span>
+                        </td>
+                        <td>
+                            <span class="price">UGX {{ number_format($item['price'] * $item['quantity']) }}</span>
+                        </td>
+                        <td>
+                            <form action="{{ route('cart.remove') }}" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="text-end">
-        <button type="button" class="btn btn-success btn-lg" id="openCartCheckoutModal"><i class="bi bi-bag-check me-1"></i>Checkout</button>
+    
+    <div class="checkout-section">
+        <button type="button" class="btn btn-success btn-lg" id="openCartCheckoutModal">
+            <i class="bi bi-bag-check me-2"></i>Proceed to Checkout
+        </button>
     </div>
     @endif
 </div>
@@ -63,20 +426,20 @@
     <div class="modal-content">
       <form id="cartCheckoutForm" method="POST" action="{{ route('cart.checkout') }}">
         @csrf
-        <div class="modal-header bg-gradient-primary text-white">
+        <div class="modal-header">
           <h5 class="modal-title" id="cartCheckoutModalLabel"><i class="bi bi-bag-check me-2"></i>Confirm Your Order</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="table-responsive mb-3">
-            <table class="table align-middle">
-              <thead class="table-light">
+            <table class="table modern-table align-middle">
+              <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Image</th>
-                  <th>Unit Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
+                  <th><i class="bi bi-cube"></i>Product</th>
+                  <th><i class="bi bi-image"></i>Image</th>
+                  <th><i class="bi bi-currency-dollar"></i>Unit Price</th>
+                  <th><i class="bi bi-123"></i>Quantity</th>
+                  <th><i class="bi bi-calculator"></i>Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -84,22 +447,34 @@
                 @foreach($cart as $item)
                   @php $grandTotal += $item['price'] * $item['quantity']; @endphp
                   <tr data-product-id="{{ $item['product_id'] }}" data-stock="{{ $item['stock'] }}">
-                    <td>{{ $item['name'] }}</td>
+                    <td>
+                        <span class="product-name">{{ $item['name'] }}</span>
+                    </td>
                     <td>
                       @if($item['image'])
-                        <img src="/assets/img/products/{{ $item['image'] }}" alt="{{ $item['name'] }}" style="max-width:60px;max-height:60px;object-fit:contain;">
+                        <img src="/assets/img/products/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="product-image" style="max-width:60px;max-height:60px;object-fit:contain;">
+                      @else
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                            <i class="bi bi-image text-muted"></i>
+                        </div>
                       @endif
                     </td>
-                    <td class="modal-price" data-price="{{ $item['price'] }}">UGX {{ number_format($item['price']) }}<br><span class="badge bg-info text-dark">Stock: {{ $item['stock'] }}</span></td>
+                    <td class="modal-price" data-price="{{ $item['price'] }}">
+                        <span class="price">UGX {{ number_format($item['price']) }}</span>
+                        <br><span class="badge bg-info text-dark">Stock: {{ $item['stock'] }}</span>
+                    </td>
                     <td><input type="number" class="form-control modal-qty-input modal-qty" min="1" value="{{ $item['quantity'] }}" style="width:80px;"></td>
-                    <td class="modal-total">UGX {{ number_format($item['price'] * $item['quantity']) }}<br><span class="text-danger small d-none stock-warning">Only {{ $item['stock'] }} left in stock!</span></td>
+                    <td class="modal-total">
+                        <span class="price">UGX {{ number_format($item['price'] * $item['quantity']) }}</span>
+                        <br><span class="text-danger small d-none stock-warning">Only {{ $item['stock'] }} left in stock!</span>
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
               <tfoot>
                 <tr>
                   <th colspan="4" class="text-end">Grand Total:</th>
-                  <th id="modalGrandTotal">UGX {{ number_format($grandTotal) }}</th>
+                  <th id="modalGrandTotal" class="price">UGX {{ number_format($grandTotal) }}</th>
                 </tr>
               </tfoot>
             </table>
@@ -147,7 +522,7 @@
 <div class="modal fade" id="postOrderOptionsModal" tabindex="-1" aria-labelledby="postOrderOptionsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header bg-gradient-primary text-white">
+      <div class="modal-header">
         <h5 class="modal-title" id="postOrderOptionsModalLabel"><i class="bi bi-bag-check me-2"></i>Order Placed!</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -320,4 +695,6 @@
     setTimeout(updateModalTotals, 300);
   });
 </script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection 

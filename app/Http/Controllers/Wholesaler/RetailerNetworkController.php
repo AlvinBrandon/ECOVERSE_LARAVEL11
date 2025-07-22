@@ -33,7 +33,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.created_at', '>=', $startDate)
             ->where('orders.created_at', '<=', $endDate);
         
@@ -68,7 +67,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'approved')
             ->where('orders.created_at', '>=', $startDate)
             ->sum('orders.total_price');
@@ -79,7 +77,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'pending')
             ->where('orders.created_at', '>=', $startDate)
             ->count();
@@ -90,7 +87,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'approved')
             ->where('orders.created_at', '>=', $startDate)
             ->count();
@@ -100,10 +96,7 @@ class RetailerNetworkController extends Controller
                 $q->where('role', 'retailer')
                   ->orWhere('role_as', 2);
             })
-            ->whereHas('orders', function($query) {
-                $query->join('products', 'orders.product_id', '=', 'products.id')
-                    ->where('products.seller_role', 'wholesaler');
-            })
+            ->whereHas('orders')
             ->select('id', 'name', 'email')
             ->get();
         
@@ -114,7 +107,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'approved')
             ->where('orders.created_at', '>=', $startDate)
             ->select([
@@ -137,7 +129,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'approved')
             ->where('orders.created_at', '>=', Carbon::now()->subMonths(6))
             ->select([
@@ -167,7 +158,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->select('orders.*')
             ->first();
         
@@ -185,6 +175,55 @@ class RetailerNetworkController extends Controller
             'tracking_code' => 'nullable|string|max:100',
         ]);
         
+        // Get the product to handle inventory deduction
+        $product = $order->product;
+        
+        // Deduct inventory when wholesaler verifies retailer order
+        if ($product) {
+            // Get the main inventory (usually the first one represents wholesaler stock)
+            $inventory = $product->inventories()->first();
+            
+            if ($inventory) {
+                // Check if sufficient stock is available
+                if ($inventory->quantity >= $order->quantity) {
+                    // Deduct the ordered quantity from wholesaler inventory
+                    $inventory->quantity -= $order->quantity;
+                    $inventory->save();
+                    
+                    // Create stock history record for the deduction
+                    \App\Models\StockHistory::create([
+                        'inventory_id' => $inventory->id,
+                        'user_id' => Auth::id(),
+                        'action' => 'deduct',
+                        'quantity_before' => $inventory->quantity + $order->quantity,
+                        'quantity_after' => $inventory->quantity,
+                        'note' => 'Stock deducted for retailer order #' . $order->id . ' verification',
+                    ]);
+                    
+                    // Optional: Create separate inventory record for retailer 
+                    // (this represents the stock that the retailer now owns)
+                    $retailerInventory = $product->inventories()
+                        ->where('id', '!=', $inventory->id)
+                        ->first();
+                    
+                    if ($retailerInventory) {
+                        $retailerInventory->quantity += $order->quantity;
+                        $retailerInventory->save();
+                    } else {
+                        // Create new inventory record for retailer stock
+                        $product->inventories()->create([
+                            'quantity' => $order->quantity,
+                            'batch_id' => 'RETAILER-' . $order->id
+                        ]);
+                    }
+                } else {
+                    return back()->with('error', 'Insufficient stock available. Only ' . $inventory->quantity . ' units in stock, but order requires ' . $order->quantity . ' units.');
+                }
+            } else {
+                return back()->with('error', 'No inventory record found for this product. Please contact admin.');
+            }
+        }
+        
         $order->update([
             'status' => 'approved',
             'delivery_status' => $request->delivery_status,
@@ -194,7 +233,7 @@ class RetailerNetworkController extends Controller
             'verified_by' => Auth::id()
         ]);
         
-        return back()->with('success', 'Order verified successfully. Retailer will be notified.');
+        return back()->with('success', 'Order verified successfully. Inventory updated and retailer will be notified.');
     }
     
     public function rejectOrder(Request $request, $orderId)
@@ -206,7 +245,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->select('orders.*')
             ->first();
         
@@ -248,7 +286,6 @@ class RetailerNetworkController extends Controller
                 $q->where('users.role', 'retailer')
                   ->orWhere('users.role_as', 2);
             })
-            ->where('products.seller_role', 'wholesaler')
             ->where('orders.status', 'pending')
             ->select('orders.*')
             ->get();

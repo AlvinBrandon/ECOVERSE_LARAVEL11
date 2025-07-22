@@ -52,10 +52,18 @@ Route::middleware(['auth', 'role:wholesaler,5'])->group(function () {
 // Retailer analytics and customer order verification
 Route::middleware(['auth', 'role:retailer,2'])->get('/retailer/reports', [RetailerReportController::class, 'index'])->name('retailer.reports');
 
-// Retailer order management routes
+// Retailer customer order verification routes
+use App\Http\Controllers\Retailer\CustomerOrderController as RetailerCustomerOrderController;
+Route::middleware(['auth', 'role:retailer,2'])->group(function () {
+    Route::get('/retailer/customer-orders', [RetailerCustomerOrderController::class, 'index'])->name('retailer.customer-orders');
+    Route::post('/retailer/customer-orders/verify/{order}', [RetailerCustomerOrderController::class, 'verify'])->name('retailer.customer-orders.verify');
+    Route::post('/retailer/customer-orders/reject/{order}', [RetailerCustomerOrderController::class, 'reject'])->name('retailer.customer-orders.reject');
+    Route::post('/retailer/customer-orders/bulk-verify', [RetailerCustomerOrderController::class, 'bulkVerify'])->name('retailer.customer-orders.bulk-verify');
+});
+
+// Retailer order management routes (legacy)
 use App\Http\Controllers\RetailerOrderController;
 Route::middleware(['auth', 'role:retailer,2'])->prefix('retailer')->group(function () {
-    Route::get('/customer-orders', [RetailerOrderController::class, 'customerOrders'])->name('retailer.customer-orders');
     Route::post('/orders/{order}/approve', [RetailerOrderController::class, 'approveOrder'])->name('retailer.orders.approve');
     Route::post('/orders/{order}/reject', [RetailerOrderController::class, 'rejectOrder'])->name('retailer.orders.reject');
     Route::get('/inventory', [RetailerOrderController::class, 'inventory'])->name('retailer.inventory');
@@ -141,9 +149,9 @@ Route::get('/dashboard', function () {
             case 'staff':
                 return view('dashboards.staff');
             case 'retailer':
-                return view('dashboards.retailer');
+                return app(\App\Http\Controllers\DashboardController::class)->retailerDashboard();
             case 'wholesaler':
-                return view('dashboards.wholesaler');
+                return app(\App\Http\Controllers\DashboardController::class)->wholesalerDashboard();
             default:
                 return app(\App\Http\Controllers\DashboardController::class)->customerDashboard();
         }

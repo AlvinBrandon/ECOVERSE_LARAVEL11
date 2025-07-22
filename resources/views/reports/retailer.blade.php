@@ -380,7 +380,7 @@
                   </div>
                 </td>
                 <td>
-                  <span class="badge bg-light text-dark">{{ $order->quantity }} units</span>
+                  <span class="badge bg-light text-dark">{{ $order->quantity }} pcs</span>
                 </td>
                 <td>
                   <div>{{ $order->created_at->format('M d, Y') }}</div>

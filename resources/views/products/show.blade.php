@@ -33,7 +33,7 @@
                     {{ $product->stock > 0 ? 'In Stock' : 'Out of Stock' }}
                 </span>
                 @if($product->stock > 0)
-                    <span class="text-muted ms-2">({{ $product->stock }} units available)</span>
+                    <span class="text-muted ms-2">({{ $product->stock }} pcs available)</span>
                 @endif
             </div>
 

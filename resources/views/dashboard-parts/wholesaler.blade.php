@@ -410,9 +410,9 @@
         <div class="ms-3 flex-grow-1">
           <h3 class="scm-metric-value">{{ number_format($pendingVerifications ?? 0) }}</h3>
           <p class="scm-metric-label">Pending Verifications</p>
-          <div class="scm-metric-trend negative">
-            <i class="bi bi-arrow-down"></i>
-            <span>-3.1%</span>
+          <div class="scm-metric-trend {{ ($pendingGrowth ?? 0) >= 0 ? 'positive' : 'negative' }}">
+            <i class="bi bi-arrow-{{ ($pendingGrowth ?? 0) >= 0 ? 'up' : 'down' }}"></i>
+            <span>{{ ($pendingGrowth ?? 0) >= 0 ? '+' : '' }}{{ number_format($pendingGrowth ?? 0, 1) }}%</span>
           </div>
         </div>
       </div>

@@ -27,23 +27,29 @@ class SalesController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user && $user->role === 'wholesaler') {
-            // Wholesalers see all products
-            $products = Product::with('inventory')->get();
+        $query = Product::with('inventory');
+        
+        if ($user) {
+            if ($user->role === 'wholesaler') {
+                // Wholesalers can see ALL products since factory produces everything
+                // No filter needed - show all products
+            } elseif ($user->role === 'retailer') {
+                // Retailers can only buy from wholesaler products
+                $query->where('seller_role', 'wholesaler');
+            } elseif ($user->role === 'customer') {
+                // Customers can only buy from retailer products
+                $query->where('seller_role', 'retailer');
+            }
         } else {
-            $query = Product::with('inventory');
-            if ($user) {
-                if ($user->role === 'retailer') {
-                    $query->where('seller_role', 'wholesaler');
-                } elseif ($user->role === 'customer') {
-                    $query->where('seller_role', 'retailer');
-                }
-            }
-            if (request()->filled('type')) {
-                $query->where('seller_role', request('type'));
-            }
-            $products = $query->get();
+            // Guest users see products available for direct purchase (retailer products)
+            $query->where('seller_role', 'retailer');
         }
+        
+        if (request()->filled('type')) {
+            $query->where('seller_role', request('type'));
+        }
+        
+        $products = $query->get();
         return view('sales.index', compact('products'));
     }
 
@@ -56,18 +62,35 @@ class SalesController extends Controller
 
         $product = Product::findOrFail($request->product_id);
 
-        // Enforce sales hierarchy
+        // Enforce sales hierarchy with new business logic
         $buyerRole = $user->role;
-        $sellerRole = $product->seller_role ?? null; // You may need to set this field in your products table
+        $sellerRole = $product->seller_role ?? null;
 
-        if ($sellerRole === 'factory' && $buyerRole !== 'wholesaler') {
-            return back()->with('error', 'Factory can only sell to wholesalers.');
-        }
-        if ($sellerRole === 'wholesaler' && $buyerRole !== 'retailer') {
-            return back()->with('error', 'Wholesalers can only sell to retailers.');
-        }
-        if ($sellerRole === 'retailer' && $buyerRole !== 'customer') {
-            return back()->with('error', 'Retailers can only sell to end-customers.');
+        // New business logic: Wholesalers can buy ANY product (factory makes everything)
+        if ($buyerRole === 'wholesaler') {
+            // Wholesalers can purchase any product from the factory
+            // No restrictions for wholesalers
+        } elseif ($buyerRole === 'retailer') {
+            // Retailers can only buy from wholesaler products
+            if ($sellerRole !== 'wholesaler') {
+                return back()->with('error', 'Retailers can only purchase products sold by wholesalers.');
+            }
+        } elseif ($buyerRole === 'customer') {
+            // Customers can only buy from retailer products
+            if ($sellerRole !== 'retailer') {
+                return back()->with('error', 'Customers can only purchase products sold by retailers.');
+            }
+        } else {
+            // Fallback for other roles - apply original restrictions
+            if ($sellerRole === 'factory' && $buyerRole !== 'wholesaler') {
+                return back()->with('error', 'Factory can only sell to wholesalers.');
+            }
+            if ($sellerRole === 'wholesaler' && $buyerRole !== 'retailer') {
+                return back()->with('error', 'Wholesalers can only sell to retailers.');
+            }
+            if ($sellerRole === 'retailer' && $buyerRole !== 'customer') {
+                return back()->with('error', 'Retailers can only sell to end-customers.');
+            }
         }
 
         $limits = $this->getOrderQuantityLimits($user->role);
@@ -114,7 +137,6 @@ class SalesController extends Controller
             'quantity' => $request->quantity,
             'unit_price' => $product->price,
             'total_price' => $total_price,
-            'total_amount' => $total_price, // Same as total_price for now
             'address' => $request->address,
             'status' => 'pending',
             'delivery_method' => $request->delivery_method ?? null,

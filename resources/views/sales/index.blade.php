@@ -509,9 +509,14 @@
                 <input type="hidden" name="delivery_method" value="delivery">
               @endif
               
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-cart-plus me-2"></i>Place Order
-              </button>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary add-to-cart-btn" data-product-id="{{ $product->id }}">
+                  <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-bag-check me-2"></i>Place Order
+                </button>
+              </div>
             </form>
           </div>
         </div>
@@ -547,7 +552,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <p class="mb-3">You cannot order more than 100 units at a time. Please enter a quantity of 100 or less.</p>
+        <p class="mb-3">You cannot order more than 100 pcs at a time. Please enter a quantity of 100 or less.</p>
         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">OK</button>
       </div>
     </div>

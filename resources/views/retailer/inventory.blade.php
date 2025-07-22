@@ -410,11 +410,12 @@
               <tr>
                 <th><i class="bi bi-cube me-1"></i>Product</th>
                 <th><i class="bi bi-tag me-1"></i>SKU</th>
+                <th><i class="bi bi-cart-plus me-1"></i>Purchased</th>
+                <th><i class="bi bi-cart-dash me-1"></i>Sold</th>
                 <th><i class="bi bi-123 me-1"></i>Current Stock</th>
                 <th><i class="bi bi-currency-dollar me-1"></i>Unit Price</th>
                 <th><i class="bi bi-cash-stack me-1"></i>Total Value</th>
                 <th><i class="bi bi-clipboard-check me-1"></i>Status</th>
-                <th><i class="bi bi-calendar me-1"></i>Last Updated</th>
                 <th><i class="bi bi-gear me-1"></i>Actions</th>
               </tr>
             </thead>
@@ -424,7 +425,7 @@
                 <td>
                   <div class="d-flex align-items-center">
                     @if($item['product']->image)
-                      <img src="{{ asset('storage/' . $item['product']->image) }}" alt="{{ $item['product']->name }}" class="me-3" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                      <img src="/assets/img/products/{{ $item['product']->image }}" alt="{{ $item['product']->name }}" class="me-3" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
                     @else
                       <div class="me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #f1f3f4; border-radius: 8px;">
                         <i class="bi bi-box text-muted"></i>
@@ -440,6 +441,18 @@
                   <span class="badge bg-light text-dark">{{ $item['product']->sku ?? 'N/A' }}</span>
                 </td>
                 <td>
+                  <div class="text-primary fw-semibold">
+                    <i class="bi bi-arrow-down-circle me-1"></i>{{ $item['purchased'] }} pcs
+                  </div>
+                  <small class="text-muted">From wholesalers</small>
+                </td>
+                <td>
+                  <div class="text-warning fw-semibold">
+                    <i class="bi bi-arrow-up-circle me-1"></i>{{ $item['sold'] }} pcs
+                  </div>
+                  <small class="text-muted">To customers</small>
+                </td>
+                <td>
                   <div class="d-flex align-items-center">
                     <div class="stock-indicator me-2" style="
                       width: 12px; 
@@ -448,11 +461,11 @@
                       background: {{ $item['status'] === 'critical' ? '#dc2626' : ($item['status'] === 'low' ? '#ea580c' : '#16a34a') }};
                     "></div>
                     <span class="fw-bold {{ $item['status'] === 'critical' ? 'text-danger' : ($item['status'] === 'low' ? 'text-warning' : 'text-success') }}">
-                      {{ $item['quantity'] }} units
+                      {{ $item['quantity'] }} pcs
                     </span>
                   </div>
                   @if($item['status'] !== 'good')
-                    <small class="text-muted">Min: 50 units</small>
+                    <small class="text-muted">Min: 50 pcs</small>
                   @endif
                 </td>
                 <td>

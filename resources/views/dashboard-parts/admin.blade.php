@@ -849,7 +849,7 @@ p, span, div, label, input, button {
               const value = context.parsed;
               const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const percentage = ((value / total) * 100).toFixed(1);
-              return `${label}: ${value} units (${percentage}%)`;
+              return `${label}: ${value} pcs (${percentage}%)`;
             }
           }
         }

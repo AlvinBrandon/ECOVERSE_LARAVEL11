@@ -64,26 +64,70 @@ class RetailerOrderController extends Controller
     }
 
     /**
-     * Show retailer's inventory (products purchased from wholesalers)
+     * Show retailer's inventory (based on their actual purchases from wholesalers)
      */
     public function inventory()
     {
-        // Get products with their inventory levels for this retailer
-        $products = Product::with(['inventories' => function($query) {
-            // Filter inventory for this retailer if needed
-            // For now, showing all products with their stock levels
-        }])->get();
+        $user = Auth::user();
+        
+        // Get only products that retailers should see:
+        // 1. Products they sell (seller_role = 'retailer') 
+        // 2. Products they can buy from wholesalers (seller_role = 'wholesaler')
+        $products = Product::whereIn('seller_role', ['retailer', 'wholesaler'])->get();
 
-        $inventory = $products->map(function($product) {
-            $totalQuantity = $product->inventories->sum('quantity');
-            $lowStockThreshold = 50; // Define minimum stock level
+        $inventory = $products->map(function($product) use ($user) {
+            // Different logic based on product type:
+            // For wholesaler products: show what retailer purchased from wholesalers
+            // For retailer products: show what customers bought from this retailer
+            
+            $purchased = 0;
+            $sold = 0;
+            $currentInventory = 0;
+            
+            if ($product->seller_role === 'wholesaler') {
+                // For wholesaler products: calculate what this retailer purchased
+                $purchased = Order::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->where('status', 'approved')
+                    ->sum('quantity');
+                
+                // For wholesaler products: calculate what customers bought from this retailer
+                $sold = Order::where('product_id', $product->id)
+                    ->where('status', 'approved')
+                    ->whereHas('user', function($query) {
+                        $query->where('role', 'customer')
+                              ->orWhere('role_as', 0);
+                    })
+                    ->sum('quantity');
+                
+                $currentInventory = $purchased - $sold;
+                
+            } else if ($product->seller_role === 'retailer') {
+                // For retailer products: only show what customers bought (no purchased quantity)
+                $purchased = 0; // Retailers don't "purchase" their own products
+                $sold = Order::where('product_id', $product->id)
+                    ->where('status', 'approved')
+                    ->whereHas('user', function($query) {
+                        $query->where('role', 'customer')
+                              ->orWhere('role_as', 0);
+                    })
+                    ->sum('quantity');
+                
+                // For retailer products, current inventory should be from the global inventory system
+                // since they manage their own stock
+                $currentInventory = $product->stock ?? 0;
+            }
+            
+            $lowStockThreshold = 50;
             
             return [
                 'product' => $product,
-                'quantity' => $totalQuantity,
-                'low_stock' => $totalQuantity < $lowStockThreshold,
-                'critical_stock' => $totalQuantity < 10,
-                'status' => $totalQuantity < 10 ? 'critical' : ($totalQuantity < $lowStockThreshold ? 'low' : 'good'),
+                'quantity' => max(0, $currentInventory), // Don't show negative inventory
+                'purchased' => $purchased,
+                'sold' => $sold,
+                'low_stock' => $currentInventory < $lowStockThreshold,
+                'critical_stock' => $currentInventory < 10,
+                'status' => $currentInventory < 10 ? 'critical' : ($currentInventory < $lowStockThreshold ? 'low' : 'good'),
                 'price' => $product->price ?? 0,
             ];
         });
