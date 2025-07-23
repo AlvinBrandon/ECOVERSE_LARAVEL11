@@ -216,7 +216,7 @@ Route::group(['middleware' => 'auth'], function () {
         return view('pages.static-sign-up');
     })->name('static-sign-up');
     Route::get('user-management', function () {
-        return redirect()->route('admin.users');
+        return redirect()->route('admin.users.index');
     })->name('user-management');
     Route::get('user-profile', function () {
         return view('pages.laravel-examples.user-profile');

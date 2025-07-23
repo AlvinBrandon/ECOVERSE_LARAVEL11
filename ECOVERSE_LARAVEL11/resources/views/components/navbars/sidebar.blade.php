@@ -57,7 +57,7 @@
             @if($user && $user->role_as == 1)
             <li class="nav-item">
                 <a class="nav-link text-white {{ $activePage == 'admin-users' ? ' active bg-gradient-primary' : '' }} "
-                    href="{{ route('admin.users') }}">
+                    href="{{ route('admin.users.index') }}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="fas fa-user-shield fa-lg ps-2 pe-2 text-center"></i>
                     </div>

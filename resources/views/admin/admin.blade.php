@@ -180,7 +180,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Manage User Roles</h5>
                     <p class="card-text">Assign roles to users (admin, vendor, customer).</p>
-                    <a href="{{ route('admin.users') }}" class="btn btn-info">Manage Roles</a>
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-info">Manage Roles</a>
                 </div>
             </div>
         </div>
