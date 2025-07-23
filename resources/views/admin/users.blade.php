@@ -11,13 +11,26 @@
     background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%) !important;
     font-family: 'Poppins', sans-serif !important;
     min-height: 10vh;
-    margin: 0 !important;
     padding: 0 !important;
   }
 
   .main-content {
     padding-top: 0 !important;
     margin-top: 0 !important;
+    /* Keep sidebar margin but reset top margin */
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure sidebar layout is preserved - highest specificity */
+  body[data-user-id] .main-content {
+    margin-left: 280px !important;
+  }
+
+  /* Mobile responsive override */
+  @media (max-width: 1199.98px) {
+    body[data-user-id] .main-content {
+      margin-left: 0 !important;
+    }
   }
 
   /* Override any layout padding/margin */

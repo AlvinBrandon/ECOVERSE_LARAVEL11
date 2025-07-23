@@ -1,0 +1,197 @@
+/* 
+===================================================================
+ECOVERSE GLOBAL SIDEBAR LAYOUT FIX
+===================================================================
+This CSS file ensures consistent sidebar positioning across ALL pages
+Author: EcoVerse Development Team
+Date: July 2025
+===================================================================
+*/
+
+/* 
+UNIVERSAL SIDEBAR LAYOUT RULES 
+These rules apply to ALL pages and override any conflicting CSS
+*/
+
+/* Base layout for authenticated users with sidebar */
+body[data-user-id] .main-content,
+body.has-sidebar .main-content,
+.main-content {
+    transition: margin-left 0.3s ease !important;
+}
+
+/* AUTHENTICATED USERS: Always apply sidebar margin */
+body[data-user-id] .main-content {
+    margin-left: 280px !important;
+}
+
+/* Override any page-specific margin resets that break the layout */
+body[data-user-id] .main-content,
+body[data-user-id] .container-fluid,
+body[data-user-id] main,
+body[data-user-id] .content,
+body[data-user-id] .app-content {
+    /* Allow left margin for sidebar, reset only top/bottom/right margins */
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+    /* KEEP margin-left for sidebar positioning */
+}
+
+/* Ensure sidebar doesn't get accidentally hidden */
+body[data-user-id] .sidebar,
+body[data-user-id] .sidenav,
+body[data-user-id] .side-nav {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 280px !important;
+    z-index: 1000 !important;
+}
+
+/* Container adjustments */
+body[data-user-id] .container-fluid {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+/* 
+RESPONSIVE DESIGN 
+Mobile and tablet adjustments
+*/
+
+/* Large tablets and below - sidebar becomes overlay */
+@media (max-width: 1199.98px) {
+    body[data-user-id] .main-content,
+    body[data-user-id] .container-fluid,
+    body[data-user-id] main,
+    body[data-user-id] .content,
+    body[data-user-id] .app-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Mobile devices - ensure proper spacing */
+@media (max-width: 767.98px) {
+    body[data-user-id] .main-content,
+    body[data-user-id] .container-fluid,
+    body[data-user-id] main {
+        margin-left: 0 !important;
+        padding-top: 1rem !important;
+    }
+    
+    body[data-user-id] .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* 
+SIDEBAR TOGGLE STATES 
+Handle collapsed/expanded sidebar
+*/
+
+/* When sidebar is collapsed/hidden */
+body.g-sidenav-hidden[data-user-id] .main-content {
+    margin-left: 0 !important;
+}
+
+/* When sidebar is pinned (normal state) */
+body.g-sidenav-show[data-user-id] .main-content {
+    margin-left: 280px !important;
+}
+
+/* 
+MATERIAL DASHBOARD COMPATIBILITY 
+For pages using x-layout component
+*/
+
+/* Material Dashboard pages with sidebar */
+.g-sidenav-show .main-content-wrapper,
+.g-sidenav-show main {
+    margin-left: 280px !important;
+}
+
+.g-sidenav-hidden .main-content-wrapper,
+.g-sidenav-hidden main {
+    margin-left: 0 !important;
+}
+
+/* 
+LAYOUT SYSTEM COMPATIBILITY 
+Support for both @extends('layouts.app') and <x-layout>
+*/
+
+/* For pages using @extends('layouts.app') */
+body[data-user-id] main.main-content {
+    margin-left: 280px !important;
+}
+
+/* For pages using <x-layout> */
+.main-content-wrapper {
+    margin-left: 280px !important;
+    transition: margin-left 0.3s ease !important;
+}
+
+/* 
+OVERRIDE PROBLEMATIC CSS PATTERNS 
+Common patterns that break sidebar layout
+*/
+
+/* Reset margin: 0 !important declarations that break sidebar */
+body[data-user-id] .main-content {
+    margin: 0 0 0 280px !important; /* top right bottom left */
+}
+
+/* Handle pages that use py-4 class */
+body[data-user-id] .main-content.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+    margin-left: 280px !important;
+}
+
+/* 
+FALLBACK RULES 
+Ultra-high specificity for stubborn cases
+*/
+
+/* Nuclear option - highest possible specificity */
+html body[data-user-id].authenticated .main-content,
+html body[data-user-id] main.main-content.py-4,
+html body[data-user-id] .main-content-wrapper {
+    margin-left: 280px !important;
+}
+
+/* Responsive fallbacks */
+@media (max-width: 1199.98px) {
+    html body[data-user-id].authenticated .main-content,
+    html body[data-user-id] main.main-content.py-4,
+    html body[data-user-id] .main-content-wrapper {
+        margin-left: 0 !important;
+    }
+}
+
+/* 
+DEBUG HELPERS 
+Uncomment for troubleshooting
+*/
+
+/*
+body[data-user-id] .main-content::before {
+    content: "SIDEBAR LAYOUT ACTIVE";
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #22c55e;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 9999;
+}
+*/
+
+/* 
+END OF GLOBAL SIDEBAR LAYOUT FIX 
+===================================================================
+*/

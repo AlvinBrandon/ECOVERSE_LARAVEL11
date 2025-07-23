@@ -60,9 +60,11 @@
           <tr><th>Paid At</th><td>{{ $order->paid_at ?? '-' }}</td></tr>
           <tr><th>Invoice</th><td>
             @if($order->invoice_path)
-              <a href="{{ asset('storage/' . $order->invoice_path) }}" target="_blank">View Invoice</a>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="showInvoiceInfo('{{ $order->id }}', '{{ $order->invoice_path }}')">
+                <i class="bi bi-file-earmark-pdf me-1"></i>Invoice Uploaded ({{ basename($order->invoice_path) }})
+              </button>
             @else
-              -
+              <span class="text-muted">No invoice uploaded</span>
             @endif
           </td></tr>
         </table>
@@ -71,5 +73,54 @@
     </div>
   </div>
 </div>
+
+<!-- Invoice Information Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="invoiceModalLabel">
+          <i class="bi bi-file-earmark-pdf me-2"></i>Invoice Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <i class="bi bi-file-earmark-check me-2"></i>
+          <strong>Invoice Information</strong><br>
+          <small>Invoice has been uploaded and is available for processing.</small>
+        </div>
+        <div class="row">
+          <div class="col-sm-4"><strong>Purchase Order:</strong></div>
+          <div class="col-sm-8" id="modal-order-id">-</div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-4"><strong>Invoice File:</strong></div>
+          <div class="col-sm-8" id="modal-invoice-file">-</div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-4"><strong>Status:</strong></div>
+          <div class="col-sm-8">
+            <span class="badge bg-primary">Invoice Uploaded</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showInvoiceInfo(orderId, invoicePath) {
+    document.getElementById('modal-order-id').textContent = '#' + String(orderId).padStart(6, '0');
+    document.getElementById('modal-invoice-file').textContent = invoicePath.split('/').pop() || 'Invoice file';
+    
+    const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+    modal.show();
+}
+</script>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection

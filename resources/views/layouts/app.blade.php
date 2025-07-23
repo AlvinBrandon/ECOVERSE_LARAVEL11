@@ -237,6 +237,9 @@
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
+    <!-- Global Sidebar Layout Fix - CRITICAL for consistent layout -->
+    <link rel="stylesheet" href="{{ asset('resources/css/sidebar-layout-fix.css') }}">
+    
     <style>
         /* Global Poppins Font */
         body, html, * {
@@ -252,6 +255,60 @@
         .cart-badge { font-size: 0.85em; background: #ff5722; color: #fff; top: 0; right: -8px; }
         .navbar-icon-btn { background: none; border: none; color: #ff9800; font-size: 1.3rem; margin-right: 0.7rem; }
         .navbar-icon-btn:last-child { margin-right: 0; }
+        
+        /* Sidebar Layout Responsive CSS */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* GLOBAL SIDEBAR FIX - Ultra High Specificity */
+        /* This overrides ALL page-specific CSS that breaks the layout */
+        
+        /* Base rule for all authenticated users */
+        body[data-user-id] .main-content,
+        body[data-user-id] main.main-content,
+        body[data-user-id] main.py-4,
+        html body[data-user-id] .main-content {
+            margin-left: 280px !important;
+        }
+        
+        /* Override common problematic patterns */
+        body[data-user-id] .main-content,
+        body[data-user-id] .container-fluid {
+            /* Reset only top, right, bottom margins - KEEP left margin for sidebar */
+            margin-top: 0 !important;
+            margin-right: 0 !important;
+            margin-bottom: 0 !important;
+            /* margin-left preserved for sidebar */
+        }
+        
+        /* Material Dashboard compatibility */
+        .g-sidenav-show body[data-user-id] .main-content,
+        body.g-sidenav-show[data-user-id] .main-content {
+            margin-left: 280px !important;
+        }
+        
+        /* Mobile responsive - hide sidebar margin on smaller screens */
+        @media (max-width: 1199.98px) {
+            body[data-user-id] .main-content,
+            body[data-user-id] main.main-content,
+            body[data-user-id] main.py-4,
+            html body[data-user-id] .main-content,
+            .g-sidenav-show body[data-user-id] .main-content,
+            body.g-sidenav-show[data-user-id] .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        
+        /* Ensure proper spacing on mobile */
+        @media (max-width: 767.98px) {
+            body[data-user-id] .main-content,
+            body[data-user-id] main.main-content,
+            body[data-user-id] main.py-4 {
+                margin-left: 0 !important;
+                padding-top: 1rem !important;
+            }
+        }
     </style>
     @stack('styles')
     @yield('head')
@@ -265,9 +322,15 @@
         @include('components.navbars.navs.guest')
     @endauth
 
-    <main class="py-4 main-content" style="@auth margin-left: 280px; transition: all 0.3s ease; @endauth">
-        @yield('content')
-    </main>
+    @auth
+        <main class="py-4 main-content" style="margin-left: 280px; transition: all 0.3s ease;">
+            @yield('content')
+        </main>
+    @else
+        <main class="py-4 main-content">
+            @yield('content')
+        </main>
+    @endauth
 
     <div class="text-center py-3" style="color: #000;">
         © 2025, built with 💚 by the Ecoverse Team — powering smarter, greener communities.

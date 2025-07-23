@@ -152,6 +152,16 @@
                         <div class="text-center amount-section p-3 rounded-3" style="background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);">
                             <div class="scm-metric-value text-success" style="font-size: 1.2rem; font-weight: 700;">UGX {{ number_format($order->total_price ?? 0) }}</div>
                             <small class="text-success" style="font-weight: 500;">Total Amount</small>
+                            
+                            @if($order->voucher_code && $order->discount_amount)
+                                <div class="mt-2 pt-2 border-top">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-tag-fill text-warning me-1" style="font-size: 0.8rem;"></i>
+                                        <small class="text-warning fw-semibold">{{ $order->voucher_code }}</small>
+                                    </div>
+                                    <small class="text-muted d-block">Saved UGX {{ number_format($order->discount_amount) }}</small>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     

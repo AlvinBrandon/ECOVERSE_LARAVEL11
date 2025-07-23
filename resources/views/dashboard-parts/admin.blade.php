@@ -705,9 +705,9 @@ p, span, div, label, input, button {
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
                                         <span class="po-badge">#{{ $inv->po_id }}</span>
-                                        <a href="{{ asset('storage/'.$inv->invoice_path) }}" target="_blank" class="invoice-link ms-2">
-                                            <i class="bi bi-file-earmark-pdf me-1"></i>View PDF
-                                        </a>
+                                        <button type="button" class="btn btn-link btn-sm ms-2" onclick="showInvoiceInfo('{{ $inv->po_id }}', '{{ $inv->invoice_path }}')">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>View Details
+                                        </button>
                                     </div>
                                     <div class="item-subtitle">Purchase Order Invoice</div>
                                 </div>
@@ -890,6 +890,15 @@ p, span, div, label, input, button {
       });
     });
   });
+</script>
+
+<script>
+function showInvoiceInfo(orderId, invoicePath) {
+    // For admin dashboard, we'll show a simple alert since the modal needs to be defined at the parent level
+    alert('Invoice Information:\nPurchase Order: #' + String(orderId).padStart(6, '0') + 
+          '\nInvoice File: ' + (invoicePath.split('/').pop() || 'Invoice file') + 
+          '\nStatus: Available for processing');
+}
 </script>
 
 <!-- Google Fonts - Poppins -->

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Retailer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\RetailerInventory;
+use App\Models\InventoryMovement;
+use App\Services\EcoPointService;
 use Illuminate\Support\Facades\Auth;
 
 class CustomerOrderController extends Controller
@@ -101,15 +104,24 @@ class CustomerOrderController extends Controller
         $order->status = 'approved';
         $order->save();
 
+        // Award eco points to the customer for completed order
+        try {
+            $ecoPointService = new EcoPointService();
+            $ecoPointService->awardOrderPoints($order);
+        } catch (\Exception $e) {
+            // Log the error but don't fail the order approval
+            \Log::error('Failed to award eco points for order ' . $order->id . ': ' . $e->getMessage());
+        }
+
         // Handle AJAX requests
         if (request()->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Customer order verified and product delivered.'
+                'message' => 'Customer order verified and product delivered. Eco points awarded!'
             ]);
         }
 
-        return back()->with('success', 'Customer order verified and product delivered.');
+        return back()->with('success', 'Customer order verified and product delivered. Eco points awarded!');
     }
 
     /**

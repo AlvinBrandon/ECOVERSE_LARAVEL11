@@ -12,7 +12,6 @@
     background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%) !important;
     font-family: 'Poppins', sans-serif !important;
     min-height: 10vh;
-    margin: 0 !important;
     padding: 0 !important;
   }
 

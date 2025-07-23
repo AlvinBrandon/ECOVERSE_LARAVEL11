@@ -212,9 +212,36 @@ class InventoryController extends Controller
         return redirect()->route('inventory.index')->with('success', 'Stock deducted successfully.');
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        $histories = StockHistory::with(['inventory.product', 'user'])->latest()->get();
+        $query = StockHistory::with(['inventory.product', 'inventory.rawMaterial', 'user']);
+        
+        // Apply filters
+        if ($request->filled('action')) {
+            $query->where('action', $request->action);
+        }
+        
+        if ($request->filled('item_type')) {
+            if ($request->item_type === 'product') {
+                $query->whereHas('inventory', function($q) {
+                    $q->whereNotNull('product_id');
+                });
+            } elseif ($request->item_type === 'raw_material') {
+                $query->whereHas('inventory', function($q) {
+                    $q->whereNotNull('raw_material_id');
+                });
+            }
+        }
+        
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        $histories = $query->latest()->paginate(50);
         return view('inventory.history', compact('histories'));
     }
 

@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesApprovalController;
 use App\Http\Controllers\StaffOrderController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\EcoPointController;
 // use App\Http\Controllers\OrderController;
 
 // Admin dashboard route with both 'auth' and 'admin' middleware
@@ -185,6 +186,12 @@ Route::get('/reset-password/{token}', function ($token) {
 Route::post('sign-out', [SessionsController::class, 'destroy'])->middleware('auth')->name('logout');
 Route::get('profile', [ProfileController::class, 'create'])->middleware('auth')->name('profile');
 Route::post('user-profile', [ProfileController::class, 'update'])->middleware('auth');
+Route::put('profile', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
+Route::get('profile/settings', [ProfileController::class, 'settings'])->middleware('auth')->name('profile.settings');
+Route::get('orders', [CustomerOrderController::class, 'index'])->middleware('auth')->name('orders.index');
+Route::get('support', function () {
+    return view('pages.support');
+})->middleware('auth')->name('support');
 Route::group(['middleware' => 'auth'], function () {
     Route::get('billing', function () {
         return view('pages.billing');
@@ -245,8 +252,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 // Purchase Order Workflow Routes
 
-// Admin routes for purchase orders
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+// Admin and Staff routes for purchase orders
+Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function () {
     Route::get('/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'adminIndex'])->name('admin.purchase_orders.index');
     Route::get('/purchase-orders/create', [App\Http\Controllers\PurchaseOrderController::class, 'create'])->name('admin.purchase_orders.create');
     Route::post('/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'store'])->name('admin.purchase_orders.store');
@@ -301,6 +308,20 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/order/confirmation', [App\Http\Controllers\CartController::class, 'confirmation'])->name('order.confirmation');
 Route::post('/help/request', [App\Http\Controllers\HelpController::class, 'request'])->name('help.request');
+
+// Eco-Points Redemption System Routes
+Route::middleware(['auth'])->prefix('eco-points')->name('eco-points.')->group(function () {
+    Route::get('/rewards', [EcoPointController::class, 'rewards'])->name('rewards');
+    Route::get('/history', [EcoPointController::class, 'history'])->name('history');
+    Route::post('/redeem/{reward}', [EcoPointController::class, 'redeem'])->name('redeem');
+    Route::get('/voucher/{voucherCode}', [EcoPointController::class, 'voucher'])->name('voucher');
+    Route::get('/balance', [EcoPointController::class, 'balance'])->name('balance');
+});
+
+// Voucher validation for checkout process
+Route::middleware(['auth'])->group(function () {
+    Route::post('/voucher/validate', [EcoPointController::class, 'validateVoucher'])->name('voucher.validate');
+});
 
 // TEMP: Route to clear cart session for development
 Route::get('/cart/clear', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');

@@ -76,6 +76,49 @@ class CartController extends Controller
         if (empty($cart)) {
             return back()->with('error', 'Your cart is empty.');
         }
+
+        // Calculate subtotal
+        $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+        $discount = 0;
+        $voucherCode = null;
+        $redemption = null;
+
+        // Handle voucher if provided
+        if ($request->voucher_code) {
+            $user = Auth::user();
+            $redemption = \App\Models\EcoPointRedemption::with('reward')
+                ->where('user_id', $user->id)
+                ->where('voucher_code', $request->voucher_code)
+                ->where('status', 'active')
+                ->first();
+
+            if ($redemption && $redemption->isUsable()) {
+                $reward = $redemption->reward;
+                
+                // Calculate discount based on reward type
+                switch($reward->type) {
+                    case 'discount_percentage':
+                        $discount = $subtotal * ($reward->value / 100);
+                        break;
+                    case 'discount_fixed':
+                        $discount = min($reward->value, $subtotal);
+                        break;
+                    case 'product_voucher':
+                        $discount = min($reward->value, $subtotal);
+                        break;
+                    case 'free_shipping':
+                        $discount = 5000; // Assume shipping cost
+                        break;
+                    default:
+                        $discount = $reward->value ?? 0;
+                }
+                
+                $voucherCode = $request->voucher_code;
+            }
+        }
+
+        $finalTotal = $subtotal - $discount;
+
         $paymentMethod = $request->payment_method;
         $paymentDetails = null;
         if ($paymentMethod === 'mobile_money') {
@@ -100,19 +143,13 @@ class CartController extends Controller
                 'card_number' => $request->card_number,
             ];
         }
-        $order = [
-            'items' => $cart,
-            'payment_method' => $paymentMethod,
-            'payment_details' => $paymentDetails,
-            'address' => $request->address,
-            'total' => collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']),
-            'created_at' => now()->toDateTimeString(),
-        ];
 
         // Save each cart item as an Order in the database
         $user = Auth::user();
+        $orderIds = [];
+        
         foreach ($cart as $item) {
-            \App\Models\Order::create([
+            $order = \App\Models\Order::create([
                 'user_id' => $user->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
@@ -122,7 +159,15 @@ class CartController extends Controller
                 'status' => 'pending',
                 'payment_method' => $paymentMethod,
                 'order_number' => 'ORD-' . strtoupper(substr(md5(uniqid()), 0, 8)),
+                'voucher_code' => $voucherCode,
+                'discount_amount' => $discount > 0 ? $discount : null,
             ]);
+            $orderIds[] = $order->id;
+        }
+
+        // Mark voucher as used if applied
+        if ($redemption && $discount > 0) {
+            $redemption->markAsUsed($orderIds[0]); // Associate with first order
         }
 
         // Clear the cart after order is placed

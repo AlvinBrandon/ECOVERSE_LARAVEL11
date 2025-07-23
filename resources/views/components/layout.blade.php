@@ -47,7 +47,54 @@
         </div>
     </div>
 
-    {{ $slot }}
+    <!-- Check if this is a page with sidebar by looking for g-sidenav-show class -->
+    @if(str_contains($bodyClass ?? '', 'g-sidenav-show'))
+        <!-- For pages with sidebar, wrap content with proper margin compensation -->
+        <div class="main-content-wrapper">
+            {{ $slot }}
+        </div>
+        
+        <!-- Add responsive CSS for mobile -->
+        <style>
+            /* Main content wrapper for sidebar compensation */
+            .main-content-wrapper {
+                transition: margin-left 0.3s ease;
+            }
+            
+            /* When sidebar is pinned (normal state) */
+            .g-sidenav-show .main-content-wrapper {
+                margin-left: 280px;
+            }
+            
+            /* When sidebar is hidden/collapsed */
+            .g-sidenav-hidden .main-content-wrapper {
+                margin-left: 0;
+            }
+            
+            /* Responsive behavior */
+            @media (max-width: 1199.98px) {
+                .main-content-wrapper {
+                    margin-left: 0 !important;
+                }
+            }
+            
+            /* Mobile devices */
+            @media (max-width: 767.98px) {
+                .main-content-wrapper {
+                    margin-left: 0 !important;
+                    padding-top: 1rem;
+                }
+            }
+            
+            /* Extra margin compensation for Material Dashboard styles */
+            .g-sidenav-show.bg-gray-200 .main-content-wrapper {
+                margin-left: 280px;
+            }
+        </style>
+    @else
+        <!-- For pages without sidebar, render content normally -->
+        {{ $slot }}
+    @endif
 
     <script src="{{ asset('assets') }}/js/core/popper.min.js"></script>
     <script src="{{ asset('assets') }}/js/core/bootstrap.min.js"></script>

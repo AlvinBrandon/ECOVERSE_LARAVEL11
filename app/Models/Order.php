@@ -25,6 +25,8 @@ class Order extends Model
         'verified_by',
         'rejected_at',
         'rejected_by',
+        'voucher_code',
+        'discount_amount',
     ];
 
     public function user()

@@ -27,6 +27,7 @@ class User extends Authenticatable
         'about',
         'password_confirmation',
         'role',
+        'eco_points',
         'last_active_at'
     ];
 
@@ -58,6 +59,11 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function ecoPointTransactions()
+    {
+        return $this->hasMany(EcoPointTransaction::class);
     }
 
     public function isAdmin() { return $this->role === 'admin' || $this->role_as == 1; }

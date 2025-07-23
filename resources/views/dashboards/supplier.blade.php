@@ -490,9 +490,9 @@
                   <li>
                     <span class="badge bg-secondary">#{{ str_pad($del->id, 4, '0', STR_PAD_LEFT) }}</span>
                     <span>{{ $del->rawMaterial->name ?? 'N/A' }}</span>
-                    <a href="{{ asset('storage/'.$del->invoice_path) }}" target="_blank" class="btn btn-link">
+                    <button type="button" class="btn btn-link btn-sm" onclick="showInvoiceInfo('{{ $del->id }}', '{{ $del->invoice_path }}')">
                       <i class="bi bi-file-earmark-pdf"></i> Invoice
-                    </a>
+                    </button>
                     <span class="badge bg-{{ $del->status == 'complete' ? 'success' : ($del->status == 'pending' ? 'warning' : 'danger') }}">
                       {{ ucfirst($del->status) }}
                     </span>
@@ -520,9 +520,9 @@
                 @foreach($invoiceFeedback as $inv)
                   <li>
                     <span class="badge bg-secondary">#{{ str_pad($inv->po_id, 4, '0', STR_PAD_LEFT) }}</span>
-                    <a href="{{ asset('storage/'.$inv->invoice_path) }}" target="_blank" class="btn btn-link">
+                    <button type="button" class="btn btn-link btn-sm" onclick="showInvoiceInfo('{{ $inv->po_id }}', '{{ $inv->invoice_path }}')">
                       <i class="bi bi-file-earmark-pdf"></i> Invoice
-                    </a>
+                    </button>
                     <span class="badge bg-{{ $inv->status == 'approved' ? 'success' : ($inv->status == 'rejected' ? 'danger' : 'warning') }}">
                       {{ ucfirst($inv->status) }}
                     </span>
@@ -547,6 +547,54 @@
     </section>
   </main>
 </div>
+
+<!-- Invoice Information Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="invoiceModalLabel">
+          <i class="bi bi-file-earmark-pdf me-2"></i>Invoice Information
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle me-2"></i>
+          <strong>Invoice Successfully Submitted</strong><br>
+          <small>Your invoice has been processed and recorded in the system.</small>
+        </div>
+        <div class="row">
+          <div class="col-sm-4"><strong>Purchase Order:</strong></div>
+          <div class="col-sm-8" id="modal-order-id">-</div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-4"><strong>Invoice File:</strong></div>
+          <div class="col-sm-8" id="modal-invoice-file">-</div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-sm-4"><strong>Status:</strong></div>
+          <div class="col-sm-8">
+            <span class="badge bg-success">Processed</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showInvoiceInfo(orderId, invoicePath) {
+    document.getElementById('modal-order-id').textContent = '#' + String(orderId).padStart(6, '0');
+    document.getElementById('modal-invoice-file').textContent = invoicePath.split('/').pop() || 'Invoice file';
+    
+    const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+    modal.show();
+}
+</script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection

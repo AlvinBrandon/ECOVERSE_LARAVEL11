@@ -472,13 +472,45 @@
                 @endforeach
               </tbody>
               <tfoot>
-                <tr>
+                <tr class="table-secondary">
+                  <th colspan="4" class="text-end">Subtotal:</th>
+                  <th><span id="modalSubtotal" class="price">UGX {{ number_format($grandTotal) }}</span></th>
+                </tr>
+                <tr id="discountRow" class="d-none">
+                  <th colspan="4" class="text-end text-success">
+                    <i class="bi bi-tag-fill me-1"></i>Discount (<span id="appliedVoucherName">Voucher</span>):
+                  </th>
+                  <th class="text-success">
+                    <span id="discountAmount">- UGX 0</span>
+                  </th>
+                </tr>
+                <tr class="table-primary">
                   <th colspan="4" class="text-end">Grand Total:</th>
                   <th id="modalGrandTotal" class="price">UGX {{ number_format($grandTotal) }}</th>
                 </tr>
               </tfoot>
             </table>
           </div>
+          <!-- Voucher/Discount Section -->
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="bi bi-ticket-perforated me-2"></i>Apply Voucher/Discount
+            </label>
+            <div class="input-group">
+              <input type="text" name="voucher_code" id="voucherCode" class="form-control" placeholder="Enter voucher code (e.g., ECO-ABC12345)">
+              <button type="button" class="btn btn-outline-success" id="applyVoucherBtn">
+                <i class="bi bi-check-lg me-1"></i>Apply
+              </button>
+            </div>
+            <div id="voucherResult" class="mt-2"></div>
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>Have an eco-voucher? Apply it for instant discounts!
+              <a href="{{ route('eco-points.history') }}" class="text-decoration-none ms-2">
+                <i class="bi bi-gift me-1"></i>View My Vouchers
+              </a>
+            </small>
+          </div>
+
           <div class="mb-3">
             <label class="form-label">Payment Method</label>
             <select name="payment_method" id="paymentMethod" class="form-select" required>
@@ -612,13 +644,20 @@
     }
     // Show post-order modal after successful order
     e.preventDefault();
+    
+    // Prepare form data with voucher if applied
+    const formData = new FormData(form);
+    if (appliedVoucher) {
+      formData.append('voucher_code', appliedVoucher.code);
+    }
+    
     fetch(form.action, {
       method: 'POST',
       headers: {
         'X-CSRF-TOKEN': form.querySelector('[name=_token]').value,
         'X-Requested-With': 'XMLHttpRequest',
       },
-      body: new FormData(form)
+      body: formData
     })
     .then(res => res.ok ? res.json().catch(() => ({})) : Promise.reject(res))
     .then(() => {
@@ -694,6 +733,122 @@
   document.getElementById('openCartCheckoutModal').addEventListener('click', function() {
     setTimeout(updateModalTotals, 300);
   });
+
+  // Voucher functionality
+  let appliedVoucher = null;
+  let originalSubtotal = 0;
+
+  document.getElementById('applyVoucherBtn').addEventListener('click', function() {
+    const voucherCode = document.getElementById('voucherCode').value.trim();
+    const resultDiv = document.getElementById('voucherResult');
+    
+    if (!voucherCode) {
+      resultDiv.innerHTML = '<div class="alert alert-warning alert-sm mb-0"><i class="bi bi-exclamation-triangle me-1"></i>Please enter a voucher code</div>';
+      return;
+    }
+
+    // Get current cart total
+    const subtotalText = document.getElementById('modalSubtotal').textContent;
+    const cartTotal = parseFloat(subtotalText.replace(/[^\d]/g, ''));
+
+    // Show loading state
+    this.disabled = true;
+    this.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Checking...';
+    
+    // Make AJAX request to validate voucher
+    fetch('{{ route("voucher.validate") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({ 
+        voucher_code: voucherCode,
+        cart_total: cartTotal
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Apply voucher discount
+        appliedVoucher = data.voucher;
+        applyVoucherDiscount(data.voucher, data.discount);
+        resultDiv.innerHTML = `<div class="alert alert-success alert-sm mb-0">
+          <i class="bi bi-check-circle me-1"></i>
+          ${data.voucher.reward_name} applied successfully! You saved UGX ${data.discount.toLocaleString()}
+        </div>`;
+        
+        // Disable voucher input and button
+        document.getElementById('voucherCode').disabled = true;
+        this.innerHTML = '<i class="bi bi-check-lg me-1"></i>Applied';
+        this.className = 'btn btn-success';
+        
+        // Add remove voucher button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-outline-danger btn-sm ms-2';
+        removeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+        removeBtn.onclick = removeVoucher;
+        this.parentNode.appendChild(removeBtn);
+        
+      } else {
+        resultDiv.innerHTML = `<div class="alert alert-danger alert-sm mb-0">
+          <i class="bi bi-exclamation-circle me-1"></i>
+          ${data.message || 'Invalid voucher code'}
+        </div>`;
+      }
+    })
+    .catch(error => {
+      resultDiv.innerHTML = '<div class="alert alert-danger alert-sm mb-0"><i class="bi bi-exclamation-circle me-1"></i>Error validating voucher. Please try again.</div>';
+    })
+    .finally(() => {
+      this.disabled = false;
+      if (this.innerHTML.includes('Checking')) {
+        this.innerHTML = '<i class="bi bi-check-lg me-1"></i>Apply';
+      }
+    });
+  });
+
+  function applyVoucherDiscount(voucher, discount) {
+    // Get current subtotal
+    originalSubtotal = parseFloat(document.getElementById('modalSubtotal').textContent.replace(/[^\d]/g, ''));
+    
+    // Show discount row
+    document.getElementById('discountRow').classList.remove('d-none');
+    document.getElementById('appliedVoucherName').textContent = voucher.reward_name;
+    document.getElementById('discountAmount').textContent = '- UGX ' + discount.toLocaleString();
+    
+    // Update grand total
+    const newTotal = originalSubtotal - discount;
+    document.getElementById('modalGrandTotal').textContent = 'UGX ' + newTotal.toLocaleString();
+  }
+
+  function removeVoucher() {
+    appliedVoucher = null;
+    
+    // Hide discount row
+    document.getElementById('discountRow').classList.add('d-none');
+    
+    // Reset totals
+    document.getElementById('modalGrandTotal').textContent = document.getElementById('modalSubtotal').textContent;
+    
+    // Reset voucher input
+    document.getElementById('voucherCode').disabled = false;
+    document.getElementById('voucherCode').value = '';
+    
+    // Reset button
+    const applyBtn = document.getElementById('applyVoucherBtn');
+    applyBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Apply';
+    applyBtn.className = 'btn btn-outline-success';
+    
+    // Remove the remove button
+    const removeBtn = applyBtn.parentNode.querySelector('.btn-outline-danger');
+    if (removeBtn) removeBtn.remove();
+    
+    // Clear result message
+    document.getElementById('voucherResult').innerHTML = '';
+  }
 </script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
