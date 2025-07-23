@@ -9,6 +9,7 @@ use App\Models\RetailerInventory;
 use App\Models\InventoryMovement;
 use App\Services\EcoPointService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CustomerOrderController extends Controller
 {
@@ -110,7 +111,7 @@ class CustomerOrderController extends Controller
             $ecoPointService->awardOrderPoints($order);
         } catch (\Exception $e) {
             // Log the error but don't fail the order approval
-            \Log::error('Failed to award eco points for order ' . $order->id . ': ' . $e->getMessage());
+            Log::error('Failed to award eco points for order ' . $order->id . ': ' . $e->getMessage());
         }
 
         // Handle AJAX requests
