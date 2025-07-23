@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\EcoPointTransaction;
 use App\Services\EcoPointService;
+use Illuminate\Support\Facades\Auth;
 
 class EcoPointController extends Controller
 {
@@ -67,7 +68,7 @@ class EcoPointController extends Controller
             $request->points,
             'manual',
             $request->description,
-            ['awarded_by' => auth()->id()]
+            ['awarded_by' => Auth::id()]
         );
 
         return redirect()->route('admin.eco-points.index')
@@ -93,7 +94,7 @@ class EcoPointController extends Controller
                 $request->points,
                 'manual_deduction',
                 $request->description,
-                ['deducted_by' => auth()->id()]
+                ['deducted_by' => auth::id()]
             );
 
             return redirect()->route('admin.eco-points.index')

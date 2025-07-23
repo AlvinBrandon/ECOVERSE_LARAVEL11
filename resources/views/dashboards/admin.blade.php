@@ -682,7 +682,7 @@
             <div class="action-description">Remove items from inventory</div>
           </a>
           
-          <a href="{{ route('register') }}" class="action-card">
+          <a href="{{ route('admin.users.create') }}" class="action-card">
             <div class="action-icon">
               <i class="bi bi-person-plus"></i>
             </div>

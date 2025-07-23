@@ -8,8 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Support\Facades\Cache;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -96,8 +97,8 @@ class User extends Authenticatable
     {
         $this->refresh();
         // Clear any role-based cache
-        \Cache::forget("user_role_{$this->id}");
-        \Cache::forget("user_permissions_{$this->id}");
+        Cache::forget("user_role_{$this->id}");
+        Cache::forget("user_permissions_{$this->id}");
         return $this;
     }
 
