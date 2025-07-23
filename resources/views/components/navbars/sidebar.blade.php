@@ -297,7 +297,7 @@
         <div class="nav-section">
             <div class="nav-section-title">Administration</div>
             <div class="nav-item">
-                <a href="{{ route('admin.users.index') }}" class="nav-link {{ $activePage == 'admin-users' ? 'active' : '' }}">
+                <a href="{{ route('admin.users') }}" class="nav-link {{ $activePage == 'admin-users' ? 'active' : '' }}">
                     <div class="nav-icon">
                         <i class="bi bi-people"></i>
                     </div>

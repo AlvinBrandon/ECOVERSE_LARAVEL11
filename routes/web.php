@@ -165,25 +165,6 @@ Route::get('sign-up', [RegisterController::class, 'create'])->middleware('guest'
 Route::post('sign-up', [RegisterController::class, 'store'])->middleware('guest');
 Route::get('sign-in', [SessionsController::class, 'create'])->middleware('guest')->name('login');
 
-// Email Verification Routes
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (\Illuminate\Foundation\Auth\EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/dashboard')->with('success', 'Email verified successfully!');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
-    try {
-        $request->user()->sendEmailVerificationNotification();
-        return back()->with('success', 'Verification link sent!');
-    } catch (\Exception $e) {
-        return back()->with('error', 'Unable to send verification email. Please contact an administrator for manual verification.');
-    }
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
 Route::post('sign-in', function (\Illuminate\Http\Request $request) {
     $response = app(App\Http\Controllers\SessionsController::class)->store($request);
     // After login, redirect to dashboard for all roles
@@ -235,7 +216,7 @@ Route::group(['middleware' => 'auth'], function () {
         return view('pages.static-sign-up');
     })->name('static-sign-up');
     Route::get('user-management', function () {
-        return redirect()->route('admin.users.index');
+        return redirect()->route('admin.users');
     })->name('user-management');
     Route::get('user-profile', function () {
         return view('pages.laravel-examples.user-profile');
@@ -290,10 +271,6 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
         'update' => 'admin.users.update',
         'destroy' => 'admin.users.destroy',
     ]);
-    
-    // Email verification management routes
-    Route::post('/users/{user}/verify-email', [App\Http\Controllers\AdminUserController::class, 'verifyEmail'])->name('admin.users.verify-email');
-    Route::post('/users/{user}/send-verification-email', [App\Http\Controllers\AdminUserController::class, 'sendVerificationEmail'])->name('admin.users.send-verification-email');
 });
 
 // Supplier routes for purchase orders
@@ -344,7 +321,7 @@ Route::get('/order/confirmation', [App\Http\Controllers\CartController::class, '
 Route::post('/help/request', [App\Http\Controllers\HelpController::class, 'request'])->name('help.request');
 
 // Eco-Points Redemption System Routes
-Route::middleware(['auth', 'verified'])->prefix('eco-points')->name('eco-points.')->group(function () {
+Route::middleware(['auth'])->prefix('eco-points')->name('eco-points.')->group(function () {
     Route::get('/rewards', [EcoPointController::class, 'rewards'])->name('rewards');
     Route::get('/history', [EcoPointController::class, 'history'])->name('history');
     Route::post('/redeem/{reward}', [EcoPointController::class, 'redeem'])->name('redeem');
@@ -353,7 +330,7 @@ Route::middleware(['auth', 'verified'])->prefix('eco-points')->name('eco-points.
 });
 
 // Voucher validation for checkout process
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/voucher/validate', [EcoPointController::class, 'validateVoucher'])->name('voucher.validate');
 });
 
