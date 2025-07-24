@@ -214,6 +214,16 @@
     color: #166534;
   }
 
+  .status-badge.dispatched {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-badge.delivered {
+    background: #f0f9ff;
+    color: #0369a1;
+  }
+
   .status-badge.rejected {
     background: #fee2e2;
     color: #991b1b;
@@ -397,6 +407,12 @@
           <button class="btn filter-btn" data-status="approved" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white;">
             <i class="bi bi-check-circle me-1"></i>Approved
           </button>
+          <button class="btn filter-btn" data-status="dispatched" style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white;">
+            <i class="bi bi-truck me-1"></i>Dispatched
+          </button>
+          <button class="btn filter-btn" data-status="delivered" style="background: linear-gradient(135deg, #0369a1 0%, #075985 100%); color: white;">
+            <i class="bi bi-box-check me-1"></i>Delivered
+          </button>
           <button class="btn filter-btn" data-status="rejected" style="border: 1px solid #6c757d; color: #6c757d; background: white;">
             <i class="bi bi-x-circle me-1"></i>Rejected
           </button>
@@ -476,6 +492,14 @@
                     <span class="status-badge approved">
                       <i class="bi bi-check-circle me-1"></i>Approved
                     </span>
+                  @elseif($order->status === 'dispatched')
+                    <span class="status-badge dispatched">
+                      <i class="bi bi-truck me-1"></i>Dispatched
+                    </span>
+                  @elseif($order->status === 'delivered')
+                    <span class="status-badge delivered">
+                      <i class="bi bi-box-check me-1"></i>Delivered
+                    </span>
                   @elseif($order->status === 'rejected')
                     <span class="status-badge rejected">
                       <i class="bi bi-x-circle me-1"></i>Rejected
@@ -497,6 +521,24 @@
                       <button class="btn btn-action btn-outline-danger" onclick="rejectOrder({{ $order->id }})">
                         <i class="bi bi-x me-1"></i>Reject
                       </button>
+                    @elseif($order->status === 'approved')
+                      <button class="btn btn-action" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white;" onclick="dispatchOrder({{ $order->id }})">
+                        <i class="bi bi-truck me-1"></i>Dispatch
+                      </button>
+                      <button class="btn btn-action" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;" onclick="markAsDelivered({{ $order->id }})">
+                        <i class="bi bi-check-circle me-1"></i>Mark Delivered
+                      </button>
+                    @elseif($order->status === 'dispatched')
+                      <button class="btn btn-action" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;" onclick="markAsDelivered({{ $order->id }})">
+                        <i class="bi bi-check-circle me-1"></i>Mark Delivered
+                      </button>
+                      <span class="badge bg-info">
+                        <i class="bi bi-truck me-1"></i>In Transit
+                      </span>
+                    @elseif($order->status === 'delivered')
+                      <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>Delivered
+                      </span>
                     @endif
                     <button class="btn btn-action btn-outline-info" onclick="viewOrderDetails({{ $order->id }})">
                       <i class="bi bi-eye me-1"></i>View
@@ -570,7 +612,7 @@ function approveOrder(orderId) {
             if(data.success) {
                 location.reload();
             } else {
-                alert('Error approving order');
+                alert('Error approving order: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
@@ -607,6 +649,59 @@ function rejectOrder(orderId) {
 function viewOrderDetails(orderId) {
     // Redirect to order details page
     window.location.href = `/orders/${orderId}`;
+}
+
+function dispatchOrder(orderId) {
+    if(confirm('Are you sure you want to dispatch this order?')) {
+        fetch(`/retailer/customer-orders/${orderId}/dispatch`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                location.reload();
+            } else {
+                alert('Error dispatching order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error dispatching order');
+        });
+    }
+}
+
+function markAsDelivered(orderId) {
+    const deliveryNotes = prompt('Please enter delivery notes (optional):');
+    
+    if(deliveryNotes !== null) { // User didn't cancel
+        fetch(`/retailer/customer-orders/${orderId}/mark-delivered`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                delivery_notes: deliveryNotes
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                location.reload();
+            } else {
+                alert('Error marking order as delivered: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error marking order as delivered');
+        });
+    }
 }
 
 function refreshOrders() {

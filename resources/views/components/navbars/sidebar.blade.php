@@ -368,6 +368,18 @@
                     <span class="nav-text">Sales</span>
                 </a>
             </div>
+            
+            <!-- Customer Management - Only for Retailers -->
+            @if(auth()->check() && auth()->user()->role === 'retailer')
+            <div class="nav-item">
+                <a href="{{ route('customers.index') }}" class="nav-link {{ $activePage == 'customers' ? 'active' : '' }}">
+                    <div class="nav-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <span class="nav-text">Customer Management</span>
+                </a>
+            </div>
+            @endif
         </div>
         @endif
 

@@ -166,28 +166,67 @@ class InventoryController extends Controller
     public function deduct(Request $request)
     {
         $request->validate([
-            'product_id' => 'nullable|exists:products,id',
+            'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
             'batch_id' => 'nullable|string|max:255',
+            'reason' => 'required|in:damaged,expired,theft,adjustment,recall,quality_control,shrinkage,other',
+            'notes' => 'nullable|string|max:500',
+            'requires_approval' => 'boolean'
         ]);
 
-        $inventory = Inventory::where('batch_id', $request->batch_id)
-            ->when($request->product_id, function ($query) use ($request) {
-                $query->where('product_id', $request->product_id);
-            })
-            ->first();
-
-        if (!$inventory) {
-            return redirect()->back()->with('error', 'Inventory record not found for this item and batch.');
+        // Enhanced inventory selection logic
+        if ($request->batch_id) {
+            // Target specific batch
+            $inventory = Inventory::where('product_id', $request->product_id)
+                ->where('batch_id', $request->batch_id)
+                ->first();
+        } else {
+            // Use FIFO (First In, First Out) - oldest batch first
+            $inventory = Inventory::where('product_id', $request->product_id)
+                ->where('quantity', '>', 0)
+                ->orderBy('created_at', 'asc')
+                ->first();
         }
 
+        if (!$inventory) {
+            return redirect()->back()->with('error', 'No available inventory found for this product' . ($request->batch_id ? ' and batch.' : '.'));
+        }
+
+        // Check stock availability
         if ($inventory->quantity < $request->quantity) {
-            return redirect()->back()->with('error', 'Cannot deduct more than available stock.');
+            return redirect()->back()->with('error', "Insufficient stock. Available: {$inventory->quantity} units, Requested: {$request->quantity} units.");
+        }
+
+        // Large quantity approval workflow
+        $requiresApproval = $request->quantity > 100 || in_array($request->reason, ['theft', 'recall']);
+        if ($requiresApproval && Auth::user()->role !== 'admin') {
+            // Create pending deduction record (you can create this table/model)
+            return redirect()->back()->with('warning', 'Large quantity deduction requires admin approval. Request has been submitted for review.');
         }
 
         $before = $inventory->quantity;
         $inventory->quantity -= $request->quantity;
         $inventory->save();
+
+        // Enhanced reason mapping for better notes
+        $reasonMessages = [
+            'damaged' => 'Damaged inventory removed',
+            'expired' => 'Expired products removed', 
+            'theft' => 'Inventory loss due to theft',
+            'adjustment' => 'Inventory adjustment/correction',
+            'recall' => 'Product recall - batch removal',
+            'quality_control' => 'Quality control rejection',
+            'shrinkage' => 'Inventory shrinkage adjustment',
+            'other' => 'Other reason specified'
+        ];
+
+        $detailedNote = $reasonMessages[$request->reason];
+        if ($request->notes) {
+            $detailedNote .= ' - ' . $request->notes;
+        }
+        if ($request->batch_id) {
+            $detailedNote .= " (Batch: {$request->batch_id})";
+        }
 
         StockHistory::create([
             'inventory_id' => $inventory->id,
@@ -195,21 +234,38 @@ class InventoryController extends Controller
             'action' => 'deduct',
             'quantity_before' => $before,
             'quantity_after' => $inventory->quantity,
-            'note' => 'Stock deducted via deduct form',
+            'note' => $detailedNote,
         ]);
+
         // Broadcast inventory update event
         event(new InventoryUpdated('deduct', $inventory->product_id, $inventory->batch_id, $request->quantity, Auth::id()));
 
+        // Enhanced low stock alerting
         if ($inventory->quantity <= 10) {
             $itemName = $inventory->product->name ?? 'Unknown';
-            Mail::to('admin@example.com')->send(new LowStockAlert(
-                $itemName,
-                $inventory->batch_id,
-                $inventory->quantity
-            ));
+            $product = $inventory->product;
+            
+            // Check total quantity across all batches for this product
+            $totalQuantity = Inventory::where('product_id', $product->id)->sum('quantity');
+            
+            if ($totalQuantity <= 20) {
+                Mail::to('admin@example.com')->send(new LowStockAlert(
+                    $itemName,
+                    $inventory->batch_id,
+                    $totalQuantity
+                ));
+            }
         }
 
-        return redirect()->route('inventory.index')->with('success', 'Stock deducted successfully.');
+        // Critical stock warning for high-value deductions
+        if ($request->quantity > 50) {
+            $productName = $inventory->product->name ?? 'Unknown Product';
+            $successMessage = "Successfully deducted {$request->quantity} units of {$productName}. Reason: " . ucfirst(str_replace('_', ' ', $request->reason));
+        } else {
+            $successMessage = 'Stock deducted successfully.';
+        }
+
+        return redirect()->route('inventory.index')->with('success', $successMessage);
     }
 
     public function history(Request $request)

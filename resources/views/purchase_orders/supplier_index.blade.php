@@ -260,6 +260,21 @@
     color: #059669;
   }
 
+  /* Price per unit styling */
+  .price-per-unit {
+    font-family: 'JetBrains Mono', monospace;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  /* Total price styling */
+  .total-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #374151;
+    font-size: 1rem;
+  }
+
   /* Quantity styling */
   .quantity {
     font-weight: 600;
@@ -339,6 +354,7 @@
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <div class="container">
   <!-- Page Header -->
@@ -366,8 +382,9 @@
             <tr>
               <th><i class="bi bi-hash me-2"></i>ID</th>
               <th><i class="bi bi-box me-2"></i>Material</th>
-              <th><i class="bi bi-123 me-2"></i>Quantity</th>
-              <th><i class="bi bi-currency-exchange me-2"></i>Price (UGX)</th>
+              <th><i class="bi bi-123 me-2"></i>Quantity (kg)</th>
+              <th><i class="bi bi-currency-exchange me-2"></i>Price per Unit (UGX/kg)</th>
+              <th><i class="bi bi-calculator me-2"></i>Total Price (UGX)</th>
               <th><i class="bi bi-info-circle me-2"></i>Status</th>
               <th><i class="bi bi-file-earmark-text me-2"></i>Invoice</th>
               <th><i class="bi bi-gear me-2"></i>Action</th>
@@ -378,8 +395,16 @@
               <tr>
                 <td><span class="order-id">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span></td>
                 <td><span class="material-name">{{ $order->rawMaterial->name ?? 'N/A' }}</span></td>
-                <td><span class="quantity">{{ $order->quantity }}</span></td>
-                <td><span class="price">UGX {{ number_format($order->price) }}</span></td>
+                <td>
+                  <span class="quantity">{{ number_format($order->quantity, 2) }}</span>
+                  <span class="text-muted" style="font-size: 0.8rem; font-weight: 400;">kg</span>
+                </td>
+                <td>
+                  <span class="price-per-unit">UGX {{ number_format($order->price, 2) }}/kg</span>
+                </td>
+                <td>
+                  <span class="total-price">UGX {{ number_format($order->quantity * $order->price, 2) }}</span>
+                </td>
                 <td>
                   <span class="badge bg-{{ $order->status == 'pending' ? 'secondary' : ($order->status == 'delivered' ? 'info' : ($order->status == 'complete' ? 'success' : 'dark')) }}">
                     {{ ucfirst($order->status) }}
@@ -414,7 +439,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="7" class="empty-state">
+                <td colspan="8" class="empty-state">
                   <i class="bi bi-inbox"></i>
                   <h5>No purchase orders found</h5>
                   <p>You don't have any purchase orders assigned yet.</p>

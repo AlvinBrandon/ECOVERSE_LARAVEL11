@@ -323,9 +323,15 @@
     @endauth
 
     @auth
-        <main class="py-4 main-content" style="margin-left: 280px; transition: all 0.3s ease;">
-            @yield('content')
-        </main>
+        @if(request()->routeIs('dashboard') && auth()->user()->role_as == 1)
+            <main class="main-content" style="margin-left: 280px; padding: 0; width: calc(100vw - 280px); min-height: calc(100vh - 120px); transition: all 0.3s ease;">
+                @yield('content')
+            </main>
+        @else
+            <main class="py-4 main-content" style="margin-left: 280px; transition: all 0.3s ease;">
+                @yield('content')
+            </main>
+        @endif
     @else
         <main class="py-4 main-content">
             @yield('content')

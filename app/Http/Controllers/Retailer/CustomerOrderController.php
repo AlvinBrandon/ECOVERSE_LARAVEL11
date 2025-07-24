@@ -14,15 +14,17 @@ use Illuminate\Support\Facades\Log;
 class CustomerOrderController extends Controller
 {
     /**
-     * Display pending customer orders for retailer verification
+     * Display customer orders for retailer management
      */
     public function index()
     {
         $retailer = Auth::user();
         
-        // Retailers should only see orders for products they have in inventory
-        $customerOrders = Order::with(['user', 'product'])
-            ->where('status', 'pending')
+        // Get filter status from request
+        $statusFilter = request('status', 'all');
+        
+        // Retailers should see orders for products they have in inventory
+        $query = Order::with(['user', 'product'])
             ->whereHas('user', function($query) {
                 $query->where('role', 'customer')
                       ->orWhere('role_as', 0);
@@ -32,17 +34,21 @@ class CustomerOrderController extends Controller
                 $query->whereIn('id', function($subQuery) use ($retailer) {
                     $subQuery->select('product_id')
                         ->from('inventories')
-                        ->where('owner_id', $retailer->id)
-                        ->where('quantity', '>', 0);
+                        ->where('owner_id', $retailer->id);
                 });
-            })
-            ->latest()
-            ->paginate(15); // Add pagination with 15 items per page
+            });
+
+        // Apply status filter
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        $customerOrders = $query->latest()->paginate(15); // Add pagination with 15 items per page
 
         // Also provide non-paginated collection for compatibility
         $orders = $customerOrders->getCollection();
 
-        return view('retailer.customer-orders', compact('orders', 'customerOrders'));
+        return view('retailer.customer-orders', compact('orders', 'customerOrders', 'statusFilter'));
     }
 
     /**
@@ -205,5 +211,72 @@ class CustomerOrderController extends Controller
         }
 
         return back()->with('success', "Successfully verified {$verifiedCount} customer orders.");
+    }
+
+    /**
+     * Mark order as dispatched
+     */
+    public function dispatch($id)
+    {
+        $retailer = Auth::user();
+        $order = Order::findOrFail($id);
+        
+        // Ensure this is an approved customer order
+        if (!$order->user || ($order->user->role !== 'customer' && $order->user->role_as !== 0)) {
+            return back()->with('error', 'You can only dispatch customer orders.');
+        }
+        
+        if ($order->status !== 'approved') {
+            return back()->with('error', 'Order must be approved before it can be dispatched.');
+        }
+
+        $order->status = 'dispatched';
+        $order->delivery_status = 'dispatched';
+        $order->tracking_code = request('tracking_code');
+        $order->dispatch_log = request('dispatch_log', 'Order dispatched by retailer');
+        $order->dispatched_at = now();
+        $order->save();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Order marked as dispatched successfully!'
+            ]);
+        }
+
+        return back()->with('success', 'Order marked as dispatched successfully!');
+    }
+
+    /**
+     * Mark order as delivered
+     */
+    public function markDelivered($id)
+    {
+        $retailer = Auth::user();
+        $order = Order::findOrFail($id);
+        
+        // Ensure this is a dispatched customer order
+        if (!$order->user || ($order->user->role !== 'customer' && $order->user->role_as !== 0)) {
+            return back()->with('error', 'You can only mark customer orders as delivered.');
+        }
+        
+        if (!in_array($order->status, ['approved', 'dispatched'])) {
+            return back()->with('error', 'Order must be approved or dispatched before it can be marked as delivered.');
+        }
+
+        $order->status = 'delivered';
+        $order->delivery_status = 'delivered';
+        $order->delivered_at = now();
+        $order->delivery_notes = request('delivery_notes', 'Order delivered to customer');
+        $order->save();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Order marked as delivered successfully!'
+            ]);
+        }
+
+        return back()->with('success', 'Order marked as delivered successfully!');
     }
 }

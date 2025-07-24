@@ -60,6 +60,8 @@ Route::middleware(['auth', 'role:retailer,2'])->group(function () {
     Route::post('/retailer/customer-orders/verify/{order}', [RetailerCustomerOrderController::class, 'verify'])->name('retailer.customer-orders.verify');
     Route::post('/retailer/customer-orders/reject/{order}', [RetailerCustomerOrderController::class, 'reject'])->name('retailer.customer-orders.reject');
     Route::post('/retailer/customer-orders/bulk-verify', [RetailerCustomerOrderController::class, 'bulkVerify'])->name('retailer.customer-orders.bulk-verify');
+    Route::post('/retailer/customer-orders/dispatch/{order}', [RetailerCustomerOrderController::class, 'dispatch'])->name('retailer.customer-orders.dispatch');
+    Route::post('/retailer/customer-orders/mark-delivered/{order}', [RetailerCustomerOrderController::class, 'markDelivered'])->name('retailer.customer-orders.mark-delivered');
 });
 
 // Retailer order management routes (legacy)
@@ -130,10 +132,15 @@ Route::middleware(['auth', 'role:admin,staff,retailer,wholesaler,customer'])->gr
 
 Route::middleware(['auth', 'role:admin'])->get('/admin/sales-report', [SalesController::class, 'report'])->name('admin.sales.report');
 
-
+// Stock transfer for admin/staff only
 Route::middleware(['auth', 'role:admin,staff'])->group(function () {
     Route::get('/stock-transfer', [StockTransferController::class, 'create'])->name('stock_transfer.create');
     Route::post('/stock-transfer', [StockTransferController::class, 'store'])->name('stock_transfer.store');
+});
+
+// Customer management - Only for retailers (since customers buy from retailers)
+Route::middleware(['auth', 'role:retailer'])->group(function () {
+    Route::get('/customers/analytics', [CustomerController::class, 'analytics'])->name('customers.analytics');
     Route::resource('customers', CustomerController::class);
 });
 

@@ -3,6 +3,7 @@
 @section('content')
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 body, .main-content, .container-fluid, .container {
     background-color: #f8fafc !important;
@@ -81,6 +82,48 @@ body, .main-content, .container-fluid, .container {
 
 .table tbody tr:hover {
     background-color: #f8fafc;
+}
+
+/* Highlight total price column */
+.total-price-column {
+    background-color: white !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.total-price-header {
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0) !important;
+    color: #1e293b !important;
+}
+
+.quantity-unit {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.price-per-unit {
+    font-family: 'JetBrains Mono', monospace;
+    color: #374151;
+}
+
+.total-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    font-size: 1.1rem;
+}
+
+/* Summary row styling */
+.table-summary {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    border-top: 3px solid #e2e8f0 !important;
+    font-weight: 600;
+}
+
+.table-summary td {
+    padding: 1.25rem 1rem !important;
+    border-color: #e2e8f0 !important;
 }
 
 .badge {
@@ -189,8 +232,9 @@ a:hover {
               <th>ID</th>
               <th>Supplier</th>
               <th>Material</th>
-              <th>Quantity</th>
-              <th>Price (UGX)</th>
+              <th>Quantity (kg)</th>
+              <th>Price per Unit (UGX/kg)</th>
+              <th class="total-price-header">Total Price (UGX)</th>
               <th>Status</th>
               <th>Invoice</th>
               <th>Actions</th>
@@ -202,8 +246,14 @@ a:hover {
                 <td>{{ $order->id }}</td>
                 <td>{{ $order->supplier->name ?? 'N/A' }}</td>
                 <td>{{ $order->rawMaterial->name ?? 'N/A' }}</td>
-                <td>{{ $order->quantity }}</td>
-                <td>UGX {{ number_format($order->price) }}</td>
+                <td>
+                  <span class="fw-bold">{{ number_format($order->quantity, 2) }}</span>
+                  <span class="quantity-unit">kg</span>
+                </td>
+                <td class="price-per-unit">UGX {{ number_format($order->price, 2) }}/kg</td>
+                <td class="total-price-column">
+                  <span class="total-price">UGX {{ number_format($order->quantity * $order->price, 2) }}</span>
+                </td>
                 <td><span class="badge bg-{{ $order->status == 'pending' ? 'secondary' : ($order->status == 'delivered' ? 'info' : ($order->status == 'complete' ? 'success' : 'dark')) }}">{{ ucfirst($order->status) }}</span></td>
                 <td>
                   @if($order->invoice_path)
@@ -230,6 +280,22 @@ a:hover {
                 </td>
               </tr>
             @endforeach
+            
+            <!-- Summary Row -->
+            @if($orders->count() > 0)
+              <tr class="table-summary">
+                <td colspan="3" class="text-end fw-bold">TOTALS:</td>
+                <td class="fw-bold">
+                  <span class="total-price">{{ number_format($orders->sum('quantity'), 2) }}</span>
+                  <span class="quantity-unit">kg</span>
+                </td>
+                <td class="text-muted">-</td>
+                <td class="total-price-column">
+                  <span class="total-price">UGX {{ number_format($orders->sum(function($order) { return $order->quantity * $order->price; }), 2) }}</span>
+                </td>
+                <td colspan="3" class="text-muted">{{ $orders->count() }} orders</td>
+              </tr>
+            @endif
           </tbody>
         </table>
       </div>
