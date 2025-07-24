@@ -11,17 +11,19 @@
             <!-- Search Bar -->
             <form action="{{ route('products.index') }}" method="GET" class="flex-grow-1 mx-3" style="max-width: 500px;">
                 <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search"></i></span>
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="form-control border-start-0" placeholder="Search products, brands and categories" aria-label="Search">
                     <button class="btn btn-primary px-4" type="submit">Search</button>
                 </div>
             </form>
             <!-- User, Help, Cart -->
             <div class="d-flex align-items-center ms-3">
-                <span class="me-4"><i class="fas fa-user me-1"></i> Hi, {{ auth()->user()->name ?? 'Customer' }}</span>
-                <a href="#" class="text-decoration-none text-dark me-4" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fas fa-question-circle fa-lg"></i></a>
+                <span class="me-4"><i class="bi bi-person-circle me-1"></i> Hi, {{ auth()->user()->name ?? 'Customer' }}</span>
+                <a href="#" class="text-decoration-none text-dark me-4" title="Help" data-bs-toggle="modal" data-bs-target="#helpModal">
+                    <i class="bi bi-question-circle-fill" style="font-size: 1.2rem;"></i>
+                </a>
                 <a href="{{ route('cart.index') }}" class="text-decoration-none text-dark position-relative" title="Cart">
-                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <i class="bi bi-cart-fill" style="font-size: 1.2rem;"></i>
                     @php $cartCount = session('cart') ? count(session('cart')) : 0; @endphp
                     @if($cartCount > 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">{{ $cartCount }}</span>
@@ -44,47 +46,15 @@
             <form method="POST" action="{{ route('logout') }}" class="d-none" id="logout-form">
                 @csrf
             </form>
-            <ul class="navbar-nav  justify-content-end">
-                <li class="nav-item d-flex align-items-center">
-                    <!-- Chat notification icon -->
-                    <a href="{{ route('chat.history') }}" class="nav-link position-relative px-2" id="chat-navbar-link"
-                        title="Open Chat" style="display:inline-block;">
-                        <span style="position:relative;display:inline-block;">
-                            <img id="chat-navbar-notification-icon" src="{{ asset('images/chat-notification.svg') }}" width="28"
-                                height="28" alt="Chat Notification">
-                            <sup id="chat-navbar-notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
-                                style="font-size:0.8rem;z-index:2;min-width:1.5em;line-height:1.2;">0</sup>
-                        </span>
-                    </a>
-                    <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
-                        <i class="fa fa-user me-sm-1"></i>
-                        <span class="d-sm-inline d-none"
-                            onclick="event.preventDefault();document.getElementById('logout-form').submit();">Sign
-                            Out</span>
-                    </a>
-                </li>
-                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                    <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
-                        <div class="sidenav-toggler-inner">
-                            <i class="sidenav-toggler-line"></i>
-                            <i class="sidenav-toggler-line"></i>
-                            <i class="sidenav-toggler-line"></i>
-                        </div>
-                    </a>
-                </li>
-                <li class="nav-item px-3 d-flex align-items-center">
-                    <a href="javascript:;" class="nav-link text-body p-0">
-                        <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
-                    </a>
-                </li>
-                
-                <!-- Chat Notification Icon -->
+            <ul class="navbar-nav justify-content-end">
+                <!-- Chat Notification Bell Icon (Golden Bell) -->
                 <li class="nav-item dropdown pe-2 d-flex align-items-center">
                     <a href="javascript:;" class="nav-link text-body p-0 position-relative" id="chatMenuButton"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-comments cursor-pointer"></i>
+                        data-bs-toggle="dropdown" aria-expanded="false" title="Chat Notifications">
+                        <i class="bi bi-bell-fill cursor-pointer notification-bell-icon" 
+                           style="font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); transition: all 0.3s ease;"></i>
                         @if(auth()->check() && auth()->user()->hasUnreadMessages())
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span class="position-absolute notification-badge">
                                 {{ auth()->user()->unreadMessagesCount() }}
                                 <span class="visually-hidden">unread messages</span>
                             </span>
@@ -96,7 +66,7 @@
                                 <div class="d-flex py-1">
                                     <div class="d-flex flex-column justify-content-center">
                                         <h6 class="text-sm font-weight-normal mb-1">
-                                            <span class="font-weight-bold">Chat Dashboard</span>
+                                            <span class="font-weight-bold">💬 Chat Dashboard</span>
                                         </h6>
                                         <p class="text-xs text-secondary mb-0">
                                             View all your chat conversations
@@ -110,7 +80,7 @@
                                 <div class="d-flex py-1">
                                     <div class="d-flex flex-column justify-content-center">
                                         <h6 class="text-sm font-weight-normal mb-1">
-                                            <span class="font-weight-bold">Start New Chat</span>
+                                            <span class="font-weight-bold">✨ Start New Chat</span>
                                         </h6>
                                         <p class="text-xs text-secondary mb-0">
                                             Create a new conversation
@@ -133,7 +103,7 @@
                             
                             @if($recentChats->isNotEmpty())
                                 <li><hr class="dropdown-divider"></li>
-                                <li class="dropdown-header">Recent Chats</li>
+                                <li class="dropdown-header">🔔 Recent Chats</li>
                                 
                                 @foreach($recentChats as $room)
                                     <li>
@@ -170,89 +140,32 @@
                         @endif
                     </ul>
                 </li>
-                
-                <li class="nav-item dropdown pe-2 d-flex align-items-center">
-                    <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-bell cursor-pointer"></i>
+
+                <!-- Settings Icon -->
+                <li class="nav-item px-3 d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-body p-0" title="Settings">
+                        <i class="bi bi-gear-fill fixed-plugin-button-nav cursor-pointer" style="font-size: 1.3rem; color: #6c757d;"></i>
                     </a>
-                    <ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4"
-                        aria-labelledby="dropdownMenuButton">
-                        <li class="mb-2">
-                            <a class="dropdown-item border-radius-md" href="javascript:;">
-                                <div class="d-flex py-1">
-                                    <div class="my-auto">
-                                        <img src="{{ asset('assets') }}/img/team-2.jpg" class="avatar avatar-sm  me-3 ">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <h6 class="text-sm font-weight-normal mb-1">
-                                            <span class="font-weight-bold">New message</span> from Laur
-                                        </h6>
-                                        <p class="text-xs text-secondary mb-0">
-                                            <i class="fa fa-clock me-1"></i>
-                                            13 minutes ago
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a class="dropdown-item border-radius-md" href="javascript:;">
-                                <div class="d-flex py-1">
-                                    <div class="my-auto">
-                                        <img src="{{ asset('assets') }}/img/small-logos/logo-spotify.svg"
-                                            class="avatar avatar-sm bg-gradient-dark  me-3 ">
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <h6 class="text-sm font-weight-normal mb-1">
-                                            <span class="font-weight-bold">New album</span> by Travis Scott
-                                        </h6>
-                                        <p class="text-xs text-secondary mb-0">
-                                            <i class="fa fa-clock me-1"></i>
-                                            1 day
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item border-radius-md" href="javascript:;">
-                                <div class="d-flex py-1">
-                                    <div class="avatar avatar-sm bg-gradient-secondary  me-3  my-auto">
-                                        <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            xmlns:xlink="http://www.w3.org/1999/xlink">
-                                            <title>credit-card</title>
-                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                <g transform="translate(-2169.000000, -745.000000)" fill="#FFFFFF"
-                                                    fill-rule="nonzero">
-                                                    <g transform="translate(1716.000000, 291.000000)">
-                                                        <g transform="translate(453.000000, 454.000000)">
-                                                            <path class="color-background"
-                                                                d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z"
-                                                                opacity="0.593633743"></path>
-                                                            <path class="color-background"
-                                                                d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z">
-                                                            </path>
-                                                        </g>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <h6 class="text-sm font-weight-normal mb-1">
-                                            Payment successfully completed
-                                        </h6>
-                                        <p class="text-xs text-secondary mb-0">
-                                            <i class="fa fa-clock me-1"></i>
-                                            2 days
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
+                </li>
+
+                <!-- User Profile and Logout -->
+                <li class="nav-item d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-body font-weight-bold px-2" title="Sign Out">
+                        <i class="bi bi-person-circle me-sm-1" style="font-size: 1.3rem; color: #6c757d;"></i>
+                        <span class="d-sm-inline d-none"
+                            onclick="event.preventDefault();document.getElementById('logout-form').submit();">Sign Out</span>
+                    </a>
+                </li>
+
+                <!-- Mobile Sidebar Toggle -->
+                <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                    <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav" title="Toggle Sidebar">
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                        </div>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -261,21 +174,189 @@
 
 @push('scripts')
 <script>
-// Update chat notification badge in navbar
+// Enhanced golden bell notification management
 function updateChatNavbarNotification(count) {
-    const badge = document.getElementById('chat-navbar-notification-badge');
-    const icon = document.getElementById('chat-navbar-notification-icon');
-    if (badge && icon) {
+    const badge = document.querySelector('#chatMenuButton .notification-badge');
+    const bellIcon = document.querySelector('#chatMenuButton .notification-bell-icon');
+    
+    if (bellIcon) {
         if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('d-none');
-            icon.style.filter = 'drop-shadow(0 0 8px #dc3545)';
+            // Show/update badge
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = 'flex';
+            } else {
+                // Create new badge if it doesn't exist
+                const newBadge = document.createElement('span');
+                newBadge.className = 'notification-badge';
+                newBadge.textContent = count;
+                
+                const hiddenText = document.createElement('span');
+                hiddenText.className = 'visually-hidden';
+                hiddenText.textContent = 'unread messages';
+                newBadge.appendChild(hiddenText);
+                
+                document.getElementById('chatMenuButton').appendChild(newBadge);
+            }
+            
+            // Add glowing effect to bell
+            bellIcon.classList.add('has-notifications');
+            
+            // Ring the bell animation
+            bellIcon.classList.add('bell-ringing');
+            setTimeout(() => {
+                bellIcon.classList.remove('bell-ringing');
+            }, 800);
+            
         } else {
-            badge.classList.add('d-none');
-            icon.style.filter = '';
+            // Hide badge
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            // Remove glow effect
+            bellIcon.classList.remove('has-notifications');
         }
     }
 }
-// Example: Call updateChatNavbarNotification(unreadCount) from your polling JS when new messages arrive
+
+// Enhanced bell hover and click effects
+document.addEventListener('DOMContentLoaded', function() {
+    const bellIcon = document.querySelector('#chatMenuButton .notification-bell-icon');
+    const chatMenuButton = document.getElementById('chatMenuButton');
+    
+    if (bellIcon && chatMenuButton) {
+        // Click effect - ring the bell
+        chatMenuButton.addEventListener('click', function() {
+            bellIcon.classList.add('bell-ringing');
+            setTimeout(() => {
+                bellIcon.classList.remove('bell-ringing');
+            }, 800);
+        });
+        
+        // Check if we have notifications on page load
+        const existingBadge = document.querySelector('#chatMenuButton .notification-badge');
+        if (existingBadge && existingBadge.textContent.trim() && existingBadge.textContent.trim() !== '0') {
+            bellIcon.classList.add('has-notifications');
+        }
+    }
+});
+
+// Legacy function support for backward compatibility
+function updateChatNavbarNotificationLegacy(count) {
+    updateChatNavbarNotification(count);
+}
 </script>
+@endpush
+
+@push('styles')
+<style>
+/* Navigation Icons Standardization */
+.navbar-nav .nav-link i {
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover i {
+    transform: scale(1.1);
+}
+
+/* Golden Bell Icon Styling - Using Bootstrap Icons */
+.notification-bell-icon {
+    font-size: 1.8rem !important;
+    color: #FFD700 !important; /* Golden yellow */
+    text-shadow: 
+        0 0 5px rgba(255, 215, 0, 0.6),
+        1px 1px 2px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+#chatMenuButton:hover .notification-bell-icon {
+    transform: scale(1.1) rotate(15deg);
+    color: #FFA500 !important; /* Slightly more orange on hover */
+    text-shadow: 
+        0 0 10px rgba(255, 215, 0, 0.8),
+        1px 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Red Notification Badge - Matching the image */
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545 !important; /* Red background */
+    color: white !important;
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    border: 2px solid white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    animation: pulse-badge 2s infinite;
+}
+
+/* Bell ring animation */
+@keyframes ring-bell {
+    0%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-15deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-10deg); }
+    50% { transform: rotate(5deg); }
+    60% { transform: rotate(-5deg); }
+    70% { transform: rotate(0deg); }
+}
+
+/* Badge pulse animation */
+@keyframes pulse-badge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Bell notification ring effect */
+.bell-ringing {
+    animation: ring-bell 0.8s ease-in-out;
+}
+
+/* Add subtle glow when notifications are present */
+.has-notifications {
+    animation: glow-bell 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-bell {
+    from {
+        text-shadow: 
+            0 0 5px rgba(255, 215, 0, 0.6),
+            1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    to {
+        text-shadow: 
+            0 0 15px rgba(255, 215, 0, 0.9),
+            1px 1px 3px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* Consistent Icon Styling */
+.nav-link i.bi {
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover i.bi {
+    color: #007bff !important;
+}
+
+/* Settings and User Icons */
+.nav-link i.bi-gear-fill:hover {
+    color: #28a745 !important;
+    transform: rotate(90deg);
+}
+
+.nav-link i.bi-person-circle:hover {
+    color: #007bff !important;
+}
+</style>
 @endpush

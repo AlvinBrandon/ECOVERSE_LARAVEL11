@@ -40,20 +40,20 @@ class NewChatMessage extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $mailMessage = (new MailMessage)
-            ->line('You have a new message in: ' . $this->message->room->name)
-            ->line('From: ' . $this->message->user->name);
+            ->line('🔔 You have a new message in: ' . $this->message->room->name)
+            ->line('💬 From: ' . $this->message->user->name);
         
         // If this is admin feedback, label it as such
         if ($this->message->is_feedback) {
-            $mailMessage->line('ADMIN FEEDBACK:');
+            $mailMessage->line('🔔 ADMIN FEEDBACK:');
         }
         
         // If this is a reply to a message, include the original message
         if ($this->message->isReply() && $this->message->parent) {
-            $mailMessage->line('In response to: "' . Str::limit($this->message->parent->message, 100) . '"');
+            $mailMessage->line('↩️ In response to: "' . Str::limit($this->message->parent->message, 100) . '"');
         }
         
-        $mailMessage->line('Message: ' . $this->message->message)
+        $mailMessage->line('💬 Message: ' . $this->message->message)
             ->action('View Message', url('/chat/history/' . $this->message->room_id))
             ->line('Thank you for using Ecoverse!');
             
@@ -69,11 +69,12 @@ class NewChatMessage extends Notification
     {
         $data = [
             'room_id' => $this->message->room_id,
-            'message' => $this->message->message,
+            'message' => '💬 ' . $this->message->message,
             'sender_id' => $this->message->user_id,
             'sender_name' => $this->message->user->name,
             'timestamp' => $this->message->created_at,
             'is_feedback' => $this->message->is_feedback,
+            'title' => '🔔 New Message from ' . $this->message->user->name,
         ];
         
         return $data;
@@ -89,11 +90,12 @@ class NewChatMessage extends Notification
     {
         $data = [
             'room_id' => $this->message->room_id,
-            'message' => Str::limit($this->message->message, 50),
+            'message' => '💬 ' . Str::limit($this->message->message, 50),
             'sender_id' => $this->message->user_id,
             'sender_name' => $this->message->user->name,
             'timestamp' => $this->message->created_at->diffForHumans(),
             'is_feedback' => $this->message->is_feedback,
+            'title' => '🔔 New Message from ' . $this->message->user->name,
         ];
         
         // Include parent message information if this is a reply

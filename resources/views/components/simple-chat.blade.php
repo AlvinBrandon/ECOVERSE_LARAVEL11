@@ -163,8 +163,8 @@ function initializeSimpleChat(config) {
         window.Echo.private(`App.Models.User.${config.userId}`)
             .notification((notification) => {
                 if (notification.type === 'App\\Notifications\\NewChatMessage') {
-                    // Show notification
-                    showBrowserNotification('New Message', notification.message);
+                    // Show notification with bell icon
+                    showBrowserNotification('🔔 New Message', '💬 ' + notification.message);
                     
                     // Play sound
                     if (notificationSound) {

@@ -370,6 +370,37 @@
             
             <form action="{{ route('chat.startChat') }}" method="POST" class="mt-4" enctype="multipart/form-data">
               @csrf
+              
+              <!-- Recipient Selection Dropdown -->
+              @if($allowedUsers->count() > 0)
+              <div class="mb-3">
+                <label for="recipient" class="form-label">
+                  <i class="bi bi-person me-1"></i>Send to
+                </label>
+                <select id="recipient" name="recipient_id" class="form-select" required>
+                  <option value="">Choose who to chat with...</option>
+                  @foreach($allowedUsers as $allowedUser)
+                    <option value="{{ $allowedUser->id }}" data-role="{{ $allowedUser->getCurrentRole() }}">
+                      {{ $allowedUser->name }} ({{ ucfirst($allowedUser->getCurrentRole()) }})
+                      @if($allowedUser->email)
+                        - {{ $allowedUser->email }}
+                      @endif
+                    </option>
+                  @endforeach
+                </select>
+                <div class="form-text">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Based on your role ({{ ucfirst($user->getCurrentRole()) }}), you can chat with the users listed above
+                </div>
+              </div>
+              @else
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>No Chat Partners Available</strong><br>
+                Based on your role ({{ ucfirst($user->getCurrentRole()) }}), there are currently no users available for direct chat.
+              </div>
+              @endif
+              
               <div class="mb-3">
                 <label for="subject" class="form-label">
                   <i class="bi bi-tag me-1"></i>Subject
@@ -379,6 +410,9 @@
                   <option value="order">📦 Order Issues</option>
                   <option value="product">🛒 Product Questions</option>
                   <option value="account">👤 Account Help</option>
+                  <option value="technical">🔧 Technical Support</option>
+                  <option value="billing">💳 Billing Questions</option>
+                  <option value="general">💬 General Inquiry</option>
                   <option value="other">❓ Other</option>
                 </select>
               </div>
@@ -410,7 +444,7 @@
               </div>
               
               <div class="d-grid">
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-success" id="submitBtn">
                   <i class="bi bi-send me-2"></i> Start Chat Conversation
                 </button>
               </div>
@@ -421,6 +455,166 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const recipientSelect = document.getElementById('recipient');
+    const subjectSelect = document.getElementById('subject');
+    const messageTextarea = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Role-specific message templates
+    const messageTemplates = {
+        'admin': {
+            'order': 'Hello! I need assistance with an order-related matter. ',
+            'product': 'Hi! I have questions about product availability or specifications. ',
+            'technical': 'Hello! I need technical support with system issues. ',
+            'general': 'Hello! I wanted to discuss '
+        },
+        'supplier': {
+            'product': 'Hello! I have updates about product inventory or specifications. ',
+            'order': 'Hi! I need to discuss order fulfillment or delivery schedules. ',
+            'general': 'Hello! I wanted to update you about '
+        },
+        'wholesaler': {
+            'order': 'Hello! I need assistance with bulk order processing. ',
+            'product': 'Hi! I have questions about product pricing or availability. ',
+            'billing': 'Hello! I need to discuss billing or payment terms. ',
+            'general': 'Hello! I wanted to discuss '
+        },
+        'retailer': {
+            'order': 'Hello! I need help with customer order issues. ',
+            'product': 'Hi! I have customer questions about products. ',
+            'account': 'Hello! I need assistance with account management. ',
+            'general': 'Hello! I wanted to ask about '
+        },
+        'customer': {
+            'order': 'Hello! I have a question about my order. ',
+            'product': 'Hi! I need information about a product. ',
+            'account': 'Hello! I need help with my account. ',
+            'billing': 'Hi! I have a billing question. ',
+            'general': 'Hello! I need assistance with '
+        },
+        'staff': {
+            'technical': 'Hello! I need to report or discuss a technical issue. ',
+            'general': 'Hi! I wanted to coordinate about ',
+            'order': 'Hello! I need to discuss order processing. '
+        }
+    };
+    
+    // Role-specific subject suggestions
+    const roleSubjects = {
+        'admin': ['technical', 'general', 'order', 'product'],
+        'supplier': ['product', 'order', 'technical', 'general'],
+        'wholesaler': ['order', 'product', 'billing', 'general'],
+        'retailer': ['order', 'product', 'account', 'general'],
+        'customer': ['order', 'product', 'account', 'billing', 'general'],
+        'staff': ['technical', 'general', 'order']
+    };
+    
+    // Update message template when recipient or subject changes
+    function updateMessageTemplate() {
+        const selectedRecipient = recipientSelect.options[recipientSelect.selectedIndex];
+        const selectedSubject = subjectSelect.value;
+        
+        if (selectedRecipient && selectedRecipient.dataset.role && selectedSubject) {
+            const recipientRole = selectedRecipient.dataset.role;
+            const currentUserRole = '{{ $user->getCurrentRole() }}';
+            
+            if (messageTemplates[currentUserRole] && messageTemplates[currentUserRole][selectedSubject]) {
+                const template = messageTemplates[currentUserRole][selectedSubject];
+                if (messageTextarea.value.trim() === '' || messageTextarea.dataset.isTemplate === 'true') {
+                    messageTextarea.value = template;
+                    messageTextarea.dataset.isTemplate = 'true';
+                    messageTextarea.focus();
+                    messageTextarea.setSelectionRange(template.length, template.length);
+                }
+            }
+        }
+    }
+    
+    // Update subject options based on recipient role
+    function updateSubjectOptions() {
+        const selectedRecipient = recipientSelect.options[recipientSelect.selectedIndex];
+        
+        if (selectedRecipient && selectedRecipient.dataset.role) {
+            const recipientRole = selectedRecipient.dataset.role;
+            const currentUserRole = '{{ $user->getCurrentRole() }}';
+            
+            // Highlight relevant subjects
+            Array.from(subjectSelect.options).forEach(option => {
+                if (option.value && roleSubjects[currentUserRole] && roleSubjects[currentUserRole].includes(option.value)) {
+                    option.style.fontWeight = 'bold';
+                } else {
+                    option.style.fontWeight = 'normal';
+                }
+            });
+            
+            // Update button text to show recipient
+            submitBtn.innerHTML = `<i class="bi bi-send me-2"></i>Send to ${selectedRecipient.text.split(' (')[0]}`;
+        } else {
+            submitBtn.innerHTML = `<i class="bi bi-send me-2"></i>Start Chat Conversation`;
+        }
+    }
+    
+    // Clear template flag when user types
+    messageTextarea.addEventListener('input', function() {
+        if (this.dataset.isTemplate === 'true') {
+            this.dataset.isTemplate = 'false';
+        }
+    });
+    
+    // Event listeners
+    if (recipientSelect) {
+        recipientSelect.addEventListener('change', function() {
+            updateSubjectOptions();
+            updateMessageTemplate();
+        });
+    }
+    
+    if (subjectSelect) {
+        subjectSelect.addEventListener('change', updateMessageTemplate);
+    }
+    
+    // Form validation enhancement
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const recipientSelected = recipientSelect && recipientSelect.value;
+        const subjectSelected = subjectSelect.value;
+        const messageEntered = messageTextarea.value.trim();
+        
+        if (!recipientSelected) {
+            e.preventDefault();
+            alert('Please select who you want to chat with.');
+            recipientSelect.focus();
+            return;
+        }
+        
+        if (!subjectSelected) {
+            e.preventDefault();
+            alert('Please select a subject for your conversation.');
+            subjectSelect.focus();
+            return;
+        }
+        
+        if (!messageEntered) {
+            e.preventDefault();
+            alert('Please enter a message to start the conversation.');
+            messageTextarea.focus();
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Starting Chat...';
+        submitBtn.disabled = true;
+    });
+    
+    // Auto-focus recipient selection
+    if (recipientSelect && recipientSelect.options.length > 1) {
+        recipientSelect.focus();
+    }
+});
+</script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection

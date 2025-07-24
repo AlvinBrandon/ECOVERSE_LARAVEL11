@@ -518,7 +518,7 @@
                                         <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong
                                                 class="text-dark">Full Name:</strong> &nbsp; {{ Auth::user()->name }}</li>
                                         <li class="list-group-item border-0 ps-0 text-sm"><strong
-                                                class="text-dark">Phone:</strong> &nbsp; {{ Auth::user()->phone ?? '(+256) 123 456 789' }}</li>
+                                                class="text-dark">Phone:</strong> &nbsp; {{ Auth::user()->phone ?? '0791199978' }}</li>
                                         <li class="list-group-item border-0 ps-0 text-sm"><strong
                                                 class="text-dark">Email:</strong> &nbsp; {{ Auth::user()->email }}</li>
                                         <li class="list-group-item border-0 ps-0 text-sm"><strong
@@ -757,7 +757,7 @@
                   <strong>Full Name:</strong> <span class="ms-auto">{{ Auth::user()->name }}</span>
                 </li>
                 <li class="list-group-item profile-detail">
-                  <strong>Phone:</strong> <span class="ms-auto">{{ Auth::user()->phone ?? '(+256) 123 456 789' }}</span>
+                  <strong>Phone:</strong> <span class="ms-auto">{{ Auth::user()->phone ?? '0791199978' }}</span>
                 </li>
                 <li class="list-group-item profile-detail">
                   <strong>Email:</strong> <span class="ms-auto">{{ Auth::user()->email }}</span>
