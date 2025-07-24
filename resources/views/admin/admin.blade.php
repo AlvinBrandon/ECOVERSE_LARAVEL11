@@ -27,12 +27,12 @@
 @endpush
 
 @section('content')
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <h1 class="fw-bold text-primary mb-0"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h1>
+    <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary mb-0"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h1>
         <form action="{{ route('logout') }}" method="POST" class="mb-0">
             @csrf
-            <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt me-1"></i> Sign Out</button>
+            <button type="submit" class="btn btn-danger"><i class="bi bi-box-arrow-right me-1"></i> Sign Out</button>
         </form>
     </div>
 </div>
@@ -40,8 +40,8 @@
         <div class="col-md-3">
             <div class="card stat-card shadow border-0 bg-gradient-info text-white h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-users fa-2x mb-2"></i>
-                    <h5 class="card-title">Total Users</h5>
+                    <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Total Users</h5>
                     <p class="card-text display-5 fw-bold">{{ $totalUsers ?? '--' }}</p>
                 </div>
             </div>
@@ -49,8 +49,8 @@
         <div class="col-md-3">
             <div class="card stat-card shadow border-0 bg-gradient-success text-white h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-boxes fa-2x mb-2"></i>
-                    <h5 class="card-title">Total Products</h5>
+                    <i class="bi bi-boxes" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Total Products</h5>
                     <p class="card-text display-5 fw-bold">{{ $totalProducts ?? '--' }}</p>
                 </div>
             </div> 
@@ -58,8 +58,8 @@
         <div class="col-md-3">
             <div class="card stat-card shadow border-0 bg-gradient-warning text-dark h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-store fa-2x mb-2"></i>
-                    <h5 class="card-title">Total Vendors</h5>
+                    <i class="bi bi-shop" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Total Vendors</h5>
                     <p class="card-text display-5 fw-bold">{{ $totalVendors ?? '--' }}</p>
                 </div>
             </div>
@@ -67,8 +67,8 @@
         <div class="col-md-3">
             <div class="card stat-card shadow border-0 bg-gradient-primary text-white h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
-                    <h5 class="card-title">Total Orders</h5>
+                    <i class="bi bi-cart-check-fill" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Total Orders</h5>
                     <p class="card-text display-5 fw-bold">{{ $totalOrders ?? '--' }}</p>
                 </div>
             </div>
@@ -78,8 +78,8 @@
         <div class="col-md-6">
             <div class="card stat-card shadow border-0 bg-gradient-secondary text-white h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                    <h5 class="card-title">Total Revenue</h5>
+                    <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Total Revenue</h5>
                     <p class="card-text display-5 fw-bold">UGX {{ number_format($totalRevenue ?? 0, 2) }}</p>
                 </div>
             </div>
@@ -87,7 +87,7 @@
         <div class="col-md-6">
             <div class="card stat-card shadow border-0 h-100">
                 <div class="card-header bg-light fw-bold">
-                    <i class="fas fa-chart-line me-2 text-primary"></i>User Registrations (Last 7 Days)
+                    <i class="bi bi-graph-up-arrow me-2 text-primary"></i>User Registrations (Last 7 Days)
                 </div>
                 <div class="card-body">
                     <canvas id="userRegistrationsChart" height="100"></canvas>
@@ -99,7 +99,7 @@
         <div class="col-md-6">
             <div class="card stat-card shadow border-0 h-100">
                 <div class="card-header bg-light fw-bold">
-                    <i class="fas fa-chart-bar me-2 text-danger"></i>Revenue Trend (Last 7 Days)
+                    <i class="bi bi-bar-chart-fill me-2 text-danger"></i>Revenue Trend (Last 7 Days)
                 </div>
                 <div class="card-body">
                     <canvas id="revenueTrendChart" height="100"></canvas>
@@ -109,7 +109,7 @@
         <div class="col-md-6">
             <div class="card stat-card shadow border-0 h-100">
                 <div class="card-header bg-light fw-bold">
-                    <i class="fas fa-receipt me-2 text-success"></i>Recent Orders
+                    <i class="bi bi-receipt me-2 text-success"></i>Recent Orders
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

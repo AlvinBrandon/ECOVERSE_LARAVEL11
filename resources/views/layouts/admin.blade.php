@@ -48,28 +48,28 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" 
                                href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-home"></i>
+                                <i class="bi bi-house-fill me-2"></i>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users') ? 'active' : '' }}" 
                                href="{{ route('admin.users.index') }}">
-                                <i class="fas fa-users"></i>
+                                <i class="bi bi-people-fill me-2"></i>
                                 Users
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.predictions.dashboard') ? 'active' : '' }}" 
                                href="{{ route('admin.predictions.dashboard') }}">
-                                <i class="fas fa-chart-line"></i>
+                                <i class="bi bi-graph-up-arrow me-2"></i>
                                 Sales Predictions
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales-forecast') ? 'active' : '' }}" 
                                href="{{ route('admin.sales-forecast') }}">
-                                <i class="fas fa-chart-bar"></i>
+                                <i class="bi bi-bar-chart-fill me-2"></i>
                                 Sales Forecast
                             </a>
                         </li>
@@ -80,7 +80,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn btn-danger w-100">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
                             </button>
                         </form>
                     </div>

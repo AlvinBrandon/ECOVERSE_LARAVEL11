@@ -340,6 +340,19 @@
             <i class="bi bi-shield-check me-1"></i>Admin View
           </span>
         @endif
+        
+        @php
+            // Check if user can chat with multiple types of users
+            $userRole = auth()->user()->getCurrentRole();
+            $multipleChats = in_array($userRole, ['admin', 'wholesaler', 'retailer', 'staff']);
+        @endphp
+        
+        @if($multipleChats)
+          <a href="{{ route('chat.selectRecipient') }}" class="btn btn-primary">
+            <i class="bi bi-chat-dots me-1"></i>Quick Message
+          </a>
+        @endif
+        
         <a href="{{ route('dashboard') }}" class="btn">
           <i class="bi bi-house-door me-1"></i>Home
         </a>
@@ -359,8 +372,18 @@
             <h5>Chat Options</h5>
             <ul class="nav flex-column">
               <li class="nav-item">
+                <a href="{{ route('chat.selectUser') }}" class="nav-link">
+                  <i class="bi bi-people me-2"></i> Message User
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ route('chat.selectRecipient') }}" class="nav-link">
+                  <i class="bi bi-chat-dots me-2"></i> Quick Message
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{ route('chat.start') }}" class="nav-link">
-                  <i class="bi bi-plus-circle me-2"></i> Start New Chat
+                  <i class="bi bi-plus-circle me-2"></i> Support Chat
                 </a>
               </li>
               <li class="nav-item">

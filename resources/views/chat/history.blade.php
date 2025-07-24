@@ -604,6 +604,22 @@
                         </span>
                     @endif
                 @endif
+                
+                @php
+                    // Check if user can chat with multiple types of users
+                    $userRole = auth()->user()->getCurrentRole();
+                    $multipleChats = in_array($userRole, ['admin', 'wholesaler', 'retailer', 'staff']);
+                @endphp
+                
+                @if($multipleChats)
+                    <a href="{{ route('chat.selectRecipient') }}" class="btn btn-primary">
+                        <i class="bi bi-chat-dots me-1"></i>New Message
+                    </a>
+                @endif
+                
+                <a href="{{ route('chat.index') }}" class="btn">
+                    <i class="bi bi-arrow-left me-1"></i>Chat List
+                </a>
                 <a href="{{ route('dashboard') }}" class="btn">
                     <i class="bi bi-house-door me-1"></i>Home
                 </a>

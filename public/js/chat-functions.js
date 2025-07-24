@@ -45,7 +45,9 @@ function listenForMessages(userId, roomId) {
                     
                     // Show browser notification if not in the same room
                     if (notification.room_id != roomId) {
-                        showBrowserNotification(notification.title, notification.message);
+                        const title = notification.title || '🔔 New Message';
+                        const message = notification.message || 'You have a new message';
+                        showBrowserNotification(title, message);
                     }
                 }
             });
@@ -82,8 +84,8 @@ function listenForMessages(userId, roomId) {
 // Display browser notification
 function showBrowserNotification(title, message) {
     if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification(title, {
-            body: message,
+        const notification = new Notification('🔔 ' + title, {
+            body: '💬 ' + message,
             icon: '/favicon.ico'
         });
         

@@ -138,12 +138,12 @@
               </a>
             </div>
             <div class="col-md-4 mb-3">
-              <a href="tel:+256123456789" class="contact-method text-decoration-none">
+              <a href="tel:0791199978" class="contact-method text-decoration-none">
                 <div class="contact-icon">
                   <i class="bi bi-telephone"></i>
                 </div>
                 <h6>Phone Support</h6>
-                <p class="text-muted mb-2">+256 123 456 789</p>
+                <p class="text-muted mb-2">0791199978</p>
                 <small class="text-muted">Mon-Fri, 9AM-6PM</small>
               </a>
             </div>

@@ -77,7 +77,11 @@ Route::middleware(['auth'])->prefix('chat')->name('chat.')->group(function () {
     Route::get('/', [ChatController::class, 'index'])->name('index');
     Route::get('/history/{roomId?}', [ChatController::class, 'history'])->name('history');
     Route::get('/start', [ChatController::class, 'start'])->name('start');
+    Route::get('/select-user', [ChatController::class, 'selectUser'])->name('selectUser');
+    Route::get('/select-recipient', [ChatController::class, 'selectRecipient'])->name('selectRecipient');
     Route::post('/start', [ChatController::class, 'startChat'])->name('startChat');
+    Route::post('/start-direct', [ChatController::class, 'startDirectChat'])->name('startDirectChat');
+    Route::post('/send-quick-message', [ChatController::class, 'sendQuickMessage'])->name('send-quick-message');
     Route::post('/room', [ChatController::class, 'createRoom'])->name('createRoom');
     Route::post('/message', [ChatController::class, 'sendMessage'])->name('sendMessage');
     Route::post('/message/reply', [ChatController::class, 'sendMessage'])->name('replyToMessage');
@@ -278,6 +282,10 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
         'update' => 'admin.users.update',
         'destroy' => 'admin.users.destroy',
     ]);
+    
+    // Email verification routes for admin user management
+    Route::post('/users/{user}/verify-email', [App\Http\Controllers\AdminUserController::class, 'verifyEmail'])->name('admin.users.verify-email');
+    Route::post('/users/{user}/send-verification-email', [App\Http\Controllers\AdminUserController::class, 'sendVerificationEmail'])->name('admin.users.send-verification-email');
 });
 
 // Supplier routes for purchase orders

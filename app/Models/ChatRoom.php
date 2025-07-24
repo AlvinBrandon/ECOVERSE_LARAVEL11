@@ -29,7 +29,7 @@ class ChatRoom extends Model
     }
     
     /**
-     * Check if a user has access to this room (either as a member or as an admin)
+     * Check if a user has access to this room based on role restrictions
      * 
      * @param \App\Models\User|int $user User model or user ID
      * @return bool
@@ -38,10 +38,12 @@ class ChatRoom extends Model
     {
         if (is_numeric($user)) {
             $userId = $user;
-            $userRole = User::find($userId)->role ?? null;
+            $userModel = User::find($userId);
+            $userRole = $userModel ? $userModel->getCurrentRole() : null;
         } else {
             $userId = $user->id;
-            $userRole = $user->role;
+            $userRole = $user->getCurrentRole();
+            $userModel = $user;
         }
         
         // Admins always have access to all rooms
@@ -50,7 +52,56 @@ class ChatRoom extends Model
         }
         
         // Check if user is a member of the room
-        return $this->users()->where('users.id', $userId)->exists();
+        $isMember = $this->users()->where('users.id', $userId)->exists();
+        
+        if (!$isMember) {
+            return false;
+        }
+        
+        // Additional role-based validation: ensure all room members can interact
+        $roomUsers = $this->users()->get();
+        foreach ($roomUsers as $roomUser) {
+            if ($roomUser->id !== $userId && !$this->canUsersChat($userModel, $roomUser)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Check if two users can chat based on role interaction rules
+     *
+     * @param  \App\Models\User  $user1
+     * @param  \App\Models\User  $user2
+     * @return bool
+     */
+    private function canUsersChat($user1, $user2)
+    {
+        $role1 = $user1->getCurrentRole();
+        $role2 = $user2->getCurrentRole();
+        
+        // Define allowed interactions (bidirectional)
+        $allowedInteractions = [
+            'admin' => ['supplier', 'wholesaler', 'staff'],
+            'supplier' => ['admin'],
+            'wholesaler' => ['admin', 'retailer', 'staff'],
+            'retailer' => ['customer', 'wholesaler'],
+            'customer' => ['retailer'],
+            'staff' => ['admin', 'wholesaler']
+        ];
+        
+        // Check if role1 can chat with role2
+        if (isset($allowedInteractions[$role1]) && in_array($role2, $allowedInteractions[$role1])) {
+            return true;
+        }
+        
+        // Check if role2 can chat with role1 (bidirectional check)
+        if (isset($allowedInteractions[$role2]) && in_array($role1, $allowedInteractions[$role2])) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**

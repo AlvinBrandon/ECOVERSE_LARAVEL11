@@ -36,9 +36,10 @@ function checkForUnreadMessages() {
                 
                 // Display a notification if browser supports it
                 if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('New Message', {
-                        body: `You have ${data.unread_count} unread message(s)`,
-                        icon: '/favicon.ico'
+                    new Notification('🔔 New Message', {
+                        body: `💬 You have ${data.unread_count} unread message(s)`,
+                        icon: '/favicon.ico',
+                        badge: '/favicon.ico'
                     });
                 }
             }
@@ -49,24 +50,43 @@ function checkForUnreadMessages() {
 }
 
 /**
- * Update the chat notification count in the UI
+ * Update the chat notification count in the UI - Golden Bell Version
  * @param {number} count - The new count to display
  * @param {boolean} set - Whether to set the count (true) or increment it (false)
  */
 function updateChatNotificationCount(count, set = false) {
-    const chatBadge = document.querySelector('#chatMenuButton .badge');
+    const chatBadge = document.querySelector('#chatMenuButton .notification-badge');
+    const bellIcon = document.querySelector('#chatMenuButton .notification-bell-icon');
     
-    if (chatBadge) {
+    if (chatBadge && bellIcon) {
         const currentCount = parseInt(chatBadge.textContent.trim()) || 0;
-        chatBadge.textContent = set ? count : currentCount + count;
-        chatBadge.classList.remove('d-none');
-    } else {
+        const newCount = set ? count : currentCount + count;
+        
+        chatBadge.textContent = newCount;
+        
+        if (newCount > 0) {
+            chatBadge.style.display = 'flex';
+            
+            // Add golden glow effect
+            bellIcon.classList.add('has-notifications');
+            
+            // Ring the bell animation
+            bellIcon.classList.add('bell-ringing');
+            setTimeout(() => {
+                bellIcon.classList.remove('bell-ringing');
+            }, 800);
+        } else {
+            chatBadge.style.display = 'none';
+            bellIcon.classList.remove('has-notifications');
+        }
+    } else if (count > 0) {
         // Create new badge if it doesn't exist
         const chatButton = document.querySelector('#chatMenuButton');
         if (chatButton) {
             const badge = document.createElement('span');
-            badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+            badge.className = 'notification-badge';
             badge.textContent = count;
+            badge.style.display = 'flex';
             
             const visually_hidden = document.createElement('span');
             visually_hidden.className = 'visually-hidden';
@@ -74,6 +94,16 @@ function updateChatNotificationCount(count, set = false) {
             
             badge.appendChild(visually_hidden);
             chatButton.appendChild(badge);
+            
+            // Add bell effects
+            if (bellIcon) {
+                bellIcon.classList.add('has-notifications');
+                bellIcon.classList.add('bell-ringing');
+                
+                setTimeout(() => {
+                    bellIcon.classList.remove('bell-ringing');
+                }, 800);
+            }
         }
     }
 }
