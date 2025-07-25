@@ -83,6 +83,12 @@ class SessionsController extends Controller
     public function destroy()
     {
         Auth::logout();
+        
+        // Invalidate the entire session for security
+        request()->session()->invalidate();
+        
+        // Regenerate CSRF token
+        request()->session()->regenerateToken();
 
         return redirect('/sign-in');
     }

@@ -498,6 +498,39 @@
         // Check role periodically (every 10 seconds)
         setInterval(checkRoleChange, 10000);
     </script>
+
+    <!-- Back Button Protection for All Authenticated Users -->
+    <script>
+        // Prevent back button access after logout
+        window.addEventListener('pageshow', function(event) {
+            // Check if the page is being loaded from cache (back button)
+            if (event.persisted) {
+                // Force page reload to check authentication
+                window.location.reload();
+            }
+        });
+
+        // Disable back button for authenticated pages
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function() {
+            // Check if user is still authenticated by making a quick API call
+            fetch('{{ route("auth.check") }}', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    // User is not authenticated, redirect to login
+                    window.location.href = '{{ route("login") }}';
+                } else {
+                    // User is authenticated, allow navigation
+                    history.pushState(null, null, location.href);
+                }
+            }).catch(() => {
+                // Error occurred, redirect to login for safety
+                window.location.href = '{{ route("login") }}';
+            });
+        });
+    </script>
     @endauth
 </body>
 </html>

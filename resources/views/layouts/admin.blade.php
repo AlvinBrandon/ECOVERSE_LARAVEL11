@@ -111,6 +111,32 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Back Button Protection -->
+    <script>
+        // Prevent back button access after logout
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function() {
+            fetch('{{ route("auth.check") }}', {
+                method: 'GET',
+                credentials: 'same-origin'
+            }).then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '{{ route("login") }}';
+                } else {
+                    history.pushState(null, null, location.href);
+                }
+            }).catch(() => {
+                window.location.href = '{{ route("login") }}';
+            });
+        });
+    </script>
+    
     <!-- Custom Scripts -->
     @stack('scripts')
 </body>

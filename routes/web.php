@@ -22,6 +22,11 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\EcoPointController;
 // use App\Http\Controllers\OrderController;
 
+// Authentication check route for JavaScript
+Route::middleware(['auth'])->get('/auth-check', function () {
+    return response()->json(['authenticated' => true]);
+})->name('auth.check');
+
 // Admin dashboard route with both 'auth' and 'admin' middleware
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
